@@ -14,13 +14,11 @@ public class ContentManager {
 
 	private Path _dataPath;
 	private List<String> _data;
-	private HashMap<String, Scene> _scenes;
 	private HashMap<String, String> _messages;
 	
 	public ContentManager() {
 		_dataPath = null;
 		_data = null;
-		_scenes = new HashMap<String, Scene>();
 		_messages = new HashMap<String, String>();
 	}
 
@@ -30,10 +28,6 @@ public class ContentManager {
 
 	public List<String> getData() {
 		return _data;
-	}
-	
-	public HashMap<String, Scene> getScenes() {
-		return _scenes;
 	}
 	
 	public HashMap<String, String> getMessages() {
@@ -57,7 +51,8 @@ public class ContentManager {
 		return false;
 	}
 
-	public boolean parseData() {
+	public HashMap<String, Scene> parseScenesSource() {
+		HashMap<String, Scene> scenes = new HashMap<String, Scene>();
 		Scene currentScene = null;
 		CommandGroup currentGroup = null;
 		
@@ -85,7 +80,7 @@ public class ContentManager {
 					}
 					String sceneName = lineParts[1];
 					// Throw on invalid keys (empty/blank/conflicting)
-					if (sceneName.isBlank() || _scenes.containsKey(sceneName)) {
+					if (sceneName.isBlank() || scenes.containsKey(sceneName)) {
 						throw new MalformedResourceException();
 					}
 					currentScene = new Scene(sceneName);
@@ -95,7 +90,7 @@ public class ContentManager {
 					if (currentScene == null) {
 						throw new MalformedResourceException();
 					}
-					_scenes.put(currentScene.getName(), currentScene);
+					scenes.put(currentScene.getName(), currentScene);
 					currentScene = null;
 					break;
 				// Command group start marker
@@ -187,10 +182,10 @@ public class ContentManager {
 			if (App.debugMode) {
 				e.printStackTrace();
 			}
-			return false;
+			return null;
 		}
 		
-		return true;
+		return scenes;
 	}
 	
 }

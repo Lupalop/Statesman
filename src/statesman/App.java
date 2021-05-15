@@ -13,7 +13,7 @@ public class App {
 		
 		Content.setDataPath("./data.txt");
 		if (Content.tryLoadData()) {
-			Content.parseData();
+			Interpreter.setScenes(Content.parseScenesSource());
 			Interpreter.startParser();
 		} else {
 			System.out.println("Data file is missing!");

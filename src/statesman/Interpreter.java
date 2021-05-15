@@ -6,6 +6,7 @@ import statesman.actions.*;
 public class Interpreter {
 	
 	private static Scanner _scanner;
+	private static HashMap<String, Scene> _scenes;
 	private static Scene _currentScene;
 	private static boolean[] _switches;
 	private static boolean _isPlaying = true;
@@ -13,6 +14,8 @@ public class Interpreter {
 	private static HashMap<String, Command> _commands;
 
 	static {
+		_scenes = new HashMap<String, Scene>();
+		
 		_commands = new HashMap<String, Command>();
 		// XXX: manually input IDs of new commands here!
 		_commands.put(PrintCommand.Id, new PrintCommand());
@@ -52,6 +55,10 @@ public class Interpreter {
 		return _switches;
 	}
 
+	public static HashMap<String, Scene> getScenes() {
+		return _scenes;
+	}
+	
 	public static Scene getCurrentScene() {
 		return _currentScene;
 	}
@@ -60,17 +67,21 @@ public class Interpreter {
 		return _scanner;
 	}
 
-	public static void setScanner(Scanner _scanner) {
-		Interpreter._scanner = _scanner;
+	public static void setScanner(Scanner scanner) {
+		_scanner = scanner;
 	}
 
 	public static void setCurrentScene(Scene scene) {
 		_currentScene = scene;
 	}
+	
+	public static void setScenes(HashMap<String, Scene> scenes) {
+		_scenes = scenes;
+	}
 
 	public static void startParser() {
 		// The first scene is the initial scene
-		_currentScene = App.Content.getScenes().get("initial");
+		_currentScene = getScenes().get("initial");
 		
 		String currentKeywords = "";
 		
