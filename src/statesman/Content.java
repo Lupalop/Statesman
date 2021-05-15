@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,12 +13,11 @@ public class Content {
 
     private static Path _dataPath;
     private static List<String> _data;
-    private static HashMap<String, String> _messages;
+    private static ContentTuple _source;
 
     static {
         _dataPath = null;
         _data = null;
-        _messages = new HashMap<String, String>();
     }
 
     public static boolean tryLoadData() {
@@ -35,8 +33,8 @@ public class Content {
         return false;
     }
 
-    public static HashMap<String, Scene> parseScenesSource() {
-        HashMap<String, Scene> scenes = new HashMap<String, Scene>();
+    public static ContentTuple getSource() {
+        _source = new ContentTuple();
         Scene currentScene = null;
         CommandGroup currentGroup = null;
 
@@ -63,7 +61,7 @@ public class Content {
                     }
                     String sceneName = lineParts[1];
                     // Throw on invalid keys (empty/blank/conflicting)
-                    if (sceneName.isBlank() || scenes.containsKey(sceneName)) {
+                    if (sceneName.isBlank() || _source.getScenes().containsKey(sceneName)) {
                         throw new MalformedResourceException();
                     }
                     currentScene = new Scene(sceneName);
@@ -73,7 +71,7 @@ public class Content {
                     if (currentScene == null) {
                         throw new MalformedResourceException();
                     }
-                    scenes.put(currentScene.getName(), currentScene);
+                    _source.getScenes().put(currentScene.getName(), currentScene);
                     currentScene = null;
                     break;
                 // Command group start marker
@@ -149,11 +147,11 @@ public class Content {
                     String value = lineParts[2];
 
                     // Throw on invalid keys (empty/blank/conflicting)
-                    if (key.isBlank() || _messages.containsKey(key)) {
+                    if (key.isBlank() || _source.getMessages().containsKey(key)) {
                         throw new MalformedResourceException();
                     }
 
-                    _messages.put(key, value);
+                    _source.getMessages().put(key, value);
                     break;
                 // Unknown tag
                 default:
@@ -167,7 +165,7 @@ public class Content {
             return null;
         }
 
-        return scenes;
+        return _source;
     }
 
     public static Path getDataPath() {
@@ -180,10 +178,6 @@ public class Content {
 
     public static List<String> getData() {
         return _data;
-    }
-
-    public static HashMap<String, String> getMessages() {
-        return _messages;
     }
 
 }

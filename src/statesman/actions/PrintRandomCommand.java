@@ -1,27 +1,26 @@
 package statesman.actions;
 
 import java.util.Random;
-import statesman.Content;
+import statesman.Interpreter;
 import statesman.Scene;
 
 public class PrintRandomCommand implements Command {
 
     public static final String Id = "printr";
 
+    private boolean _initialized;
     private String[] _messages;
     private Random _random;
 
     public PrintRandomCommand() {
+        _initialized = false;
         _messages = null;
         _random = new Random();
     }
 
     public PrintRandomCommand(String[] messages) {
         this();
-        _messages = new String[messages.length];
-        for (int i = 0; i < messages.length; i++) {
-            _messages[i] = Content.getMessages().getOrDefault(messages[i], messages[i]);
-        }
+        _messages = messages;
     }
 
     @Override
@@ -41,6 +40,13 @@ public class PrintRandomCommand implements Command {
 
     @Override
     public void execute() {
+        if (!_initialized) {
+            for (int i = 0; i < _messages.length; i++) {
+                _messages[i] = Interpreter.getSource().getMessages().getOrDefault(_messages[i], _messages[i]);
+            }
+            _initialized = true;
+        }
+
         int i = _random.nextInt(_messages.length);
         System.out.printf(_messages[i] + "%n");
     }

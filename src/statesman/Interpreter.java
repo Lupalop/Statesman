@@ -9,7 +9,7 @@ public class Interpreter {
     
     private static Scanner _scanner;
     private static HashMap<String, Command> _commands;
-    private static HashMap<String, Scene> _scenes;
+    private static ContentTuple _source;
     private static Scene _currentScene;
     private static boolean[] _switches;
     private static boolean _isRunning = false;
@@ -28,7 +28,7 @@ public class Interpreter {
         _commands.put(ConditionalJumpCommand.Id, new ConditionalJumpCommand());
         _commands.put(SetSwitchCommand.Id, new SetSwitchCommand());
 
-        _scenes = new HashMap<String, Scene>();
+        _source = null;
         _currentScene = null;
         _switches = new boolean[switchSize];
         Arrays.fill(_switches, false);
@@ -53,19 +53,25 @@ public class Interpreter {
             System.out.println("The interpreter is already running.");
             return;
         }
-        _isRunning = true;
         
-        Scene initialScene = getScenes().get("initial");
+        if (_source == null) {
+            System.out.println("Source is missing.");
+            return;
+        }
+        
+        Scene initialScene = _source.getScenes().get("initial");
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");
             return;
         }
         _currentScene = initialScene;
+        
+        _isRunning = true;
 
         while (_isRunning) {
             // FIXME: static'd
             if (!_shownIntro) {
-                System.out.printf(Content.getMessages().get("0"));
+                System.out.printf(_source.getMessages().get("0"));
                 _shownIntro = true;
             }
 
@@ -99,12 +105,12 @@ public class Interpreter {
         return _commands;
     }
 
-    public static HashMap<String, Scene> getScenes() {
-        return _scenes;
+    public static ContentTuple getSource() {
+        return _source;
     }
-
-    public static void setScenes(HashMap<String, Scene> scenes) {
-        _scenes = scenes;
+    
+    public static void setSource(ContentTuple source) {
+        _source = source;
     }
 
     public static Scene getCurrentScene() {

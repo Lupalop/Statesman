@@ -8,9 +8,11 @@ public class SceneCommand implements Command {
     public static final String Id = "scene";
 
     private String _targetScene;
+    private boolean _hasKey;
 
     public SceneCommand() {
         _targetScene = "";
+        _hasKey = false;
     }
 
     public SceneCommand(String targetScene) {
@@ -18,6 +20,7 @@ public class SceneCommand implements Command {
             throw new IllegalArgumentException();
         }
         _targetScene = targetScene;
+        _hasKey = false;
     }
 
     @Override
@@ -35,8 +38,9 @@ public class SceneCommand implements Command {
 
     @Override
     public void execute() {
-        if (Interpreter.getScenes().containsKey(_targetScene)) {
-            Interpreter.setCurrentScene(Interpreter.getScenes().get(_targetScene));
+        if (_hasKey || Interpreter.getSource().getScenes().containsKey(_targetScene)) {
+            Interpreter.setCurrentScene(Interpreter.getSource().getScenes().get(_targetScene));
+            _hasKey = true;
         }
     }
 

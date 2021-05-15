@@ -1,35 +1,39 @@
 package statesman.actions;
 
-import statesman.Content;
+import statesman.Interpreter;
 import statesman.Scene;
 
 public class PrintCommand implements Command {
 
     public static final String Id = "print";
 
+    private boolean _initialized;
     private String _message;
 
     public PrintCommand() {
-        _message = "";
+        _initialized = false;
+        _message = null;
     }
 
     public PrintCommand(String message) {
+        this();
         _message = message;
-    }
-
-    public PrintCommand(String message, boolean dynamic) {
-        this(Content.getMessages().getOrDefault(message, message));
     }
 
     @Override
     public void execute() {
+        if (!_initialized) {
+            _message = Interpreter.getSource().getMessages().getOrDefault(_message, _message);
+            _initialized = true;
+        }
+        
         System.out.printf(_message + "%n");
     }
 
     @Override
     public Command createInstance(Scene parent, String[] arguments) {
         if (arguments.length == 2) {
-            return new PrintCommand(arguments[1], true);
+            return new PrintCommand(arguments[1]);
         }
         return null;
     }
