@@ -33,7 +33,8 @@ public class CommandGroup {
 				command instanceof ConditionalJumpCommand ||
 				command instanceof BreakCommand) {
 				i = ((JumpCommand)command).getJumpIndex();
-				if (i == Integer.MAX_VALUE) {
+				// Break if the index is invalid
+				if (i < 0 || i > _commands.size()) {
 					break;
 				}
 				continue;
