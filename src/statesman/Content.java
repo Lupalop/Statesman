@@ -79,27 +79,33 @@ public class Content {
                     break;
                 // Command group start marker
                 case "$cgb":
-                    if (lineParts.length != 2) {
+                    if (currentGroup != null || lineParts.length != 2) {
                         throw new MalformedResourceException();
                     }
                     String groupName = lineParts[1];
-                    // Throw on invalid keys (empty/blank/conflicting)
-                    if (groupName.isBlank() || currentScene.getGroupCommands().containsKey(groupName)) {
+                    // Throw on invalid keys (empty/blank)
+                    if (groupName.isBlank()) {
                         throw new MalformedResourceException();
                     }
                     currentGroup = new CommandGroup(groupName);
                     break;
                 // Command group end marker
                 case "$cge":
-                    if (currentScene == null || currentGroup == null) {
+                    if (currentGroup == null) {
                         throw new MalformedResourceException();
                     }
-                    currentScene.getGroupCommands().put(currentGroup.getName(), currentGroup);
+                    // Global command groups
+                    if (currentScene == null) {
+                        _source.getCommandGroups().put(currentGroup.getName(), currentGroup);
+                    // Local scene command groups
+                    } else {
+                        currentScene.getGroupCommands().put(currentGroup.getName(), currentGroup);
+                    }
                     currentGroup = null;
                     break;
                 // Action marker (command with keyword)
                 case "a":
-                    if (currentScene == null || lineParts.length != 3) {
+                    if (lineParts.length != 3) {
                         throw new MalformedResourceException();
                     }
                     String[] keywords = lineParts[1].split(",");
@@ -112,12 +118,18 @@ public class Content {
                     }
 
                     for (int i = 0; i < keywords.length; i++) {
-                        currentScene.getActions().put(keywords[i], cCommand);
+                        // Global actions
+                        if (currentScene == null) {
+                            _source.getActions().put(keywords[i], cCommand);
+                        // Local scene actions
+                        } else {
+                            currentScene.getActions().put(keywords[i], cCommand);
+                        }
                     }
                     break;
                 // Command marker (command inside a group)
                 case "c":
-                    if (currentScene == null || currentGroup == null) {
+                    if (currentGroup == null) {
                         throw new MalformedResourceException();
                     }
 

@@ -77,12 +77,32 @@ public class Interpreter {
 
             System.out.println();
             System.out.print("> ");
-            String currentKeyword = getScanner().nextLine();
+            String currentKeyword = getScanner().nextLine().trim();
             
+            if (currentKeyword.isBlank()) {
+                continue;
+            }
+            
+            Command currentAction = null;
+
             boolean hasKeyword = _currentScene.getActions().containsKey(currentKeyword);
-            
             if (hasKeyword) {
-                Command currentAction = _currentScene.getActions().get(currentKeyword);
+                currentAction = _currentScene.getActions().get(currentKeyword);
+                currentAction.execute();
+                continue;
+            }
+            
+            boolean hasGlobalKeyword = _source.getActions().containsKey(currentKeyword);
+            if (hasGlobalKeyword) {
+                currentAction = _source.getActions().get(currentKeyword);
+                currentAction.execute();
+                continue;
+            }
+            
+            currentAction = _source.getActions().get("fallback");
+            if (currentAction == null && App.debugMode) {
+                System.out.println("Fallback message is missing");
+            } else {
                 currentAction.execute();
             }
         }

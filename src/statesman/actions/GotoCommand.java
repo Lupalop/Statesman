@@ -1,24 +1,20 @@
 package statesman.actions;
 
+import statesman.Interpreter;
 import statesman.Scene;
 
 public class GotoCommand implements Command {
 
     public static final String Id = "goto";
 
-    private Scene _parentScene;
     private String _groupName;
 
     public GotoCommand() {
-        _parentScene = null;
         _groupName = "";
     }
 
-    public GotoCommand(Scene parentScene, String commandGroupName) {
-        if (parentScene == null) {
-            throw new IllegalArgumentException();
-        }
-        _parentScene = parentScene;
+    public GotoCommand(String commandGroupName) {
+        this();
         if (commandGroupName.isBlank()) {
             throw new IllegalArgumentException();
         }
@@ -28,20 +24,28 @@ public class GotoCommand implements Command {
     @Override
     public Command createInstance(Scene parent, String[] arguments) {
         if (arguments.length == 2) {
-            return new GotoCommand(parent, arguments[1]);
+            return new GotoCommand(arguments[1]);
         }
         return null;
     }
 
     @Override
     public Command createInstance(String[] arguments) {
-        return null;
+        return createInstance(null, arguments);
     }
 
     @Override
     public void execute() {
-        if (_parentScene != null && _parentScene.getGroupCommands().containsKey(_groupName)) {
-            CommandGroup group = _parentScene.getGroupCommands().get(_groupName);
+        CommandGroup group = Interpreter.getSource().getCommandGroups().get(_groupName);
+        // Local scene groups override the global group
+        if (Interpreter.getCurrentScene() != null) {
+            CommandGroup localGroup = Interpreter.getCurrentScene().getGroupCommands().get(_groupName);
+            if (localGroup != null) {
+                group = localGroup;
+            }
+        }
+        
+        if (group != null) {
             group.execute();
         }
     }
