@@ -1,55 +1,57 @@
 // Global messages
 m|5|Dummy message.
 
+// Scene: initial (called upon start-up)
 $sb|initial
 
-// Messages
-m|0|Welcome to the year 1914, situated in the Philippines, a colony of the United States of America. You are currently standing in front of a branch of the Intercontinental Bank, holding a leather briefcase containing thousands of pesos. You were instructed by your manager to deposit a large sum of money to a private account in another bank. What are you going to do now?%n
-m|1|You are talking to someone now.
-m|2|You've picked up a rock.%nA person is approaching you from far away, waving.
-m|3|You waved back and the person ran towards you.%n"Don't you remember me?" He asked.
-m|4|"You've got to be kidding!" He answered back, taking something from their pockets.
+    // Messages
+    m|0|Welcome to the year 1914, situated in the Philippines, a colony of the United States of America. You are currently standing in front of a branch of the Intercontinental Bank, holding a leather briefcase containing thousands of pesos. You were instructed by your manager to deposit a large sum of money to a private account in another bank. What are you going to do now?%n
+    m|1|You are talking to someone now.
+    m|2|You've picked up a rock.%nA person is approaching you from far away, waving.
+    m|3|You waved back and the person ran towards you.%n"Don't you remember me?" He asked.
+    m|4|"You've got to be kidding!" He answered back, taking something from their pockets.
 
-// Actions
-a|look,view,see|goto,view
-//a|look,view,see|print,0
-a|talk|print,1
-a|take rock|print,2
-a|wave back|print,3
-a|no|print,4
-a|dummy|print,5
-a|random|printr,1,2
-a|combine|printc,1,2,3,4
-a|walk north, walk n|scene,north
+    // Actions
+    a|look,view,see|goto,view
+    //a|look,view,see|print,0
+    a|talk|print,1
+    a|take rock|print,2
+    a|wave back|print,3
+    a|no|print,4
+    a|dummy|print,5
+    a|random|printr,1,2
+    a|combine|printc,1,2,3,4
+    a|walk north, walk n|scene,north
 
-// Command group: view
-$cgb|view
-// conditional jump, switch #, line if true, line if false
-c|0|cjmp,1,1,3
-c|1|print,0
-c|2|break
-c|3|set,1,true
-c|4|print,5
-$cge
+    // Command group: view
+    $cgb|view
+        // conditional jump, switch #, line if true, line if false
+        c|0|cjmp,1,1,3
+        c|1|print,0
+        c|2|jmp,
+        c|3|set,1,true
+        c|4|print,5
+    $cge
 
 $se
 
+// Scene: north
 $sb|north
 
-m|nothing|There's nothing here.
-m|nothing2|THERE IS NOTHING! I REPEAT, THERE IS NOTHING!
+    m|nothing|There's nothing here.
+    m|nothing2|THERE IS NOTHING! I REPEAT, THERE IS NOTHING!
 
-a|look,view,see|goto,view
-a|walk south, walk s|scene,initial
+    a|look,view,see|goto,view
+    a|walk south, walk s|scene,initial
 
-// Command group: view
-$cgb|view
-// conditional jump, switch #, line if true, line if false
-c|0|cjmp,2,1,3
-c|1|print,nothing2
-c|2|break
-c|3|set,2,true
-c|4|print,nothing
-$cge
+    // Command group: view
+    $cgb|view
+        // conditional jump, switch #, line if true, line if false
+        c|0|cjmp,2,1,3
+        c|1|print,nothing2
+        c|2|break
+        c|3|set,2,true
+        c|4|print,nothing
+    $cge
 
 $se
