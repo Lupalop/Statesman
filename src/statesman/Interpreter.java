@@ -75,13 +75,13 @@ public class Interpreter {
                 _shownIntro = true;
             }
 
-            System.out.println();
             System.out.print("> ");
             String currentKeyword = getScanner().nextLine().trim();
             
             if (currentKeyword.isBlank()) {
                 continue;
             }
+            System.out.println();
             
             Command currentAction = null;
 
