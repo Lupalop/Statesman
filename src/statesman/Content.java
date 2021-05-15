@@ -127,30 +127,46 @@ public class Content {
                         }
                     }
                     break;
+                // Entry action marker (command when entering a scene)
+                case "ae":
+                    if (currentScene == null || lineParts.length != 2) {
+                        throw new MalformedResourceException();
+                    }
+
+                    String[] iArguments = lineParts[1].split(",");
+                    
+                    Command iCommand = Interpreter.findCommand(currentScene, iArguments);
+
+                    if (iCommand == null) {
+                        throw new MalformedResourceException();
+                    }
+
+                    currentScene.getEntryActions().add(iCommand);
+                    break;
                 // Command marker (command inside a group)
                 case "c":
                     if (currentGroup == null) {
                         throw new MalformedResourceException();
                     }
-
+                
                     String[] gArguments;
                     // With line numbers
                     if (lineParts.length == 3) {
                         gArguments = lineParts[2].split(",");
-                        // Without line numbers
+                    // Without line numbers
                     } else if (lineParts.length == 2) {
                         gArguments = lineParts[1].split(",");
-                        // Weird argument count
+                    // Weird argument count
                     } else {
                         throw new MalformedResourceException();
                     }
-
+                
                     Command gCommand = Interpreter.findCommand(currentScene, gArguments);
-
+                
                     if (gCommand == null) {
                         throw new MalformedResourceException();
                     }
-
+                
                     currentGroup.getCommands().add(gCommand);
                     break;
                 // Message marker

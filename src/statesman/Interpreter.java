@@ -13,7 +13,6 @@ public class Interpreter {
     private static Scene _currentScene;
     private static boolean[] _switches;
     private static boolean _isRunning = false;
-    private static boolean _shownIntro = false;
 
     static {
         _commands = new HashMap<String, Command>();
@@ -64,17 +63,11 @@ public class Interpreter {
             System.out.println("Initial scene is missing.");
             return;
         }
-        _currentScene = initialScene;
+        setCurrentScene(initialScene);
         
         _isRunning = true;
 
         while (_isRunning) {
-            // FIXME: static'd
-            if (!_shownIntro) {
-                System.out.printf(_source.getMessages().get("0"));
-                _shownIntro = true;
-            }
-
             System.out.print("> ");
             String currentKeyword = getScanner().nextLine().trim();
             
@@ -138,6 +131,7 @@ public class Interpreter {
 
     public static void setCurrentScene(Scene scene) {
         _currentScene = scene;
+        _currentScene.runEntryActions();
     }
 
     public static boolean[] getSwitches() {
