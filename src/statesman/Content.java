@@ -12,33 +12,33 @@ import statesman.actions.*;
 
 public class Content {
 
-	private Path _dataPath;
-	private List<String> _data;
-	private HashMap<String, String> _messages;
+	private static Path _dataPath;
+	private static List<String> _data;
+	private static HashMap<String, String> _messages;
 	
-	public Content() {
+	static {
 		_dataPath = null;
 		_data = null;
 		_messages = new HashMap<String, String>();
 	}
 
-	public Path getDataPath() {
+	public static Path getDataPath() {
 		return _dataPath;
 	}
 
-	public List<String> getData() {
+	public static List<String> getData() {
 		return _data;
 	}
 	
-	public HashMap<String, String> getMessages() {
+	public static HashMap<String, String> getMessages() {
 		return _messages;
 	}
 
-	public void setDataPath(String location) {
+	public static void setDataPath(String location) {
 		_dataPath = Paths.get(location);
 	}
 
-	public boolean tryLoadData() {
+	public static boolean tryLoadData() {
 		if (Files.exists(_dataPath)) {
 			try {
 				_data = Files.readAllLines(_dataPath);
@@ -51,7 +51,7 @@ public class Content {
 		return false;
 	}
 
-	public HashMap<String, Scene> parseScenesSource() {
+	public static HashMap<String, Scene> parseScenesSource() {
 		HashMap<String, Scene> scenes = new HashMap<String, Scene>();
 		Scene currentScene = null;
 		CommandGroup currentGroup = null;

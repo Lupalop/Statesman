@@ -88,7 +88,7 @@ public class Interpreter {
 		while (_isPlaying) {
 			// FIXME: static'd
 			if (!_shownIntro) {
-				System.out.printf(App.Content.getMessages().get("0"));
+				System.out.printf(Content.getMessages().get("0"));
 				_shownIntro = true;
 			}
 			

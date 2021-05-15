@@ -1,6 +1,6 @@
 package statesman.actions;
 
-import statesman.App;
+import statesman.Content;
 import statesman.Scene;
 
 public class PrintCombineCommand extends Command {
@@ -17,7 +17,7 @@ public class PrintCombineCommand extends Command {
 		this();
 		_messages = new String[messages.length];
 		for (int i = 0; i < messages.length; i++) {
-			_messages[i] = App.Content.getMessages().getOrDefault(messages[i], messages[i]);				
+			_messages[i] = Content.getMessages().getOrDefault(messages[i], messages[i]);				
 		}
 	}
 

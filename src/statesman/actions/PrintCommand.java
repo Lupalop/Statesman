@@ -1,6 +1,6 @@
 package statesman.actions;
 
-import statesman.App;
+import statesman.Content;
 import statesman.Scene;
 
 public class PrintCommand extends Command {
@@ -18,7 +18,7 @@ public class PrintCommand extends Command {
 	}
 
 	public PrintCommand(String message, boolean dynamic) {
-		this(App.Content.getMessages().getOrDefault(message, message));
+		this(Content.getMessages().getOrDefault(message, message));
 	}
 
 	@Override
