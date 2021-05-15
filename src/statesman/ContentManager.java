@@ -16,30 +16,14 @@ public class ContentManager {
 	private List<String> _data;
 	private HashMap<String, Scene> _scenes;
 	private HashMap<String, String> _messages;
-	private HashMap<String, Command> _commands;
 	
 	public ContentManager() {
 		_dataPath = null;
 		_data = null;
 		_scenes = new HashMap<String, Scene>();
 		_messages = new HashMap<String, String>();
-		_commands = new HashMap<String, Command>();
-		initializeCommands();
 	}
 
-	public void initializeCommands() {
-		// XXX: manually input IDs of new commands here!
-		_commands.put(PrintCommand.Id, new PrintCommand());
-		_commands.put(PrintRandomCommand.Id, new PrintRandomCommand());
-		_commands.put(PrintCombineCommand.Id, new PrintCombineCommand());
-		_commands.put(SceneCommand.Id, new SceneCommand());
-		_commands.put(GotoCommand.Id, new GotoCommand());
-		_commands.put(JumpCommand.Id, new JumpCommand());
-		_commands.put(BreakCommand.Id, new BreakCommand());
-		_commands.put(ConditionalJumpCommand.Id, new ConditionalJumpCommand());
-		_commands.put(SetSwitchCommand.Id, new SetSwitchCommand());
-	}
-	
 	public Path getDataPath() {
 		return _dataPath;
 	}
@@ -54,10 +38,6 @@ public class ContentManager {
 	
 	public HashMap<String, String> getMessages() {
 		return _messages;
-	}
-
-	public HashMap<String, Command> getCommands() {
-		return _commands;
 	}
 
 	public void setDataPath(String location) {
@@ -77,20 +57,6 @@ public class ContentManager {
 		return false;
 	}
 
-	public Command findCommand(Scene parent, String[] arguments) {
-		String commandId = arguments[0];
-
-		Iterator<String> iterator = getCommands().keySet().iterator();
-		while (iterator.hasNext()) {
-			String key = iterator.next();
-			if (key.equalsIgnoreCase(commandId)) {
-				return getCommands().get(key).createInstance(parent, arguments);
-			}
-		}
-		
-		return null;
-	}
-	
 	public boolean parseData() {
 		Scene currentScene = null;
 		CommandGroup currentGroup = null;
@@ -161,7 +127,7 @@ public class ContentManager {
 					String[] keywords = lineParts[1].split(",");
 					String[] cArguments = lineParts[2].split(",");
 					
-					Command cCommand = findCommand(currentScene, cArguments);
+					Command cCommand = GameManager.findCommand(currentScene, cArguments);
 					
 					if (cCommand == null) {
 						throw new MalformedResourceException();
@@ -188,7 +154,7 @@ public class ContentManager {
 						throw new MalformedResourceException();
 					}
 					
-					Command gCommand = findCommand(currentScene, gArguments);
+					Command gCommand = GameManager.findCommand(currentScene, gArguments);
 					
 					if (gCommand == null) {
 						throw new MalformedResourceException();
