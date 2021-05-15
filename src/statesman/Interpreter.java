@@ -49,8 +49,12 @@ public class Interpreter {
     }
 
     public static void startParser() {
-        // The first scene is the initial scene
-        _currentScene = getScenes().get("initial");
+        Scene initialScene = getScenes().get("initial");
+        if (initialScene == null) {
+            System.out.println("Initial scene is missing.");
+            return;
+        }
+        _currentScene = initialScene;
 
         String currentKeywords = "";
 
