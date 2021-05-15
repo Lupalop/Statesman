@@ -28,7 +28,7 @@ $sb|initial
         // conditional jump, switch #, line if true, line if false
         c|0|cjmp,1,1,3
         c|1|print,0
-        c|2|jmp,
+        c|2|break
         c|3|set,1,true
         c|4|print,5
     $cge
