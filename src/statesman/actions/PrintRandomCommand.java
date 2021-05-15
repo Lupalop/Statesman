@@ -4,7 +4,7 @@ import java.util.Random;
 import statesman.Content;
 import statesman.Scene;
 
-public class PrintRandomCommand extends Command {
+public class PrintRandomCommand implements Command {
 
     public static final String Id = "printr";
 

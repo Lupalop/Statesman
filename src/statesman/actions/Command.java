@@ -2,7 +2,7 @@ package statesman.actions;
 
 import statesman.Scene;
 
-public abstract class Command {
+public interface Command {
 
     public static final String Id = "";
 

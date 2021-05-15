@@ -3,7 +3,7 @@ package statesman.actions;
 import statesman.Interpreter;
 import statesman.Scene;
 
-public class SceneCommand extends Command {
+public class SceneCommand implements Command {
 
     public static final String Id = "scene";
 

@@ -2,7 +2,7 @@ package statesman.actions;
 
 import statesman.Scene;
 
-public class JumpCommand extends Command {
+public class JumpCommand implements Command {
 
     public static final String Id = "jmp";
 

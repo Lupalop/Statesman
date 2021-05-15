@@ -2,7 +2,7 @@ package statesman.actions;
 
 import statesman.Scene;
 
-public class GotoCommand extends Command {
+public class GotoCommand implements Command {
 
     public static final String Id = "goto";
 

@@ -3,7 +3,7 @@ package statesman.actions;
 import statesman.Content;
 import statesman.Scene;
 
-public class PrintCombineCommand extends Command {
+public class PrintCombineCommand implements Command {
 
     public static final String Id = "printc";
 
