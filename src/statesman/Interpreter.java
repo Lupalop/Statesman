@@ -5,6 +5,8 @@ import statesman.actions.*;
 
 public class Interpreter {
 
+    public static final int switchSize = 2000;
+    
     private static Scanner _scanner;
     private static HashMap<String, Command> _commands;
     private static HashMap<String, Scene> _scenes;
@@ -28,8 +30,7 @@ public class Interpreter {
 
         _scenes = new HashMap<String, Scene>();
         _currentScene = null;
-        // XXX: Fixed switch size of 2000
-        _switches = new boolean[2000];
+        _switches = new boolean[switchSize];
         Arrays.fill(_switches, false);
     }
 
