@@ -94,7 +94,7 @@ public class Content {
                     currentScene.getGroupCommands().put(currentGroup.getName(), currentGroup);
                     currentGroup = null;
                     break;
-                // Action marker
+                // Action marker (command with keyword)
                 case "a":
                     if (currentScene == null || lineParts.length != 3) {
                         throw new MalformedResourceException();
@@ -108,10 +108,11 @@ public class Content {
                         throw new MalformedResourceException();
                     }
 
-                    Action action = new Action(keywords, cCommand);
-                    currentScene.getActions().add(action);
+                    for (int i = 0; i < keywords.length; i++) {
+                        currentScene.getActions().put(keywords[i], cCommand);
+                    }
                     break;
-                // Command (in a group) marker
+                // Command marker (command inside a group)
                 case "c":
                     if (currentScene == null || currentGroup == null) {
                         throw new MalformedResourceException();

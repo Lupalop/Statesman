@@ -77,14 +77,13 @@ public class Interpreter {
 
             System.out.println();
             System.out.print("> ");
-            String currentKeywords = getScanner().nextLine();
-            Iterator<Action> iterator = _currentScene.getActions().iterator();
-            while (iterator.hasNext()) {
-                Action currentAction = iterator.next();
-                boolean matches = currentAction.hasKeyword(currentKeywords);
-                if (matches) {
-                    currentAction.execute();
-                }
+            String currentKeyword = getScanner().nextLine();
+            
+            boolean hasKeyword = _currentScene.getActions().containsKey(currentKeyword);
+            
+            if (hasKeyword) {
+                Command currentAction = _currentScene.getActions().get(currentKeyword);
+                currentAction.execute();
             }
         }
     }

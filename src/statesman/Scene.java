@@ -6,10 +6,10 @@ import statesman.actions.*;
 public class Scene {
 
     private String _name;
-    private ArrayList<Action> _actions;
+    private HashMap<String, Command> _actions;
     private HashMap<String, CommandGroup> _groupCommands;
 
-    public Scene(String name, ArrayList<Action> actions, HashMap<String, CommandGroup> groupCommands) {
+    public Scene(String name, HashMap<String, Command> actions, HashMap<String, CommandGroup> groupCommands) {
         _actions = actions;
         _groupCommands = groupCommands;
         if (name == null || name.isBlank()) {
@@ -19,14 +19,14 @@ public class Scene {
     }
 
     public Scene(String name) {
-        this(name, new ArrayList<Action>(), new HashMap<String, CommandGroup>());
+        this(name, new HashMap<String, Command>(), new HashMap<String, CommandGroup>());
     }
 
     public String getName() {
         return _name;
     }
 
-    public ArrayList<Action> getActions() {
+    public HashMap<String, Command> getActions() {
         return _actions;
     }
 
