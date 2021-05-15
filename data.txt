@@ -1,5 +1,34 @@
 // Global messages
+m|f_1|I don't understand that!
+m|f_2|I don't know that word.
+m|f_3|What?
+m|f_4|You're confusing!
+
+m|t_1|There's nobody in here.
+m|t_2|There's no one to talk to.
+
+m|w_1|Where?
+m|w_2|May I know which direction?
+
 m|5|Dummy message.
+m|junk|You are a piece of junk too!
+m|otherjunk|You are a huge steaming pile of junk, man!
+
+// Global actions
+a|fallback|printr,f_1,f_2,f_3,f_4
+a|junk|print,junk
+a|junktest|goto,junk
+a|talk|printr,t_1,t_2
+a|walk|printr,w_1,w_2
+
+// Global command groups
+$cgb|junk
+    c|0|cjmp,0,1,3
+    c|1|print,otherjunk
+    c|2|break
+    c|3|set,0,true
+    c|4|print,junk
+$cge
 
 // Scene: initial (called upon start-up)
 $sb|initial
@@ -22,6 +51,9 @@ $sb|initial
     a|random|printr,1,2
     a|combine|printc,1,2,3,4
     a|walk north, walk n|scene,north
+    
+    // Global command group test
+    a|junked|goto,junk
 
     // Command group: view
     $cgb|view
@@ -52,6 +84,15 @@ $sb|north
         c|2|break
         c|3|set,2,true
         c|4|print,nothing
+    $cge
+
+    // Overriden global command group test: junk
+    $cgb|junk
+        c|0|print,this is an inline message
+        c|1|print,this message is inline
+        c|2|print,this message is not in the source
+        c|3|print,nothing
+        c|4|print,nothing2
     $cge
 
 $se
