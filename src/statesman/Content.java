@@ -11,29 +11,32 @@ import statesman.actions.*;
 
 public class Content {
 
+    private static boolean _dataParsed;
     private static Path _dataPath;
     private static List<String> _data;
     private static ContentTuple _source;
 
     static {
+        _dataParsed = false;
         _dataPath = null;
         _data = null;
+        _source = null;
     }
 
+    public static void loadData() throws IOException {
+        _data = Files.readAllLines(_dataPath);
+    }
+    
     public static boolean tryLoadData() {
-        if (Files.exists(_dataPath)) {
-            try {
-                _data = Files.readAllLines(_dataPath);
-            } catch (IOException e) {
-                return false;
-            }
-            return true;
+        try {
+            loadData();
+        } catch (IOException e) {
+            return false;
         }
-
-        return false;
+        return true;
     }
 
-    public static ContentTuple getSource() {
+    private static void parseData() {
         _source = new ContentTuple();
         Scene currentScene = null;
         CommandGroup currentGroup = null;
@@ -163,9 +166,15 @@ public class Content {
             if (App.debugMode) {
                 e.printStackTrace();
             }
-            return null;
+            _source = null;
         }
-
+        _dataParsed = true;
+    }
+    
+    public static ContentTuple getSource() {
+        if (!_dataParsed) {
+            parseData();
+        }
         return _source;
     }
 
@@ -175,6 +184,9 @@ public class Content {
 
     public static void setDataPath(String location) {
         _dataPath = Paths.get(location);
+        _dataParsed = false;
+        _data = null;
+        _source = null;
     }
 
     public static List<String> getData() {
