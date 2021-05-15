@@ -4,7 +4,7 @@ import java.util.*;
 
 public class App {
 
-    public static boolean debugMode = true;
+    public static final boolean debugMode = true;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
