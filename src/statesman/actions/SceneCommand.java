@@ -36,7 +36,7 @@ public class SceneCommand extends Command {
 	@Override
 	public void execute() {
 		if (App.Content.getScenes().containsKey(_targetScene)) {
-			App.Game.setCurrentScene(App.Content.getScenes().get(_targetScene));
+			App.Interpreter.setCurrentScene(App.Content.getScenes().get(_targetScene));
 		}
 	}
 

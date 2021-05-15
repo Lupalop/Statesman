@@ -127,7 +127,7 @@ public class ContentManager {
 					String[] keywords = lineParts[1].split(",");
 					String[] cArguments = lineParts[2].split(",");
 					
-					Command cCommand = GameManager.findCommand(currentScene, cArguments);
+					Command cCommand = Interpreter.findCommand(currentScene, cArguments);
 					
 					if (cCommand == null) {
 						throw new MalformedResourceException();
@@ -154,7 +154,7 @@ public class ContentManager {
 						throw new MalformedResourceException();
 					}
 					
-					Command gCommand = GameManager.findCommand(currentScene, gArguments);
+					Command gCommand = Interpreter.findCommand(currentScene, gArguments);
 					
 					if (gCommand == null) {
 						throw new MalformedResourceException();

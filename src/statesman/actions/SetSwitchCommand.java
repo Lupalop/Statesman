@@ -16,7 +16,7 @@ public class SetSwitchCommand extends Command {
 	}
 	
 	public SetSwitchCommand(int switchId, boolean value) {
-		if (switchId < 0 || switchId > App.Game.getSwitches().length) {
+		if (switchId < 0 || switchId > App.Interpreter.getSwitches().length) {
 			throw new IllegalArgumentException();
 		}
 		_switchId = switchId;
@@ -40,7 +40,7 @@ public class SetSwitchCommand extends Command {
 
 	@Override
 	public void execute() {
-		App.Game.getSwitches()[_switchId] = _value;
+		App.Interpreter.getSwitches()[_switchId] = _value;
 	}
 
 }

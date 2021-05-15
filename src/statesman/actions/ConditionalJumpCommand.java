@@ -19,7 +19,7 @@ public class ConditionalJumpCommand extends JumpCommand {
 	}
 	
 	public ConditionalJumpCommand(int switchId, int lineIfTrue, int lineIfFalse) {
-		if (switchId < 0 || switchId > App.Game.getSwitches().length) {
+		if (switchId < 0 || switchId > App.Interpreter.getSwitches().length) {
 			throw new IllegalArgumentException();
 		}
 		_switchId = switchId;
@@ -57,7 +57,7 @@ public class ConditionalJumpCommand extends JumpCommand {
 	public void execute() { }
 
 	public int getJumpIndex() {
-		if (App.Game.getSwitches()[_switchId]) {
+		if (App.Interpreter.getSwitches()[_switchId]) {
 			return _lineIfTrue;
 		}
 		return _lineIfFalse;

@@ -3,7 +3,7 @@ import java.util.*;
 
 import statesman.actions.*;
 
-public class GameManager {
+public class Interpreter {
 	private Scanner _scanner;
 	private Scene _currentScene;
 	private boolean[] _switches;
@@ -11,7 +11,7 @@ public class GameManager {
 	private boolean _shownIntro = false;
 	private static HashMap<String, Command> _commands;
 	
-	public GameManager(Scanner scanner) {
+	public Interpreter(Scanner scanner) {
 		_scanner = scanner;
 		// XXX: Fixed switch size of 2000
 		_switches = new boolean[2000];
