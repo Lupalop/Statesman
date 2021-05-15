@@ -12,7 +12,7 @@ public class Interpreter {
     private static HashMap<String, Scene> _scenes;
     private static Scene _currentScene;
     private static boolean[] _switches;
-    private static boolean _isPlaying = true;
+    private static boolean _isRunning = false;
     private static boolean _shownIntro = false;
 
     static {
@@ -48,7 +48,13 @@ public class Interpreter {
         return null;
     }
 
-    public static void startParser() {
+    public static void run() {
+        if (_isRunning) {
+            System.out.println("The interpreter is already running.");
+            return;
+        }
+        _isRunning = true;
+        
         Scene initialScene = getScenes().get("initial");
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");
@@ -56,9 +62,7 @@ public class Interpreter {
         }
         _currentScene = initialScene;
 
-        String currentKeywords = "";
-
-        while (_isPlaying) {
+        while (_isRunning) {
             // FIXME: static'd
             if (!_shownIntro) {
                 System.out.printf(Content.getMessages().get("0"));
@@ -67,7 +71,7 @@ public class Interpreter {
 
             System.out.println();
             System.out.print("> ");
-            currentKeywords = getScanner().nextLine();
+            String currentKeywords = getScanner().nextLine();
             Iterator<Action> iterator = _currentScene.getActions().iterator();
             while (iterator.hasNext()) {
                 Action currentAction = iterator.next();
@@ -77,6 +81,10 @@ public class Interpreter {
                 }
             }
         }
+    }
+    
+    public static void stop() {
+        _isRunning = false;
     }
 
     public static Scanner getScanner() {
