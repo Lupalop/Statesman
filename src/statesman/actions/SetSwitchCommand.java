@@ -1,6 +1,6 @@
 package statesman.actions;
 
-import statesman.App;
+import statesman.Interpreter;
 import statesman.Scene;
 
 public class SetSwitchCommand extends Command {
@@ -16,7 +16,7 @@ public class SetSwitchCommand extends Command {
 	}
 	
 	public SetSwitchCommand(int switchId, boolean value) {
-		if (switchId < 0 || switchId > App.Interpreter.getSwitches().length) {
+		if (switchId < 0 || switchId > Interpreter.getSwitches().length) {
 			throw new IllegalArgumentException();
 		}
 		_switchId = switchId;
@@ -40,7 +40,7 @@ public class SetSwitchCommand extends Command {
 
 	@Override
 	public void execute() {
-		App.Interpreter.getSwitches()[_switchId] = _value;
+		Interpreter.getSwitches()[_switchId] = _value;
 	}
 
 }
