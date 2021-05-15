@@ -10,13 +10,13 @@ import java.util.List;
 
 import statesman.actions.*;
 
-public class ContentManager {
+public class Content {
 
 	private Path _dataPath;
 	private List<String> _data;
 	private HashMap<String, String> _messages;
 	
-	public ContentManager() {
+	public Content() {
 		_dataPath = null;
 		_data = null;
 		_messages = new HashMap<String, String>();
