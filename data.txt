@@ -40,6 +40,8 @@ $sb|initial
     m|3|You waved back and the person ran towards you.%n"Don't you remember me?" He asked.
     m|4|"You've got to be kidding!" He answered back, taking something from their pockets.
 
+    // Intro
+    ae|print,0
     // Actions
     a|look,view,see|goto,view
     //a|look,view,see|print,0
