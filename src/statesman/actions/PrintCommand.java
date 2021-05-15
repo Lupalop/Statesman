@@ -4,39 +4,39 @@ import statesman.Content;
 import statesman.Scene;
 
 public class PrintCommand extends Command {
-	
-	public static final String Id = "print";
-	
-	private String _message;
 
-	public PrintCommand() {
-		_message = "";
-	}
+    public static final String Id = "print";
 
-	public PrintCommand(String message) {
-		_message = message;
-	}
+    private String _message;
 
-	public PrintCommand(String message, boolean dynamic) {
-		this(Content.getMessages().getOrDefault(message, message));
-	}
+    public PrintCommand() {
+        _message = "";
+    }
 
-	@Override
-	public void execute() {
-		System.out.printf(_message + "%n");
-	}
+    public PrintCommand(String message) {
+        _message = message;
+    }
 
-	@Override
-	public Command createInstance(Scene parent, String[] arguments) {
-		if (arguments.length == 2) {
-			return new PrintCommand(arguments[1], true);
-		}
-		return null;
-	}
+    public PrintCommand(String message, boolean dynamic) {
+        this(Content.getMessages().getOrDefault(message, message));
+    }
 
-	@Override
-	public Command createInstance(String[] arguments) {
-		return createInstance(null, arguments);
-	}
-	
+    @Override
+    public void execute() {
+        System.out.printf(_message + "%n");
+    }
+
+    @Override
+    public Command createInstance(Scene parent, String[] arguments) {
+        if (arguments.length == 2) {
+            return new PrintCommand(arguments[1], true);
+        }
+        return null;
+    }
+
+    @Override
+    public Command createInstance(String[] arguments) {
+        return createInstance(null, arguments);
+    }
+
 }

@@ -4,27 +4,28 @@ import statesman.Scene;
 
 public class BreakCommand extends JumpCommand {
 
-	public static final String Id = "break";
-	
-	public BreakCommand() {
-		super();
-	}
+    public static final String Id = "break";
 
-	@Override
-	public Command createInstance(Scene parent, String[] arguments) {
-		return new BreakCommand();
-	}
+    public BreakCommand() {
+        super();
+    }
 
-	@Override
-	public Command createInstance(String[] arguments) {
-		return createInstance(null, arguments);
-	}
+    @Override
+    public Command createInstance(Scene parent, String[] arguments) {
+        return new BreakCommand();
+    }
 
-	@Override
-	public void execute() { }
+    @Override
+    public Command createInstance(String[] arguments) {
+        return createInstance(null, arguments);
+    }
 
-	public int getJumpIndex() {
-		return Integer.MAX_VALUE;
-	}
+    @Override
+    public void execute() {
+    }
+
+    public int getJumpIndex() {
+        return Integer.MAX_VALUE;
+    }
 
 }
