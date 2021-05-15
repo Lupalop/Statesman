@@ -107,6 +107,9 @@ public class ContentManager {
 				}
 				
 				String[] lineParts = line.split("\\|");
+				for (int i = 0; i < lineParts.length; i++) {
+					lineParts[i] = lineParts[i].trim();
+				}
 
 				switch (lineParts[0]) {
 				// Scene start marker
@@ -114,7 +117,7 @@ public class ContentManager {
 					if (lineParts.length != 2) {
 						throw new MalformedResourceException();
 					}
-					String sceneName = lineParts[1].trim();
+					String sceneName = lineParts[1];
 					// Throw on invalid keys (empty/blank/conflicting)
 					if (sceneName.isBlank() || _scenes.containsKey(sceneName)) {
 						throw new MalformedResourceException();
@@ -134,7 +137,7 @@ public class ContentManager {
 					if (lineParts.length != 2) {
 						throw new MalformedResourceException();
 					}
-					String groupName = lineParts[1].trim();
+					String groupName = lineParts[1];
 					// Throw on invalid keys (empty/blank/conflicting)
 					if (groupName.isBlank() ||
 						currentScene.getGroupCommands().containsKey(groupName)) {
@@ -199,7 +202,7 @@ public class ContentManager {
 						throw new MalformedResourceException();
 					}
 					
-					String key = lineParts[1].trim();
+					String key = lineParts[1];
 					String value = lineParts[2];
 					
 					// Throw on invalid keys (empty/blank/conflicting)
