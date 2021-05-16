@@ -9,15 +9,15 @@ public class Scene {
     
     private String _name;
     private HashMap<String, Command> _actions;
-    private HashMap<String, CommandGroup> _groupCommands;
+    private HashMap<String, CommandGroup> _commandGroups;
 
-    public Scene(String name, HashMap<String, Command> actions, HashMap<String, CommandGroup> groupCommands, ArrayList<Command> entryActions) {
+    public Scene(String name, HashMap<String, Command> actions, HashMap<String, CommandGroup> commandGroups, ArrayList<Command> entryActions) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException();
         }
         _name = name;
         _actions = actions;
-        _groupCommands = groupCommands;
+        _commandGroups = commandGroups;
     }
 
     public Scene(String name) {
@@ -32,13 +32,13 @@ public class Scene {
         return _actions;
     }
 
-    public HashMap<String, CommandGroup> getGroupCommands() {
-        return _groupCommands;
+    public HashMap<String, CommandGroup> getCommandGroups() {
+        return _commandGroups;
     }
 
     public void runEntry() {
-        if (_groupCommands.containsKey(Scene.entryCommandGroup)) {
-            _groupCommands.get(Scene.entryCommandGroup).execute();
+        if (_commandGroups.containsKey(Scene.entryCommandGroup)) {
+            _commandGroups.get(Scene.entryCommandGroup).execute();
         }
     }
 

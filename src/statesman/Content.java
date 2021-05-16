@@ -78,7 +78,7 @@ public class Content {
                             _source.getCommandGroups().put(currentGroup.getName(), currentGroup);
                         // Local scene command groups
                         } else {
-                            currentScene.getGroupCommands().put(currentGroup.getName(), currentGroup);
+                            currentScene.getCommandGroups().put(currentGroup.getName(), currentGroup);
                         }
                         currentGroup = null;
                     case Actions:
@@ -161,7 +161,7 @@ public class Content {
                             } else {
                                 // Group name already in use locally
                                 // Overriding global command groups are allowed
-                                if (currentScene.getGroupCommands().containsKey(groupName)) {
+                                if (currentScene.getCommandGroups().containsKey(groupName)) {
                                     throw new MalformedResourceException("Command group name already in use locally was specified in line " + lineNumber);
                                 }
                             }
