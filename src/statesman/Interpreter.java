@@ -87,6 +87,18 @@ public class Interpreter {
                 continue;
             }
             
+            // Debug mode keywords
+            if (App.debugMode) {
+                if (currentKeyword.startsWith("tp")) {
+                    String[] keywordParts = currentKeyword.split(" ");
+                    if (keywordParts.length == 2) {
+                        Command tpAction = new SceneCommand(keywordParts[1]);
+                        tpAction.execute();
+                        continue;
+                    }
+                }
+            }
+            
             currentAction = _source.getActions().get("fallback");
             if (currentAction == null && App.debugMode) {
                 System.out.println("Fallback message is missing");
