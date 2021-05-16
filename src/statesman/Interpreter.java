@@ -131,7 +131,7 @@ public class Interpreter {
 
     public static void setCurrentScene(Scene scene) {
         _currentScene = scene;
-        _currentScene.runEntryActions();
+        _currentScene.runEntry();
     }
 
     public static boolean[] getSwitches() {
