@@ -34,16 +34,11 @@ public class Interpreter {
     }
 
     public static Command findCommand(Scene parent, String[] arguments) {
-        String commandId = arguments[0];
-
-        Iterator<String> iterator = getCommands().keySet().iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            if (key.equalsIgnoreCase(commandId)) {
-                return getCommands().get(key).createInstance(parent, arguments);
-            }
+        String commandId = arguments[0].toLowerCase();
+        Command command = getCommands().getOrDefault(commandId, null);
+        if (command != null) {
+            return command.createInstance(parent, arguments);
         }
-
         return null;
     }
 
