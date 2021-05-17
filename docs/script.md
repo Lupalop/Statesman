@@ -14,7 +14,7 @@ end
 ## Messages
 Messages are strings that are linked to a key and are used by the several available print commands. Message section blocks can be placed either inside or outside of scenes, and regardless of their placement, messages inside these blocks are always global (can be used by all scenes). The messages themselves can only be placed inside a message section block, which always starts with the keyword `messages`.
 
-### Message section block (globaL)
+### Message section block (global)
 ```
 messages
     test|This is a test message.
