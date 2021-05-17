@@ -28,13 +28,14 @@ actions
     junktest|goto,junk
     talk|printr,t_1,t_2
     walk|printr,w_1,w_2
+    quit|quit
 end
 
 // Global command groups
 group junk
     0|cjmp,0,1,3
     1|print,otherjunk
-    2|break
+    2|ret
     3|set,0,true
     4|print,junk
 end
@@ -46,8 +47,17 @@ scene initial
         0|Welcome to the year 1914, situated in the Philippines, a colony of the United States of America. You are currently standing in front of a branch of the Intercontinental Bank, holding a leather briefcase containing thousands of pesos. You were instructed by your manager to deposit a large sum of money to a private account in another bank. What are you going to do now?%n
         1|You are talking to someone now.
         2|You've picked up a rock.%nA person is approaching you from far away, waving.
-        3|You waved back and the person ran towards you.%n"Don't you remember me?" He asked.
+        3|After waving back, the person ran towards you.%n"Don't you remember me?" He asked.
         4|"You've got to be kidding!" He answered back, taking something from their pockets.
+        5|There's no one to talk to anymore. He left!
+        6|You picked the rock from the filthy ground.
+        7|You've already picked the rock
+        8|There's no rock to be picked (yet!).
+        9|You've waved back at the person.
+        10|You've already waved at that person!
+        11|Who are you waving at?
+        12|You screamed, "No!"
+        13|You've already said no, weirdo.
     end
 
     // Intro
@@ -59,7 +69,6 @@ scene initial
     actions
         look,view,see|goto,view
         //look,view,see|print,0
-        talk|print,1
         take rock|print,2
         wave back|print,3
         no|print,4
@@ -70,6 +79,12 @@ scene initial
         
         // Global command group test
         junked|goto,junk
+        
+		// Sample convo
+        talk|goto,conversation
+        pick rock|goto,pick_rock
+        wave|goto,wave
+        no|goto,response_no
     end
 
     // Command group: view
@@ -77,9 +92,71 @@ scene initial
         // conditional jump, switch #, line if true, line if false
         0|cjmp,1,1,3
         1|print,0
-        2|break
+        2|ret
         3|set,1,true
         4|print,5
+    end
+
+    /*
+     * Sample conversation
+     */
+    group conversation
+        if !100
+            print,1
+            set,99,true
+        end
+        if !101,100
+            print,2
+        end
+        if !102,101
+            print,3
+        end
+        if !103,102
+            print,4
+            set,103,true
+        end
+        if 100,101,102,103
+            print,5
+        end
+    end
+    
+    group pick_rock
+        if 99
+            if !100
+                print,6
+                set,100,true
+            else
+                print,7
+            end
+        else
+            print,8
+        end
+    end
+    
+    group wave
+        if 100
+            if !101
+                print,9
+                set,101,true
+            else
+                print,10
+            end
+        else
+            print,11
+        end
+    end
+    
+    group response_no
+        if 100,101
+            if !102
+                print,12
+                set,102,true
+            else
+                print,13
+            end
+        else
+            printr,t_1,t_2
+        end
     end
 end
 
@@ -100,7 +177,7 @@ scene north
         // conditional jump, switch #, line if true, line if false
         0|cjmp,2,1,3
         1|print,nothing2
-        2|break
+        2|ret
         3|set,2,true
         4|print,nothing
     end
