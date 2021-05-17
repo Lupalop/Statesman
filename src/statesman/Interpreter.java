@@ -99,6 +99,21 @@ public class Interpreter {
                         continue;
                     }
                 }
+                if (currentKeyword.startsWith("set")) {
+                    String[] keywordParts = currentKeyword.split(" ");
+                    if (keywordParts.length == 3) {
+                        try {
+                            int switchId = Integer.parseInt(keywordParts[1]);
+                            boolean value = Boolean.parseBoolean(keywordParts[2]);
+                            Command setAction = new SetSwitchCommand(switchId, value);
+                            setAction.execute();
+                        } 
+                        catch (Exception e) {
+                            System.out.println("Invalid arguments were passed to the set switch command.");
+                        }
+                        continue;
+                    }                    
+                }
             }
             
             currentAction = _source.getActions().get("fallback");
