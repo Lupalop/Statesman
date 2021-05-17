@@ -138,6 +138,43 @@ group view
 end
 ```
 
+## Comments
+Statesman allows both single-line and block comments, with the following syntax:
+
+### Single-line comments
+```
+// This is a comment
+// This is a comment (another)
+// This is a comment (and another one)
+```
+
+### Block comments
+```
+/*
+ * This is a block comment.
+ * This line is ignored by the parser.
+ This one too!
+ */
+```
+
+### Notes
+The start tag for block comments (`/*`) must appear as the first sequence (white space is excluded). The end tag for block comments (`*/`) must appear either as the first or the last sequence and it MUST NOT be placed in between.
+
+The following locations for comments are not allowed:
+```
+/* This is not allowed */
+ blabla /* This is not allowed */
+ bla /*
+ This is not allowed
+ */ bla
+ 
+group test // This comment is not allowed
+    messages
+        test|//This comment is treated as a message and is read by the parser.
+    end
+end
+```
+
 ## Commands
 
 ### Commands that can be used anywhere (action or inside command group):
