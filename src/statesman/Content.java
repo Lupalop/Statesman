@@ -56,7 +56,7 @@ public class Content {
                     continue;
                 }
                 // Block comment end tag
-                if (line.startsWith("*/")) {
+                if (line.startsWith("*/") || line.endsWith("*/")) {
                     blockComment = false;
                     continue;
                 }
