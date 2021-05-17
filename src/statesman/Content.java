@@ -45,6 +45,9 @@ public class Content {
             CommandGroup currentGroup = null;
             SectionBlock currentSectionBlock = SectionBlock.None;
             boolean blockComment = false;
+            ConditionalCommand[] conditionals = new ConditionalCommand[255];
+            boolean[] conditionalsElse = new boolean[255];
+            int conditionalDepth = 0;
             
             for (int i = 0; i < _data.size(); i++) {
                 int lineNumber = i + 1;
@@ -65,8 +68,34 @@ public class Content {
                     continue;
                 }
 
-                // End tag: used for closing section blocks
+                // End tag
                 if (line.startsWith("end")) {
+                    // Terminating conditional blocks
+                    if (currentGroup != null && conditionalDepth > 0) {
+                        if (conditionalsElse[conditionalDepth]) {
+                            conditionalsElse[conditionalDepth] = false;
+                        }
+                        if (conditionalDepth == 1) {
+                            currentGroup
+                                    .getCommands()
+                                    .add(conditionals[conditionalDepth]);
+                        } else {
+                            if (conditionalsElse[conditionalDepth - 1]) {
+                                conditionals[conditionalDepth - 1]
+                                        .getElseGroup()
+                                        .getCommands()
+                                        .add(conditionals[conditionalDepth]);
+                            } else {
+                                conditionals[conditionalDepth - 1]
+                                        .getGroup()
+                                        .getCommands()
+                                        .add(conditionals[conditionalDepth]);
+                            }
+                        }
+                        conditionalDepth--;
+                        continue;
+                    }
+                    // Terminating section blocks
                     switch (currentSectionBlock) {
                     case Group:
                         if (currentGroup == null)
@@ -104,6 +133,37 @@ public class Content {
                     }
                 }
                 
+                if (currentSectionBlock == SectionBlock.Group) {
+                    String[] sectionParts = line.split(" ");
+
+                    if (sectionParts.length == 1) {
+                        switch (sectionParts[0]) {
+                        case "else":
+                            if (conditionals[conditionalDepth] == null || conditionalsElse[conditionalDepth]) {
+                                throw new MalformedResourceException("Stray else tag in line " + lineNumber);
+                            }
+                            conditionalsElse[conditionalDepth] = true;
+                            continue;
+                        default:
+                            break;
+                        }
+                    }
+                    
+                    if (sectionParts.length == 2) {
+                        switch (sectionParts[0]) {
+                        case "if":
+                            if (currentGroup == null) {
+                                throw new MalformedResourceException("Conditional sections are only allowed inside command groups, see line " + lineNumber);
+                            }
+                            conditionalDepth++;
+                            conditionals[conditionalDepth] = (ConditionalCommand)new ConditionalCommand().createInstance(sectionParts);
+                            continue;
+                        default:
+                            break;
+                        }
+                    }
+                }
+                
                 // Section tag
                 if (currentSectionBlock == SectionBlock.None ||
                     currentSectionBlock == SectionBlock.Scene) {
@@ -122,7 +182,7 @@ public class Content {
                             break;
                         }
                     }
-                    
+
                     // Section tags with one (1) parameter
                     if (sectionParts.length == 2) {
                         switch (sectionParts[0]) {
@@ -172,7 +232,7 @@ public class Content {
                             break;
                         }
                     }
-                    
+
                     // Invalid or unknown section tag
                     throw new MalformedResourceException("Invalid or unknown section tag in line " + lineNumber);
                 }
@@ -222,7 +282,15 @@ public class Content {
                     if (command == null) {
                         throw new MalformedResourceException("Unknown command was referenced in line " + lineNumber);
                     }
-                    currentGroup.getCommands().add(command);
+                    if (conditionalDepth > 0) {
+                        if (conditionalsElse[conditionalDepth]) {
+                            conditionals[conditionalDepth].getElseGroup().getCommands().add(command);
+                        } else {
+                            conditionals[conditionalDepth].getGroup().getCommands().add(command);
+                        }
+                    } else {
+                        currentGroup.getCommands().add(command);
+                    }
                     continue;
                 }
                 
