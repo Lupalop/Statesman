@@ -91,7 +91,7 @@ public class Interpreter {
             
             // Debug mode keywords
             if (App.debugMode) {
-                if (currentKeyword.startsWith("tp")) {
+                if (currentKeyword.startsWith("*tp")) {
                     String[] keywordParts = currentKeyword.split(" ");
                     if (keywordParts.length == 2) {
                         Command tpAction = new SceneCommand(keywordParts[1]);
@@ -99,7 +99,7 @@ public class Interpreter {
                         continue;
                     }
                 }
-                if (currentKeyword.startsWith("set")) {
+                if (currentKeyword.startsWith("*set")) {
                     String[] keywordParts = currentKeyword.split(" ");
                     if (keywordParts.length == 3) {
                         try {
