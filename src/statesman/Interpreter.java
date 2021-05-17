@@ -26,6 +26,7 @@ public class Interpreter {
         _commands.put(BreakCommand.Id, new BreakCommand());
         _commands.put(ConditionalJumpCommand.Id, new ConditionalJumpCommand());
         _commands.put(SetSwitchCommand.Id, new SetSwitchCommand());
+        _commands.put(QuitCommand.Id, new QuitCommand());
 
         _source = null;
         _currentScene = null;
