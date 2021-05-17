@@ -2,17 +2,17 @@ package statesman.actions;
 
 import statesman.Scene;
 
-public class BreakCommand extends JumpCommand {
+public class ReturnCommand extends JumpCommand {
 
-    public static final String Id = "break";
+    public static final String Id = "ret";
 
-    public BreakCommand() {
+    public ReturnCommand() {
         super();
     }
 
     @Override
     public Command createInstance(Scene parent, String[] arguments) {
-        return new BreakCommand();
+        return new ReturnCommand();
     }
 
     @Override

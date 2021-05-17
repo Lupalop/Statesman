@@ -32,13 +32,13 @@ public class ConditionalJumpCommand extends JumpCommand {
         if (arguments.length == 4) {
             int switchId = Integer.parseInt(arguments[1]);
             int lineIfTrue = 0;
-            if (arguments[2].equalsIgnoreCase("break")) {
+            if (arguments[2].equalsIgnoreCase("ret")) {
                 lineIfTrue = Integer.MAX_VALUE;
             } else {
                 lineIfTrue = Integer.parseInt(arguments[2]);
             }
             int lineIfFalse = 0;
-            if (arguments[3].equalsIgnoreCase("break")) {
+            if (arguments[3].equalsIgnoreCase("ret")) {
                 lineIfFalse = Integer.MAX_VALUE;
             } else {
                 lineIfFalse = Integer.parseInt(arguments[3]);

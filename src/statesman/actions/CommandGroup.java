@@ -28,11 +28,12 @@ public class CommandGroup {
         int i = 0;
         while (i < _commands.size()) {
             Command command = _commands.get(i);
-            // Handle jumps or breaks
-            if (command instanceof JumpCommand || command instanceof ConditionalJumpCommand
-                    || command instanceof BreakCommand) {
-                i = ((JumpCommand) command).getJumpIndex();
-                // Break if the index is invalid
+            // Handle jumps
+            if (command instanceof JumpCommand ||
+                command instanceof ConditionalJumpCommand ||
+                command instanceof ReturnCommand) {
+                i = ((JumpCommand)command).getJumpIndex();
+                // Stop execution if the index is invalid
                 if (i < 0 || i > _commands.size()) {
                     break;
                 }
