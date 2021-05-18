@@ -54,7 +54,7 @@ end
 ```
 
 ## Command Groups
-Command groups, as the name implies, contain a set of commands that are executed sequentially or as the way they are ordered in the data file. They are usually called and executed using the `goto` command that is associated with an action. Conditional sections can be placed inside command groups to apply conditional behavior, but the conditional jump (`cjmp`) can also be used if you prefer that format. Command group section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Command group section blocks that are outside of scenes (global) can be referenced by all scenes, while section blocks that are placed inside a scene can only be accessed by that individual scene. Local command group section blocks can override or replace global command groups in an individual scene's scope. A command group section block always starts with the `group` keyword.
+Command groups, as the name implies, contain a set of commands that are executed sequentially or as the way they are ordered in the data file. They are usually called and executed using the `goto` command that is associated with an action. Conditional sections can be placed inside command groups to apply conditional behavior, but the conditional jump [`cjmp`] can also be used if you prefer that format. Command group section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Command group section blocks that are outside of scenes (global) can be referenced by all scenes, while section blocks that are placed inside a scene can only be accessed by that individual scene. Local command group section blocks can override or replace global command groups in an individual scene's scope. A command group section block always starts with the `group` keyword.
 
 ### Command group section block (global)
 ```
@@ -158,7 +158,7 @@ Statesman allows both single-line and block comments, with the following syntax:
 ```
 
 ### Notes
-The start tag for block comments (`/*`) must appear as the first sequence (white space is excluded). The end tag for block comments (`*/`) must appear either as the first or the last sequence and it MUST NOT be placed in between.
+The start tag for block comments [`/*`] must appear as the first sequence (white space is excluded). The end tag for block comments [`*/`] must appear either as the first or the last sequence and it MUST NOT be placed in between.
 
 The following locations for comments are not allowed:
 ```
@@ -181,34 +181,34 @@ end
 
 #### `goto`
 - Executes commands inside a command group.
-- Accepts only one argument: command group name (`string`).
+- Accepts only one argument: command group name [`string`].
 - Example: `goto,view`
 #### `print`
 - Prints the message to console.
-- Accepts only one argument: message key or inline message (`string`).
+- Accepts only one argument: message key or inline message [`string`].
 - Example (key): `print,1`, `print,test`
 - Inline messages MUST NOT use commas aside from the initial one used to separate it from the keyword.
 - Example (inline): `print,1`, `print,This is an inline message!`
 - INVALID: `print,this,is,an,inline,message`
 #### `printr`
 - Randomly prints one of the provided messages to console.
-- Accepts many arguments: message keys or inline messages separated by commas (`string`).
+- Accepts many arguments: message keys or inline messages separated by commas [`string`].
 - Same rules in `print` apply, but comma can be used to separate multiple keys or inline messages.
 - Example (key): `printr,f_1,f_2,f_3`
 - Example (inline): `printr,Inline message 1,Inline message 2,Inline message 3`
 #### `printc`
 - Prints all provided messages to console.
-- Accepts many arguments: message keys or inline messages separated by commas (`string`).
+- Accepts many arguments: message keys or inline messages separated by commas [`string`].
 - Same rules in `print` apply, but comma can be used to separate multiple keys or inline messages.
 - Example (key): `printc,f_1,f_2,f_3`
 - Example (inline): `printc,Inline message 1,Inline message 2,Inline message 3`
 #### `set`
 - Sets a single switch to a boolean value.
-- Accepts two arguments: switch number (`int`) and new value (`boolean`).
+- Accepts two arguments: switch number [`int`] and new value [`boolean`].
 - Example: `set,1,true`, `set,1,false`
 #### `scene`
 - Changes the current scene to the provided scene.
-- Accepts only one argument: scene name (`string`).
+- Accepts only one argument: scene name [`string`].
 - Example: `scene,initial`, `scene,north`
 #### `quit`
 - Exits the application.
@@ -218,11 +218,11 @@ end
 
 #### `jmp`
 - Moves execution to the provided line.
-- Accepts only one argument: line number starting from zero (`int`).
+- Accepts only one argument: line number starting from zero [`int`].
 - Example: `jmp,1`, `jmp,100`
 #### `cjmp`
 - Moves execution to the provided line depending on the provided switch's value.
-- Accepts three arguments: switch number (`int`), line to jump if true (`int`), line to jump if false (`int`).
+- Accepts three arguments: switch number [`int`], line to jump if true [`int`], line to jump if false [`int`].
 - Example: `cjmp,1,1,5`, `cjmp,2,5,1`
 #### `ret`
 - Stops execution of the current block and returns to the parent block.
