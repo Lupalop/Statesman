@@ -29,11 +29,12 @@ actions
     talk|printr,t_1,t_2
     walk|printr,w_1,w_2
     quit|quit
+    inventory,check inventory,get inventory,inv,check inv,get inv|invlist
 end
 
 // Global command groups
 group junk
-    0|cjmp,0,1,3
+    0|sjmp,0,1,3
     1|print,otherjunk
     2|ret
     3|set,0,true
@@ -59,7 +60,7 @@ scene initial
         12|You screamed, "No!"
         13|You've already said no, weirdo.
     end
-
+    
     // Intro
     group $
         print,0
@@ -72,7 +73,7 @@ scene initial
         take rock|print,2
         wave back|print,3
         no|print,4
-        dummy|print,5
+        dummy|print,dummy
         random|printr,1,2
         combine|printc,1,2,3,4
         walk north, walk n|scene,north
@@ -90,7 +91,7 @@ scene initial
     // Command group: view
     group view
         // conditional jump, switch #, line if true, line if false
-        0|cjmp,1,1,3
+        0|sjmp,1,1,3
         1|print,0
         2|ret
         3|set,1,true
@@ -122,7 +123,8 @@ scene initial
     
     group pick_rock
         if 99
-            if !100
+            if_inv !rock
+                invset,rock,add
                 print,6
                 set,100,true
             else
@@ -158,6 +160,115 @@ scene initial
             printr,t_1,t_2
         end
     end
+    
+    actions
+        rocka|goto,inventory_test
+        rockb|goto,inventory_test_inverted
+        rockadd|invset,rock,add
+        rockrm|invset,rock,rm
+    end
+
+    items
+        rock|A dirty rock picked from somewhere. Hmm?
+        paper|This is a paper
+        pen|This is a pen
+    end
+    
+    group inventory_test
+        if_inv rock
+            print,Rock is in your inventory!
+        else
+            print,There's no rock!
+        end
+    end
+
+    group inventory_test_inverted
+        if_inv !rock
+            print,There's no rock!
+        else
+            print,Rock is in your inventory!
+        end
+    end
+
+    actions
+        pp|goto,paper_pen
+        penadd|invset,pen,add
+        penrm|invset,pen,rm
+        paperadd|invset,paper,add
+        paperrm|invset,paper,rm
+    end
+    
+    group paper_pen
+        print,Individual conditions:%n
+        if_inv paper
+            print,we have paper
+        end
+        if_inv !paper
+            print,no paper here
+        end
+        if_inv pen
+            print,we have a pen
+        end
+        if_inv !pen
+            print,no pen here
+        end
+        print,%nAND/OR conditions:%n
+        if_inv paper,pen
+            print,paper AND pen
+        end
+        if_inv paper;pen
+            print,paper OR pen
+        end
+        if_inv pen,paper
+            print,pen AND paper
+        end
+        if_inv pen;paper
+            print,pen OR paper
+        end
+        print,%nNOT AND conditions:%n
+        if_inv !paper,!pen
+            print,NOT paper AND NOT pen
+        end
+        if_inv !pen,!paper
+            print,NOT pen AND NOT paper
+        end
+        print,%nNOT OR conditions:%n
+        if_inv !paper;!pen
+            print,NOT paper OR NOT pen
+        end
+        if_inv !pen;!paper
+            print,NOT pen OR NOT paper
+        end
+        print,%nNOT AND HAS conditions:%n
+        if_inv !paper,pen
+            print,NOT paper AND HAS pen
+        end
+        if_inv !pen,paper
+            print,NOT pen AND HAS paper
+        end
+        print,%nHAS AND NOT conditions:%n
+        if_inv paper,!pen
+            print,HAS paper AND NOT pen
+        end
+        if_inv pen,!paper
+            print,HAS pen AND NOT paper
+        end
+        print,%nNOT OR HAS conditions:%n
+        if_inv !paper;pen
+            print,NOT paper OR HAS pen
+        end
+        if_inv !pen;paper
+            print,NOT pen OR HAS paper
+        end
+        print,%nHAS OR NOT conditions:%n
+        if_inv paper;!pen
+            print,HAS paper OR NOT pen
+        end
+        if_inv pen;!paper
+            print,HAS pen OR NOT paper
+        end
+    end
+    
 end
 
 // Scene: north
@@ -175,7 +286,7 @@ scene north
     // Command group: view
     group view
         // conditional jump, switch #, line if true, line if false
-        0|cjmp,2,1,3
+        0|sjmp,2,1,3
         1|print,nothing2
         2|ret
         3|set,2,true
