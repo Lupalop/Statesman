@@ -35,7 +35,7 @@ public class Content {
         return true;
     }
 
-    private enum SectionBlock { None, Scene, Group, Actions, Messages };
+    private enum SectionBlock { None, Scene, Group, Actions, Messages, Items };
     
     private static void parseData() {
         _source = new GameData();
@@ -112,6 +112,7 @@ public class Content {
                         currentGroup = null;
                     case Actions:
                     case Messages:
+                    case Items:
                         if (currentScene != null) {
                             currentSectionBlock = SectionBlock.Scene;
                         } else {
@@ -156,7 +157,20 @@ public class Content {
                                 throw new GameException("Conditional sections are only allowed inside command groups, see line " + lineNumber);
                             }
                             conditionalDepth++;
-                            conditionals[conditionalDepth] = (ConditionalCommand)new ConditionalCommand().createInstance(sectionParts);
+                            conditionals[conditionalDepth] = (ConditionalCommand)Interpreter
+                                    .getCommands()
+                                    .get(SwitchConditionalCommand.Id)
+                                    .createInstance(sectionParts);
+                            continue;
+                        case "if_inv":
+                            if (currentGroup == null) {
+                                throw new GameException("Conditional sections are only allowed inside command groups, see line " + lineNumber);
+                            }
+                            conditionalDepth++;
+                            conditionals[conditionalDepth] = (ConditionalCommand)Interpreter
+                                    .getCommands()
+                                    .get(InventoryConditionalCommand.Id)
+                                    .createInstance(sectionParts);
                             continue;
                         default:
                             break;
@@ -177,6 +191,12 @@ public class Content {
                             continue;
                         case "messages":
                             currentSectionBlock = SectionBlock.Messages;
+                            continue;
+                        case "items":
+                            if (currentSectionBlock != SectionBlock.Scene) {
+                                throw new GameException("The items section MUST be inside a scene section, see line " + lineNumber);
+                            }
+                            currentSectionBlock = SectionBlock.Items;
                             continue;
                         default:
                             break;
@@ -311,6 +331,26 @@ public class Content {
                         throw new GameException("Duplicate key was specified by the message in line " + lineNumber);
                     }
                     _source.getMessages().put(key, value);
+                    continue;
+                }
+                
+                // Items section
+                if (currentSectionBlock == SectionBlock.Items) {
+                    if (parts.length != 2) {
+                        throw new GameException("Incorrect argument count was specified by the inventory item in line " + lineNumber);
+                    }
+                    String keyword = parts[0];
+                    String description = parts[1];
+                    // Missing keys
+                    if (keyword.isBlank()) {
+                        throw new GameException("Missing inventory item key in line " + lineNumber);
+                    }
+                    // Key already in use 
+                    if (currentScene.getItems().containsKey(keyword)) {
+                        throw new GameException("Duplicate key was specified by the inventory item in line " + lineNumber);
+                    }
+                    InventoryItem item = new InventoryItem(keyword, description);
+                    currentScene.getItems().put(keyword, item);
                     continue;
                 }
                 

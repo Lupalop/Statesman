@@ -4,14 +4,17 @@ public class JumpCommand implements Command {
 
     public static final String Id = "jmp";
 
-    private int _jumpIndex;
+    protected int _lineIfTrue;
+    protected int _lineIfFalse;
 
     public JumpCommand() {
-        _jumpIndex = 0;
+        _lineIfTrue = 0;
+        _lineIfFalse = 0;
     }
 
     public JumpCommand(int line) {
-        _jumpIndex = line;
+        super();
+        _lineIfTrue = line;
     }
 
     @Override
@@ -27,8 +30,18 @@ public class JumpCommand implements Command {
     public void execute() {
     }
 
+    protected int getLineNumberFromString(String lineNumber) {
+        int index = 0;
+        if (lineNumber.equalsIgnoreCase("ret")) {
+            index = Integer.MAX_VALUE;
+        } else {
+            index = Integer.parseInt(lineNumber);
+        }
+        return index;
+    }
+    
     public int getJumpIndex() {
-        return _jumpIndex;
+        return _lineIfTrue;
     }
 
 }

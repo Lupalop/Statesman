@@ -30,7 +30,6 @@ public class CommandGroup {
             Command command = _commands.get(i);
             // Handle jumps
             if (command instanceof JumpCommand ||
-                command instanceof ConditionalJumpCommand ||
                 command instanceof ReturnCommand) {
                 i = ((JumpCommand)command).getJumpIndex();
                 // Stop execution if the index is invalid

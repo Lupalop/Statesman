@@ -13,6 +13,7 @@ public class Interpreter {
     private static GameData _source;
     private static Scene _currentScene;
     private static boolean[] _switches;
+    private static HashMap<String, InventoryItem> _inventory;
     private static boolean _isRunning = false;
 
     static {
@@ -25,14 +26,19 @@ public class Interpreter {
         _commands.put(GotoCommand.Id, new GotoCommand());
         _commands.put(JumpCommand.Id, new JumpCommand());
         _commands.put(ReturnCommand.Id, new ReturnCommand());
-        _commands.put(ConditionalJumpCommand.Id, new ConditionalJumpCommand());
         _commands.put(SetSwitchCommand.Id, new SetSwitchCommand());
+        _commands.put(SwitchJumpCommand.Id, new SwitchJumpCommand());
+        _commands.put(SwitchConditionalCommand.Id, new SwitchConditionalCommand());
+        _commands.put(InventorySetCommand.Id, new InventorySetCommand());
+        _commands.put(InventoryJumpCommand.Id, new InventoryJumpCommand());
+        _commands.put(InventoryConditionalCommand.Id, new InventoryConditionalCommand());
+        _commands.put(InventoryListCommand.Id, new InventoryListCommand());
         _commands.put(QuitCommand.Id, new QuitCommand());
-        _commands.put(ConditionalCommand.Id, new ConditionalCommand());
 
         _source = null;
         _currentScene = null;
         _switches = new boolean[switchSize];
+        _inventory = new HashMap<String, InventoryItem>();
         Arrays.fill(_switches, false);
     }
 
@@ -161,6 +167,14 @@ public class Interpreter {
 
     public static boolean[] getSwitches() {
         return _switches;
+    }
+
+    public static HashMap<String, InventoryItem> getInventory() {
+        return _inventory;
+    }
+
+    public static void setInventory(HashMap<String, InventoryItem> inventory) {
+        _inventory = inventory;
     }
 
 }
