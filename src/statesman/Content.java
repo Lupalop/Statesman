@@ -100,7 +100,7 @@ public class Content {
                     case Group:
                         if (currentGroup == null)
                         {
-                            throw new MalformedResourceException("Ending an invalid group in line " + lineNumber);
+                            throw new GameException("Ending an invalid group in line " + lineNumber);
                         }
                         // Global command groups
                         if (currentScene == null) {
@@ -121,7 +121,7 @@ public class Content {
                     case Scene:
                         if (currentScene == null)
                         {
-                            throw new MalformedResourceException("Ending an invalid scene in line " + lineNumber);
+                            throw new GameException("Ending an invalid scene in line " + lineNumber);
                         }
                         _source.getScenes().put(currentScene.getName(), currentScene);
                         currentScene = null;
@@ -129,7 +129,7 @@ public class Content {
                         continue;
                     case None:
                     default:
-                        throw new MalformedResourceException("Stray end tag in line " + lineNumber);
+                        throw new GameException("Stray end tag in line " + lineNumber);
                     }
                 }
                 
@@ -140,7 +140,7 @@ public class Content {
                         switch (sectionParts[0]) {
                         case "else":
                             if (conditionals[conditionalDepth] == null || conditionalsElse[conditionalDepth]) {
-                                throw new MalformedResourceException("Stray else tag in line " + lineNumber);
+                                throw new GameException("Stray else tag in line " + lineNumber);
                             }
                             conditionalsElse[conditionalDepth] = true;
                             continue;
@@ -153,7 +153,7 @@ public class Content {
                         switch (sectionParts[0]) {
                         case "if":
                             if (currentGroup == null) {
-                                throw new MalformedResourceException("Conditional sections are only allowed inside command groups, see line " + lineNumber);
+                                throw new GameException("Conditional sections are only allowed inside command groups, see line " + lineNumber);
                             }
                             conditionalDepth++;
                             conditionals[conditionalDepth] = (ConditionalCommand)new ConditionalCommand().createInstance(sectionParts);
@@ -189,16 +189,16 @@ public class Content {
                         case "scene":
                             // Nested scenes
                             if (currentScene != null) {
-                                throw new MalformedResourceException("Nested scenes are not allowed, see line " + lineNumber);
+                                throw new GameException("Nested scenes are not allowed, see line " + lineNumber);
                             }
                             String sceneName = sectionParts[1];
                             // Missing keys (empty/blank)
                             if (sceneName.isBlank()) {
-                                throw new MalformedResourceException("Missing scene name in line " + lineNumber);
+                                throw new GameException("Missing scene name in line " + lineNumber);
                             }
                             // Scene name already in use
                             if (_source.getScenes().containsKey(sceneName)) {
-                                throw new MalformedResourceException("Scene name already in use was specified in line " + lineNumber);
+                                throw new GameException("Scene name already in use was specified in line " + lineNumber);
                             }
                             currentScene = new Scene(sceneName);
                             currentSectionBlock = SectionBlock.Scene;
@@ -206,23 +206,23 @@ public class Content {
                         case "group":
                             // Nested groups
                             if (currentGroup != null) {
-                                throw new MalformedResourceException("Nested command groups are not allowed, see line " + lineNumber);
+                                throw new GameException("Nested command groups are not allowed, see line " + lineNumber);
                             }
                             String groupName = sectionParts[1];
                             // Missing keys
                             if (groupName.isBlank()) {
-                                throw new MalformedResourceException("Missing command group name in line " + lineNumber);
+                                throw new GameException("Missing command group name in line " + lineNumber);
                             }
                             if (currentScene == null) {
                                 // Reserved group name (command ran on entry)
                                 if (groupName.equals(Scene.entryCommandGroup)) {
-                                    throw new MalformedResourceException("Use of reserved command group name in line " + lineNumber);
+                                    throw new GameException("Use of reserved command group name in line " + lineNumber);
                                 }
                             } else {
                                 // Group name already in use locally
                                 // Overriding global command groups are allowed
                                 if (currentScene.getCommandGroups().containsKey(groupName)) {
-                                    throw new MalformedResourceException("Command group name already in use locally was specified in line " + lineNumber);
+                                    throw new GameException("Command group name already in use locally was specified in line " + lineNumber);
                                 }
                             }
                             currentGroup = new CommandGroup(groupName);
@@ -234,7 +234,7 @@ public class Content {
                     }
 
                     // Invalid or unknown section tag
-                    throw new MalformedResourceException("Invalid or unknown section tag in line " + lineNumber);
+                    throw new GameException("Invalid or unknown section tag in line " + lineNumber);
                 }
                 
                 String[] parts = line.split("\\|");
@@ -242,13 +242,13 @@ public class Content {
                 // Actions section: commands linked to keywords
                 if (currentSectionBlock == SectionBlock.Actions) {
                     if (parts.length != 2) {
-                        throw new MalformedResourceException("Incorrect argument count for the action in line " + lineNumber);
+                        throw new GameException("Incorrect argument count for the action in line " + lineNumber);
                     }
                     String[] keywords = parts[0].split(",");
                     String[] arguments = parts[1].split(",");
                     Command command = Interpreter.findCommand(arguments);
                     if (command == null) {
-                        throw new MalformedResourceException("Unknown command was referenced by the action in line " + lineNumber);
+                        throw new GameException("Unknown command was referenced by the action in line " + lineNumber);
                     }
                     for (int j = 0; j < keywords.length; j++) {
                         // Global actions
@@ -265,7 +265,7 @@ public class Content {
                 // Command group section: a group of commands
                 if (currentSectionBlock == SectionBlock.Group) {
                     if (currentGroup == null) {
-                        throw new MalformedResourceException("Invalid command group in line " + lineNumber);
+                        throw new GameException("Invalid command group in line " + lineNumber);
                     }
                     String[] arguments;
                     // With line numbers
@@ -276,11 +276,11 @@ public class Content {
                         arguments = parts[0].split(",");
                     // Weird argument count
                     } else {
-                        throw new MalformedResourceException("Incorrect argument count was specified by the command in line " + lineNumber);
+                        throw new GameException("Incorrect argument count was specified by the command in line " + lineNumber);
                     }
                     Command command = Interpreter.findCommand(arguments);
                     if (command == null) {
-                        throw new MalformedResourceException("Unknown command was referenced in line " + lineNumber);
+                        throw new GameException("Unknown command was referenced in line " + lineNumber);
                     }
                     if (conditionalDepth > 0) {
                         if (conditionalsElse[conditionalDepth]) {
@@ -298,23 +298,23 @@ public class Content {
                 // XXX: messages are always global regardless of placement
                 if (currentSectionBlock == SectionBlock.Messages) {
                     if (parts.length != 2) {
-                        throw new MalformedResourceException("Incorrect argument count was specified by the message in line " + lineNumber);
+                        throw new GameException("Incorrect argument count was specified by the message in line " + lineNumber);
                     }
                     String key = parts[0];
                     String value = parts[1];
                     // Missing keys
                     if (key.isBlank()) {
-                        throw new MalformedResourceException("Missing message key in line " + lineNumber);
+                        throw new GameException("Missing message key in line " + lineNumber);
                     }
                     // Key already in use 
                     if (_source.getMessages().containsKey(key)) {
-                        throw new MalformedResourceException("Duplicate key was specified by the message in line " + lineNumber);
+                        throw new GameException("Duplicate key was specified by the message in line " + lineNumber);
                     }
                     _source.getMessages().put(key, value);
                     continue;
                 }
                 
-                throw new MalformedResourceException("Invalid text in line " + lineNumber);
+                throw new GameException("Invalid text in line " + lineNumber);
             }
         } catch (Exception e) {
             if (App.debugMode) {
