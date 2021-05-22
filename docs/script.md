@@ -122,6 +122,21 @@ group wave
 end
 ```
 
+### Command group section block (if-style conditional - inventory)
+```
+group check_rock
+    // Checks if the item "rock" exists in the global inventory
+    if_inv rock
+        // Print message with a key of `9`
+        print,9
+    // If the item "rock" is NOT in the global inventory
+    else
+        // Print message with a key of `11`
+        print,11
+    end
+end
+```
+
 ### Command group section block (conditional jump)
 ```
 group view
@@ -206,6 +221,16 @@ end
 - Sets a single switch to a boolean value.
 - Accepts two arguments: switch number [`int`] and new value [`boolean`].
 - Example: `set,1,true`, `set,1,false`
+#### `invset`
+- Adds or removes an item to the global inventory.
+- The item MUST be present in the current scene's `items` section **only adding items**.
+- The item MUST be present in the **global inventory** when **removing items**, otherwise a message will be shown stating that the item does not exist in the inventory.
+- Accepts three arguments: item name [`string`] and action [either: `add` for adding an item or `rm` for removing an item].
+- Example: `invset,rock,add`, `invset,rock,rm`
+#### `invlist`
+- Lists all the items in the global inventory
+- Does NOT accept any arguments.
+- Example: `invlist`
 #### `scene`
 - Changes the current scene to the provided scene.
 - Accepts only one argument: scene name [`string`].
@@ -213,6 +238,7 @@ end
 #### `quit`
 - Exits the application.
 - Does NOT accept any arguments.
+- Example: `quit`
 
 ### Commands that can only be used in command groups:
 
@@ -220,13 +246,17 @@ end
 - Moves execution to the provided line.
 - Accepts only one argument: line number starting from zero [`int`].
 - Example: `jmp,1`, `jmp,100`
-#### `cjmp`
+#### `sjmp`
 - Moves execution to the provided line depending on the provided switch's value.
 - Accepts three arguments: switch number [`int`], line to jump if true [`int`], line to jump if false [`int`].
-- Example: `cjmp,1,1,5`, `cjmp,2,5,1`
+- Example: `sjmp,1,1,5`, `sjmp,2,5,1`
+#### `ijmp`
+- Moves execution to the provided line depending on the presence of an item in the global inventory
+- Accepts three arguments: item name [`string`], line to jump if present [`int`], line to jump if absent [`int`].
+- Example: `ijmp,rock,1,5`, `ijmp,pen,5,1`
 #### `ret`
 - Stops execution of the current block and returns to the parent block.
 - Does NOT accept any arguments.
-#### `cond`
-- This is a **reserved** command used in allowing if-style conditional blocks.
-- Do NOT use this under any circumstances.
+#### `cond`, `swcond`, `invcond`
+- These are **reserved** commands used in allowing if-style conditional blocks.
+- **DO NOT** use these commands under any circumstances.
