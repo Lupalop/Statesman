@@ -5,14 +5,14 @@ import java.util.HashMap;
 import statesman.commands.Command;
 import statesman.commands.CommandGroup;
 
-public class ContentTuple {
+public class GameData {
 
     private HashMap<String, String> _messages;
     private HashMap<String, Scene> _scenes;
     private HashMap<String, Command> _actions;
     private HashMap<String, CommandGroup> _commandGroups;
     
-    public ContentTuple() {
+    public GameData() {
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();

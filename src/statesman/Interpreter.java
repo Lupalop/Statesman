@@ -10,7 +10,7 @@ public class Interpreter {
     
     private static Scanner _scanner;
     private static HashMap<String, Command> _commands;
-    private static ContentTuple _source;
+    private static GameData _source;
     private static Scene _currentScene;
     private static boolean[] _switches;
     private static boolean _isRunning = false;
@@ -142,11 +142,11 @@ public class Interpreter {
         return _commands;
     }
 
-    public static ContentTuple getSource() {
+    public static GameData getSource() {
         return _source;
     }
     
-    public static void setSource(ContentTuple source) {
+    public static void setSource(GameData source) {
         _source = source;
     }
 

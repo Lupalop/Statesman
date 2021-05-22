@@ -13,7 +13,7 @@ public class Content {
     private static boolean _dataParsed;
     private static Path _dataPath;
     private static List<String> _data;
-    private static ContentTuple _source;
+    private static GameData _source;
 
     static {
         _dataParsed = false;
@@ -38,7 +38,7 @@ public class Content {
     private enum SectionBlock { None, Scene, Group, Actions, Messages };
     
     private static void parseData() {
-        _source = new ContentTuple();
+        _source = new GameData();
 
         try {
             Scene currentScene = null;
@@ -325,7 +325,7 @@ public class Content {
         _dataParsed = true;
     }
     
-    public static ContentTuple getSource() {
+    public static GameData getSource() {
         if (!_dataParsed) {
             parseData();
         }
