@@ -2,7 +2,6 @@ package statesman.commands;
 
 import java.util.Random;
 import statesman.Interpreter;
-import statesman.Scene;
 
 public class PrintRandomCommand implements Command {
 
@@ -24,18 +23,13 @@ public class PrintRandomCommand implements Command {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length > 2) {
             String[] messages = new String[arguments.length - 1];
             System.arraycopy(arguments, 1, messages, 0, arguments.length - 1);
             return new PrintRandomCommand(messages);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override

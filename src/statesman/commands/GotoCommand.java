@@ -1,7 +1,6 @@
 package statesman.commands;
 
 import statesman.Interpreter;
-import statesman.Scene;
 
 public class GotoCommand implements Command {
 
@@ -22,16 +21,11 @@ public class GotoCommand implements Command {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length == 2) {
             return new GotoCommand(arguments[1]);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override

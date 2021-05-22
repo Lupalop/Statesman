@@ -1,12 +1,8 @@
 package statesman.commands;
 
-import statesman.Scene;
-
 public interface Command {
 
     public static final String Id = "";
-
-    public abstract Command createInstance(Scene parent, String[] arguments);
 
     public abstract Command createInstance(String[] arguments);
 

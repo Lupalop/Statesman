@@ -1,7 +1,5 @@
 package statesman.commands;
 
-import statesman.Scene;
-
 public class ReturnCommand extends JumpCommand {
 
     public static final String Id = "ret";
@@ -11,13 +9,8 @@ public class ReturnCommand extends JumpCommand {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
-        return new ReturnCommand();
-    }
-
-    @Override
     public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
+        return new ReturnCommand();
     }
 
     @Override

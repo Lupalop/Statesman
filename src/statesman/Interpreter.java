@@ -36,11 +36,11 @@ public class Interpreter {
         Arrays.fill(_switches, false);
     }
 
-    public static Command findCommand(Scene parent, String[] arguments) {
+    public static Command findCommand(String[] arguments) {
         String commandId = arguments[0].toLowerCase();
         Command command = getCommands().getOrDefault(commandId, null);
         if (command != null) {
-            return command.createInstance(parent, arguments);
+            return command.createInstance(arguments);
         }
         return null;
     }

@@ -1,7 +1,6 @@
 package statesman.commands;
 
 import statesman.Interpreter;
-import statesman.Scene;
 
 public class ConditionalCommand implements Command {
 
@@ -31,7 +30,7 @@ public class ConditionalCommand implements Command {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length == 2) {
             String[] parts;
             boolean orMode = arguments[1].contains(";");
@@ -64,11 +63,6 @@ public class ConditionalCommand implements Command {
                     orMode);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override

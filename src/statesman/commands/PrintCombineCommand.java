@@ -1,7 +1,6 @@
 package statesman.commands;
 
 import statesman.Interpreter;
-import statesman.Scene;
 
 public class PrintCombineCommand implements Command {
 
@@ -21,18 +20,13 @@ public class PrintCombineCommand implements Command {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length > 2) {
             String[] messages = new String[arguments.length - 1];
             System.arraycopy(arguments, 1, messages, 0, arguments.length - 1);
             return new PrintCombineCommand(messages);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override

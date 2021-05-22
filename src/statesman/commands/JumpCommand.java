@@ -1,7 +1,5 @@
 package statesman.commands;
 
-import statesman.Scene;
-
 public class JumpCommand implements Command {
 
     public static final String Id = "jmp";
@@ -17,17 +15,12 @@ public class JumpCommand implements Command {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length == 2) {
             int line = Integer.parseInt(arguments[1]);
             return new JumpCommand(line);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override

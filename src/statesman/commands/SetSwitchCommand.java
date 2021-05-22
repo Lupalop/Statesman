@@ -1,7 +1,6 @@
 package statesman.commands;
 
 import statesman.Interpreter;
-import statesman.Scene;
 
 public class SetSwitchCommand implements Command {
 
@@ -24,18 +23,13 @@ public class SetSwitchCommand implements Command {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length == 3) {
             int switchId = Integer.parseInt(arguments[1]);
             boolean value = Boolean.parseBoolean(arguments[2]);
             return new SetSwitchCommand(switchId, value);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override

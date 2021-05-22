@@ -246,7 +246,7 @@ public class Content {
                     }
                     String[] keywords = parts[0].split(",");
                     String[] arguments = parts[1].split(",");
-                    Command command = Interpreter.findCommand(currentScene, arguments);
+                    Command command = Interpreter.findCommand(arguments);
                     if (command == null) {
                         throw new MalformedResourceException("Unknown command was referenced by the action in line " + lineNumber);
                     }
@@ -278,7 +278,7 @@ public class Content {
                     } else {
                         throw new MalformedResourceException("Incorrect argument count was specified by the command in line " + lineNumber);
                     }
-                    Command command = Interpreter.findCommand(currentScene, arguments);
+                    Command command = Interpreter.findCommand(arguments);
                     if (command == null) {
                         throw new MalformedResourceException("Unknown command was referenced in line " + lineNumber);
                     }

@@ -1,7 +1,6 @@
 package statesman.commands;
 
 import statesman.Interpreter;
-import statesman.Scene;
 
 public class ConditionalJumpCommand extends JumpCommand {
 
@@ -28,7 +27,7 @@ public class ConditionalJumpCommand extends JumpCommand {
     }
 
     @Override
-    public Command createInstance(Scene parent, String[] arguments) {
+    public Command createInstance(String[] arguments) {
         if (arguments.length == 4) {
             int switchId = Integer.parseInt(arguments[1]);
             int lineIfTrue = 0;
@@ -46,11 +45,6 @@ public class ConditionalJumpCommand extends JumpCommand {
             return new ConditionalJumpCommand(switchId, lineIfTrue, lineIfFalse);
         }
         return null;
-    }
-
-    @Override
-    public Command createInstance(String[] arguments) {
-        return createInstance(null, arguments);
     }
 
     @Override
