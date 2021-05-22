@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import statesman.actions.*;
+import statesman.commands.*;
 
 public class Content {
 

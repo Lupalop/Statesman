@@ -1,4 +1,4 @@
-package statesman.actions;
+package statesman.commands;
 
 import statesman.Interpreter;
 import statesman.Scene;

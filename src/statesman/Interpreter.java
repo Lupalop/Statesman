@@ -1,7 +1,8 @@
 package statesman;
 
 import java.util.*;
-import statesman.actions.*;
+
+import statesman.commands.*;
 
 public class Interpreter {
 

@@ -1,8 +1,9 @@
 package statesman;
 
 import java.util.HashMap;
-import statesman.actions.Command;
-import statesman.actions.CommandGroup;
+
+import statesman.commands.Command;
+import statesman.commands.CommandGroup;
 
 public class ContentTuple {
 
