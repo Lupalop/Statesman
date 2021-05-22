@@ -16,7 +16,7 @@ messages
     w_1|Where?
     w_2|May I know which direction?
     // Dummies
-    5|Dummy message.
+    dummy|Dummy message.
     junk|You are a piece of junk too!
     otherjunk|You are a huge steaming pile of junk, man!
 end
@@ -94,7 +94,7 @@ scene initial
         1|print,0
         2|ret
         3|set,1,true
-        4|print,5
+        4|print,dummy
     end
 
     /*
