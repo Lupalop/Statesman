@@ -12,7 +12,7 @@ public class InventoryCommand implements Command {
     private String _itemName;
     private InventoryAction _action;
     
-    public enum InventoryAction { Add, Remove, List };
+    public enum InventoryAction { Add, Remove, Clear, List };
     
     public InventoryCommand() {
         _itemName = null;
@@ -20,7 +20,7 @@ public class InventoryCommand implements Command {
     }
     
     public InventoryCommand(InventoryAction action, String itemName) {
-        if (action != InventoryAction.List && itemName.isBlank()) {
+        if ((action != InventoryAction.List && action != InventoryAction.Clear) && itemName.isBlank()) {
             throw new IllegalArgumentException("Inventory item name cannot be blank");
         }
         if (action == null) {
@@ -43,6 +43,9 @@ public class InventoryCommand implements Command {
             switch (actionString) {
             case "list":
                 action = InventoryAction.List;
+                break;
+            case "clear":
+                action = InventoryAction.Clear;
                 break;
             default:
                 action = null;
@@ -114,6 +117,8 @@ public class InventoryCommand implements Command {
                 // TODO: use messages provided by the interpreter's source
                 System.out.println("Your inventory is empty!");
             }
+        } else if (_action == InventoryAction.Clear) {
+            Interpreter.getInventory().clear();
         }
     }
 
