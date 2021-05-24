@@ -19,7 +19,7 @@ public class InventoryCommand implements Command {
         _action = null;
     }
     
-    public InventoryCommand(String itemName, InventoryAction action) {
+    public InventoryCommand(InventoryAction action, String itemName) {
         if (action != InventoryAction.List && itemName.isBlank()) {
             throw new IllegalArgumentException("Inventory item name cannot be blank");
         }
@@ -31,15 +31,15 @@ public class InventoryCommand implements Command {
     }
     
     public InventoryCommand(InventoryAction action) {
-        this(null, action);
+        this(action, null);
     }
 
     @Override
     public Command createInstance(String[] arguments) {
         String actionString = null;
+        InventoryAction action = null;
         if (arguments.length == 2) {
             actionString = arguments[1].trim().toLowerCase();
-            InventoryAction action = null;
             switch (actionString) {
             case "list":
                 action = InventoryAction.List;
@@ -50,9 +50,7 @@ public class InventoryCommand implements Command {
             }
             return new InventoryCommand(action);
         } else if (arguments.length == 3) {
-            String itemName = arguments[1].trim();
-            actionString = arguments[2].trim().toLowerCase();
-            InventoryAction action = null;
+            actionString = arguments[1].trim().toLowerCase();
             switch (actionString) {
             case "add":
                 action = InventoryAction.Add;
@@ -64,7 +62,8 @@ public class InventoryCommand implements Command {
                 action = null;
                 break;
             }
-            return new InventoryCommand(itemName, action);
+            String itemName = arguments[2].trim();
+            return new InventoryCommand(action, itemName);
         }
         return null;
     }
