@@ -7,16 +7,29 @@ import statesman.commands.CommandGroup;
 
 public class GameData {
 
+    private int _maxPoints;
     private HashMap<String, String> _messages;
     private HashMap<String, Scene> _scenes;
     private HashMap<String, Command> _actions;
     private HashMap<String, CommandGroup> _commandGroups;
     
     public GameData() {
+        _maxPoints = 0;
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();
         _commandGroups = new HashMap<String, CommandGroup>(); 
+    }
+
+    public int getMaxPoints() {
+        return _maxPoints;
+    }
+
+    public void setMaxPoints(int maxPoints) {
+        if (maxPoints < 0) {
+            throw new IllegalArgumentException("The maximum number of points must be greater than or equal to zero");
+        }
+        this._maxPoints = maxPoints;
     }
 
     public HashMap<String, String> getMessages() {

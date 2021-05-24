@@ -14,6 +14,7 @@ public class Interpreter {
     private static Scene _currentScene;
     private static boolean[] _switches;
     private static HashMap<String, InventoryItem> _inventory;
+    private static int _points;
     private static boolean _isRunning = false;
 
     static {
@@ -33,6 +34,7 @@ public class Interpreter {
         _commands.put(InventoryJumpCommand.Id, new InventoryJumpCommand());
         _commands.put(InventoryConditionalCommand.Id, new InventoryConditionalCommand());
         _commands.put(InventoryListCommand.Id, new InventoryListCommand());
+        _commands.put(PointsCommand.Id, new PointsCommand());
         _commands.put(QuitCommand.Id, new QuitCommand());
 
         _source = null;
@@ -175,6 +177,14 @@ public class Interpreter {
 
     public static void setInventory(HashMap<String, InventoryItem> inventory) {
         _inventory = inventory;
+    }
+
+    public static int getPoints() {
+        return _points;
+    }
+
+    public static void setPoints(int points) {
+        _points = points;
     }
 
 }

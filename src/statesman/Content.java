@@ -206,6 +206,16 @@ public class Content {
                     // Section tags with one (1) parameter
                     if (sectionParts.length == 2) {
                         switch (sectionParts[0]) {
+                        case "maxpoints":
+                            if (currentSectionBlock == SectionBlock.Scene) {
+                                throw new GameException("The maxpoints section tag MUST NOT appear inside a scene section block, see line " + lineNumber);
+                            }
+                            int maxPoints = Integer.parseInt(sectionParts[1]);
+                            if (maxPoints < 0) {
+                                throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + lineNumber);
+                            }
+                            _source.setMaxPoints(maxPoints);
+                            continue;
                         case "scene":
                             // Nested scenes
                             if (currentScene != null) {
