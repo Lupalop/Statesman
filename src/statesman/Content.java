@@ -10,34 +10,27 @@ import statesman.commands.*;
 
 public class Content {
 
+    private static boolean _manualSource;
     private static boolean _dataParsed;
     private static Path _dataPath;
-    private static List<String> _data;
     private static GameData _source;
 
     static {
+        _manualSource = false;
         _dataParsed = false;
         _dataPath = null;
-        _data = null;
         _source = null;
-    }
-
-    public static void loadData() throws IOException {
-        _data = Files.readAllLines(_dataPath);
-    }
-    
-    public static boolean tryLoadData() {
-        try {
-            loadData();
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
     }
 
     private enum SectionBlock { None, Scene, Group, Actions, Messages, Items };
     
-    private static void parseData() {
+    public static void loadData() throws IOException {
+        // Refuse to parse data if the source was set manually
+        if (_manualSource) {
+            return;
+        }
+        
+        List<String> _data = Files.readAllLines(_dataPath);
         _source = new GameData();
 
         try {
@@ -374,12 +367,28 @@ public class Content {
         }
         _dataParsed = true;
     }
-    
+
+    public static boolean tryLoadData() {
+        try {
+            loadData();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
     public static GameData getSource() {
-        if (!_dataParsed) {
-            parseData();
+        if (!_manualSource && !_dataParsed) {
+            tryLoadData();
         }
         return _source;
+    }
+    
+    public static void setSource(GameData source) {
+        _manualSource = true;
+        _dataPath = null;
+        _dataParsed = false;
+        _source = source;
     }
 
     public static Path getDataPath() {
@@ -387,14 +396,10 @@ public class Content {
     }
 
     public static void setDataPath(String location) {
+        _manualSource = false;
         _dataPath = Paths.get(location);
         _dataParsed = false;
-        _data = null;
         _source = null;
-    }
-
-    public static List<String> getData() {
-        return _data;
     }
 
 }
