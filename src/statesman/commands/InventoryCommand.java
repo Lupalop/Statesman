@@ -19,8 +19,8 @@ public class InventoryCommand implements Command {
         _action = null;
     }
     
-    public InventoryCommand(InventoryAction action, String itemName) {
-        if ((action != InventoryAction.List && action != InventoryAction.Clear) && itemName.isBlank()) {
+    private InventoryCommand(InventoryAction action, String itemName, boolean nameRequired) {
+        if (nameRequired && itemName.isBlank()) {
             throw new IllegalArgumentException("Inventory item name cannot be blank");
         }
         if (action == null) {
@@ -30,8 +30,12 @@ public class InventoryCommand implements Command {
         _action = action;
     }
     
+    public InventoryCommand(InventoryAction action, String itemName) {
+        this(action, itemName, true);
+    }
+    
     public InventoryCommand(InventoryAction action) {
-        this(action, null);
+        this(action, null, false);
     }
 
     @Override
@@ -75,50 +79,52 @@ public class InventoryCommand implements Command {
     public void execute() {
         InventoryItem item = getItem();
         if (item != null) {
-            if (Interpreter.getInventory().containsKey(item.getName())) {
-                // TODO: use messages provided by the interpreter's source
-                switch (_action) {
-                case Add:
+            // TODO: use messages provided by the interpreter's source
+            switch (_action) {
+            case Add:
+                if (Interpreter.getInventory().containsKey(item.getName())) {
                     System.out.println("This item is already in your inventory!");
                     break;
-                case Remove:
+                }
+                Interpreter.getInventory().put(item.getName(), item);
+                break;
+            case Remove:
+                if (Interpreter.getInventory().containsKey(item.getName())) {
                     Interpreter.getInventory().remove(_itemName);
                     break;
-                default:
-                    break;
                 }
-            } else {
-                switch (_action) {
-                case Add:
-                    Interpreter.getInventory().put(item.getName(), item);
-                    break;
-                case Remove:
-                    System.out.println("This item is NOT in your inventory!");
-                    break;
-                default:
-                    break;
-                }
+                System.out.println("This item is NOT in your inventory!");
+                break;
+            default:
+                break;
             }
-        } else if (_action == InventoryAction.List) {
-            int inventorySize = Interpreter.getInventory().size();
-            if (inventorySize > 0) {
-                // TODO: use messages provided by the interpreter's source
-                if (inventorySize == 1) {
-                    System.out.printf("You only have one item in your inventory:%n", inventorySize);
+        } else {
+            switch (_action) {
+            case List:
+                int inventorySize = Interpreter.getInventory().size();
+                if (inventorySize > 0) {
+                    // TODO: use messages provided by the interpreter's source
+                    if (inventorySize == 1) {
+                        System.out.printf("You only have one item in your inventory:%n", inventorySize);
+                    } else {
+                        System.out.printf("You have %s items in your inventory:%n", inventorySize);
+                    }
+                    Iterator<InventoryItem> iterator = Interpreter.getInventory().values().iterator();
+                    while (iterator.hasNext()) {
+                        InventoryItem currentItem = iterator.next();
+                        System.out.printf("%s: %s%n", currentItem.getName(), currentItem.getDescription());
+                    }
                 } else {
-                    System.out.printf("You have %s items in your inventory:%n", inventorySize);
+                    // TODO: use messages provided by the interpreter's source
+                    System.out.println("Your inventory is empty!");
                 }
-                Iterator<InventoryItem> iterator = Interpreter.getInventory().values().iterator();
-                while (iterator.hasNext()) {
-                    InventoryItem currentItem = iterator.next();
-                    System.out.printf("%s: %s%n", currentItem.getName(), currentItem.getDescription());
-                }
-            } else {
-                // TODO: use messages provided by the interpreter's source
-                System.out.println("Your inventory is empty!");
+                break;
+            case Clear:
+                Interpreter.getInventory().clear();
+                break;
+            default:
+                break;
             }
-        } else if (_action == InventoryAction.Clear) {
-            Interpreter.getInventory().clear();
         }
     }
 
@@ -127,6 +133,9 @@ public class InventoryCommand implements Command {
     }
     
     private InventoryItem getItem() {
+        if (_itemName == null) {
+            return null;
+        }
         return Interpreter.getCurrentScene().getItems().get(_itemName);
     }
 
