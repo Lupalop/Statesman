@@ -10,17 +10,10 @@ import statesman.commands.*;
 
 public class Content {
 
-    private static boolean _manualSource;
-    private static boolean _dataParsed;
-    private static Path _dataPath;
-    private static GameData _source;
-
-    static {
-        _manualSource = false;
-        _dataParsed = false;
-        _dataPath = null;
-        _source = null;
-    }
+    private static boolean _manualSource = false;
+    private static boolean _dataParsed = false;
+    private static Path _dataPath = null;
+    private static GameData _source = null;
 
     private enum SectionBlock { None, Scene, Group, Actions, Messages, Items };
     
