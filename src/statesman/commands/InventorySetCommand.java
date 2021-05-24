@@ -1,5 +1,7 @@
 package statesman.commands;
 
+import java.util.Iterator;
+
 import statesman.Interpreter;
 import statesman.InventoryItem;
 
@@ -10,7 +12,7 @@ public class InventorySetCommand implements Command {
     private String _itemName;
     private InventoryAction _action;
     
-    public enum InventoryAction { Add, Remove };
+    public enum InventoryAction { Add, Remove, List };
     
     public InventorySetCommand() {
         _itemName = null;
@@ -18,7 +20,7 @@ public class InventorySetCommand implements Command {
     }
     
     public InventorySetCommand(String itemName, InventoryAction action) {
-        if (itemName.isBlank()) {
+        if (action != InventoryAction.List && itemName.isBlank()) {
             throw new IllegalArgumentException("Inventory item name cannot be blank");
         }
         if (action == null) {
@@ -27,12 +29,29 @@ public class InventorySetCommand implements Command {
         _itemName = itemName;
         _action = action;
     }
+    
+    public InventorySetCommand(InventoryAction action) {
+        this(null, action);
+    }
 
     @Override
     public Command createInstance(String[] arguments) {
-        if (arguments.length == 3) {
+        String actionString = null;
+        if (arguments.length == 2) {
+            actionString = arguments[1].trim().toLowerCase();
+            InventoryAction action = null;
+            switch (actionString) {
+            case "list":
+                action = InventoryAction.List;
+                break;
+            default:
+                action = null;
+                break;
+            }
+            return new InventorySetCommand(action);
+        } else if (arguments.length == 3) {
             String itemName = arguments[1].trim();
-            String actionString = arguments[2].trim().toLowerCase();
+            actionString = arguments[2].trim().toLowerCase();
             InventoryAction action = null;
             switch (actionString) {
             case "add":
@@ -77,6 +96,24 @@ public class InventorySetCommand implements Command {
                 default:
                     break;
                 }
+            }
+        } else if (_action == InventoryAction.List) {
+            int inventorySize = Interpreter.getInventory().size();
+            if (inventorySize > 0) {
+                // TODO: use messages provided by the interpreter's source
+                if (inventorySize == 1) {
+                    System.out.printf("You only have one item in your inventory:%n", inventorySize);
+                } else {
+                    System.out.printf("You have %s items in your inventory:%n", inventorySize);
+                }
+                Iterator<InventoryItem> iterator = Interpreter.getInventory().values().iterator();
+                while (iterator.hasNext()) {
+                    InventoryItem currentItem = iterator.next();
+                    System.out.printf("%s: %s%n", currentItem.getName(), currentItem.getDescription());
+                }
+            } else {
+                // TODO: use messages provided by the interpreter's source
+                System.out.println("Your inventory is empty!");
             }
         }
     }

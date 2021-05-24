@@ -33,7 +33,6 @@ public class Interpreter {
         _commands.put(InventorySetCommand.Id, new InventorySetCommand());
         _commands.put(InventoryJumpCommand.Id, new InventoryJumpCommand());
         _commands.put(InventoryConditionalCommand.Id, new InventoryConditionalCommand());
-        _commands.put(InventoryListCommand.Id, new InventoryListCommand());
         _commands.put(PointsCommand.Id, new PointsCommand());
         _commands.put(QuitCommand.Id, new QuitCommand());
 
