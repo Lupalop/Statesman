@@ -1,7 +1,7 @@
 package statesman.commands;
 
 import java.util.Random;
-import statesman.Interpreter;
+import statesman.Content;
 
 public class PrintRandomCommand implements Command {
 
@@ -36,7 +36,7 @@ public class PrintRandomCommand implements Command {
     public void execute() {
         if (!_initialized) {
             for (int i = 0; i < _messages.length; i++) {
-                _messages[i] = Interpreter.getSource().getMessages().getOrDefault(_messages[i], _messages[i]);
+                _messages[i] = Content.getSource().getMessages().getOrDefault(_messages[i], _messages[i]);
             }
             _initialized = true;
         }

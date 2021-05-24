@@ -1,5 +1,6 @@
 package statesman.commands;
 
+import statesman.Content;
 import statesman.Interpreter;
 
 public class PointsCommand implements Command {
@@ -91,7 +92,7 @@ public class PointsCommand implements Command {
             // TODO: use messages provided by the interpreter's source
             System.out.printf("You currently have %s of %s points.%n",
                     Interpreter.getPoints(),
-                    Interpreter.getSource().getMaxPoints());
+                    Content.getSource().getMaxPoints());
             break;
         default:
             break;

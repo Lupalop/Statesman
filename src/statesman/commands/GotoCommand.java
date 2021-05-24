@@ -1,5 +1,6 @@
 package statesman.commands;
 
+import statesman.Content;
 import statesman.Interpreter;
 
 public class GotoCommand implements Command {
@@ -30,7 +31,7 @@ public class GotoCommand implements Command {
 
     @Override
     public void execute() {
-        CommandGroup group = Interpreter.getSource().getCommandGroups().get(_groupName);
+        CommandGroup group = Content.getSource().getCommandGroups().get(_groupName);
         // Local scene groups override the global group
         if (Interpreter.getCurrentScene() != null) {
             CommandGroup localGroup = Interpreter.getCurrentScene().getCommandGroups().get(_groupName);

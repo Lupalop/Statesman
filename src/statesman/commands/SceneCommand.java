@@ -1,5 +1,6 @@
 package statesman.commands;
 
+import statesman.Content;
 import statesman.Interpreter;
 
 public class SceneCommand implements Command {
@@ -32,8 +33,8 @@ public class SceneCommand implements Command {
 
     @Override
     public void execute() {
-        if (_hasKey || Interpreter.getSource().getScenes().containsKey(_targetScene)) {
-            Interpreter.setCurrentScene(Interpreter.getSource().getScenes().get(_targetScene));
+        if (_hasKey || Content.getSource().getScenes().containsKey(_targetScene)) {
+            Interpreter.setCurrentScene(Content.getSource().getScenes().get(_targetScene));
             _hasKey = true;
         }
     }

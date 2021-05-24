@@ -10,7 +10,6 @@ public class Interpreter {
     
     private static Scanner _scanner;
     private static HashMap<String, Command> _commands;
-    private static GameData _source;
     private static Scene _currentScene;
     private static boolean[] _switches;
     private static HashMap<String, InventoryItem> _inventory;
@@ -36,7 +35,6 @@ public class Interpreter {
         _commands.put(PointsCommand.Id, new PointsCommand());
         _commands.put(QuitCommand.Id, new QuitCommand());
 
-        _source = null;
         _currentScene = null;
         _switches = new boolean[switchSize];
         _inventory = new HashMap<String, InventoryItem>();
@@ -58,12 +56,12 @@ public class Interpreter {
             return;
         }
         
-        if (_source == null) {
+        if (Content.getSource() == null) {
             System.out.println("Source is missing.");
             return;
         }
         
-        Scene initialScene = _source.getScenes().get("initial");
+        Scene initialScene = Content.getSource().getScenes().get("initial");
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");
             return;
@@ -90,9 +88,9 @@ public class Interpreter {
                 continue;
             }
             
-            boolean hasGlobalKeyword = _source.getActions().containsKey(currentKeyword);
+            boolean hasGlobalKeyword = Content.getSource().getActions().containsKey(currentKeyword);
             if (hasGlobalKeyword) {
-                currentAction = _source.getActions().get(currentKeyword);
+                currentAction = Content.getSource().getActions().get(currentKeyword);
                 currentAction.execute();
                 continue;
             }
@@ -124,7 +122,7 @@ public class Interpreter {
                 }
             }
             
-            currentAction = _source.getActions().get("fallback");
+            currentAction = Content.getSource().getActions().get("fallback");
             if (currentAction == null && App.debugMode) {
                 System.out.println("Fallback message is missing");
             } else {
@@ -147,14 +145,6 @@ public class Interpreter {
 
     public static HashMap<String, Command> getCommands() {
         return _commands;
-    }
-
-    public static GameData getSource() {
-        return _source;
-    }
-    
-    public static void setSource(GameData source) {
-        _source = source;
     }
 
     public static Scene getCurrentScene() {

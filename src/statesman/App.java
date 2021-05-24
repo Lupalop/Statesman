@@ -12,7 +12,6 @@ public class App {
 
         Content.setDataPath("./data.txt");
         if (Content.tryLoadData()) {
-            Interpreter.setSource(Content.getSource());
             Interpreter.run();
         } else {
             System.out.println("Data file is missing!");

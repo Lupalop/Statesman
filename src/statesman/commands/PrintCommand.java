@@ -1,6 +1,6 @@
 package statesman.commands;
 
-import statesman.Interpreter;
+import statesman.Content;
 
 public class PrintCommand implements Command {
 
@@ -22,7 +22,7 @@ public class PrintCommand implements Command {
     @Override
     public void execute() {
         if (!_initialized) {
-            _message = Interpreter.getSource().getMessages().getOrDefault(_message, _message);
+            _message = Content.getSource().getMessages().getOrDefault(_message, _message);
             _initialized = true;
         }
         
