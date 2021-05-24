@@ -202,6 +202,16 @@ public class Content {
                             }
                             _source.setMaxPoints(maxPoints);
                             continue;
+                        case "switches":
+                            if (currentSectionBlock == SectionBlock.Scene) {
+                                throw new GameException("The switchsize section tag MUST NOT appear inside a scene section block, see line " + lineNumber);
+                            }
+                            int switchSize = Integer.parseInt(sectionParts[1]);
+                            if (switchSize < 0) {
+                                throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + lineNumber);
+                            }
+                            _source.setSwitchSize(switchSize);
+                            continue;
                         case "scene":
                             // Nested scenes
                             if (currentScene != null) {

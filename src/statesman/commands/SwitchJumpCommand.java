@@ -14,7 +14,7 @@ public class SwitchJumpCommand extends JumpCommand {
     }
 
     public SwitchJumpCommand(int switchId, int lineIfTrue, int lineIfFalse) {
-        if (switchId < 0 || switchId > Interpreter.getSwitches().length) {
+        if (switchId < 0) {
             throw new IllegalArgumentException();
         }
         _switchId = switchId;

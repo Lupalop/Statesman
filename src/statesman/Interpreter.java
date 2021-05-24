@@ -6,8 +6,6 @@ import statesman.commands.*;
 
 public class Interpreter {
 
-    public static final int switchSize = 2000;
-    
     private static Scanner _scanner;
     private static HashMap<String, Command> _commands;
     private static Scene _currentScene;
@@ -36,9 +34,7 @@ public class Interpreter {
         _commands.put(QuitCommand.Id, new QuitCommand());
 
         _currentScene = null;
-        _switches = new boolean[switchSize];
         _inventory = new HashMap<String, InventoryItem>();
-        Arrays.fill(_switches, false);
     }
 
     public static Command findCommand(String[] arguments) {
@@ -60,7 +56,10 @@ public class Interpreter {
             System.out.println("Source is missing.");
             return;
         }
-        
+
+        _switches = new boolean[Content.getSource().getSwitchSize()];
+        Arrays.fill(_switches, false);
+
         Scene initialScene = Content.getSource().getScenes().get("initial");
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");

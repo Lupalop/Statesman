@@ -7,7 +7,10 @@ import statesman.commands.CommandGroup;
 
 public class GameData {
 
+    public static final int defaultSwitchSize = 2000;
+    
     private int _maxPoints;
+    private int _switchSize;
     private HashMap<String, String> _messages;
     private HashMap<String, Scene> _scenes;
     private HashMap<String, Command> _actions;
@@ -15,6 +18,7 @@ public class GameData {
     
     public GameData() {
         _maxPoints = 0;
+        _switchSize = defaultSwitchSize;
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();
@@ -30,6 +34,17 @@ public class GameData {
             throw new IllegalArgumentException("The maximum number of points must be greater than or equal to zero");
         }
         this._maxPoints = maxPoints;
+    }
+
+    public int getSwitchSize() {
+        return _switchSize;
+    }
+
+    public void setSwitchSize(int switchSize) {
+        if (switchSize < 0) {
+            throw new IllegalArgumentException("The number of allocated switches must be greater than or equal to zero");
+        }
+        _switchSize = switchSize;
     }
 
     public HashMap<String, String> getMessages() {
