@@ -5,21 +5,21 @@ import java.util.Iterator;
 import statesman.Interpreter;
 import statesman.InventoryItem;
 
-public class InventorySetCommand implements Command {
+public class InventoryCommand implements Command {
 
-    public static final String Id = "invset";
+    public static final String Id = "inv";
     
     private String _itemName;
     private InventoryAction _action;
     
     public enum InventoryAction { Add, Remove, List };
     
-    public InventorySetCommand() {
+    public InventoryCommand() {
         _itemName = null;
         _action = null;
     }
     
-    public InventorySetCommand(String itemName, InventoryAction action) {
+    public InventoryCommand(String itemName, InventoryAction action) {
         if (action != InventoryAction.List && itemName.isBlank()) {
             throw new IllegalArgumentException("Inventory item name cannot be blank");
         }
@@ -30,7 +30,7 @@ public class InventorySetCommand implements Command {
         _action = action;
     }
     
-    public InventorySetCommand(InventoryAction action) {
+    public InventoryCommand(InventoryAction action) {
         this(null, action);
     }
 
@@ -48,7 +48,7 @@ public class InventorySetCommand implements Command {
                 action = null;
                 break;
             }
-            return new InventorySetCommand(action);
+            return new InventoryCommand(action);
         } else if (arguments.length == 3) {
             String itemName = arguments[1].trim();
             actionString = arguments[2].trim().toLowerCase();
@@ -64,7 +64,7 @@ public class InventorySetCommand implements Command {
                 action = null;
                 break;
             }
-            return new InventorySetCommand(itemName, action);
+            return new InventoryCommand(itemName, action);
         }
         return null;
     }

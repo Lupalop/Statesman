@@ -30,7 +30,7 @@ public class Interpreter {
         _commands.put(SwitchSetCommand.Id, new SwitchSetCommand());
         _commands.put(SwitchJumpCommand.Id, new SwitchJumpCommand());
         _commands.put(SwitchConditionalCommand.Id, new SwitchConditionalCommand());
-        _commands.put(InventorySetCommand.Id, new InventorySetCommand());
+        _commands.put(InventoryCommand.Id, new InventoryCommand());
         _commands.put(InventoryJumpCommand.Id, new InventoryJumpCommand());
         _commands.put(InventoryConditionalCommand.Id, new InventoryConditionalCommand());
         _commands.put(PointsCommand.Id, new PointsCommand());
