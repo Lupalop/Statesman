@@ -26,7 +26,7 @@ public class Interpreter {
         _commands.put(GotoCommand.Id, new GotoCommand());
         _commands.put(JumpCommand.Id, new JumpCommand());
         _commands.put(ReturnCommand.Id, new ReturnCommand());
-        _commands.put(SetSwitchCommand.Id, new SetSwitchCommand());
+        _commands.put(SwitchSetCommand.Id, new SwitchSetCommand());
         _commands.put(SwitchJumpCommand.Id, new SwitchJumpCommand());
         _commands.put(SwitchConditionalCommand.Id, new SwitchConditionalCommand());
         _commands.put(InventorySetCommand.Id, new InventorySetCommand());
@@ -112,7 +112,7 @@ public class Interpreter {
                         try {
                             int switchId = Integer.parseInt(keywordParts[1]);
                             boolean value = Boolean.parseBoolean(keywordParts[2]);
-                            Command setAction = new SetSwitchCommand(switchId, value);
+                            Command setAction = new SwitchSetCommand(switchId, value);
                             setAction.execute();
                         } 
                         catch (Exception e) {

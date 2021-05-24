@@ -2,19 +2,19 @@ package statesman.commands;
 
 import statesman.Interpreter;
 
-public class SetSwitchCommand implements Command {
+public class SwitchSetCommand implements Command {
 
     public static final String Id = "set";
 
     private int _switchId;
     private boolean _value;
 
-    public SetSwitchCommand() {
+    public SwitchSetCommand() {
         _switchId = 0;
         _value = false;
     }
 
-    public SetSwitchCommand(int switchId, boolean value) {
+    public SwitchSetCommand(int switchId, boolean value) {
         if (switchId < 0 || switchId > Interpreter.getSwitches().length) {
             throw new IllegalArgumentException();
         }
@@ -27,7 +27,7 @@ public class SetSwitchCommand implements Command {
         if (arguments.length == 3) {
             int switchId = Integer.parseInt(arguments[1]);
             boolean value = Boolean.parseBoolean(arguments[2]);
-            return new SetSwitchCommand(switchId, value);
+            return new SwitchSetCommand(switchId, value);
         }
         return null;
     }
