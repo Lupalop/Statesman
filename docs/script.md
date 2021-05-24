@@ -153,6 +153,21 @@ group view
 end
 ```
 
+## Other section tags
+These section tags are optional, and follow a key-value pair format.
+
+### `maxpoints`
+This tag sets the highest number of points that a player can achieve in-game. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to zero (0).
+```
+maxpoints 200
+```
+
+### `switches`
+This tag sets the number of switches that is allocated by the game's interpreter. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to two thousand (2000).
+```
+switches 5000
+```
+
 ## Comments
 Statesman allows both single-line and block comments, with the following syntax:
 
@@ -221,16 +236,17 @@ end
 - Sets a single switch to a boolean value.
 - Accepts two arguments: switch number [`int`] and new value [`boolean`].
 - Example: `set,1,true`, `set,1,false`
-#### `invset`
-- Adds or removes an item to the global inventory.
+#### `inv`
+- Lists all the items in the global inventory, adds or removes an item, and clearing the inventory's contents.
 - The item MUST be present in the current scene's `items` section **only adding items**.
 - The item MUST be present in the **global inventory** when **removing items**, otherwise a message will be shown stating that the item does not exist in the inventory.
-- Accepts three arguments: item name [`string`] and action [either: `add` for adding an item or `rm` for removing an item].
-- Example: `invset,rock,add`, `invset,rock,rm`
-#### `invlist`
-- Lists all the items in the global inventory
-- Does NOT accept any arguments.
-- Example: `invlist`
+- Accepts one to two (1-2) arguments: action [`add` for adding an item, `rm` for removing an item, `list` for showing all the items, and `clear` for removing all the items] and item name [`string`] (required for `add` and `rm` actions, otherwise optional).
+- Example: `inv,add,rock`, `inv,rm,rock`, `inv,list`, `inv,clear`
+#### `points`
+- Adds, subtracts, sets to a specific value, shows all points, and resets the points to zero.
+- The specific value that will be added, subtracted, or set to, MUST NOT be zero.
+- Accepts one to two (1-2) arguments: action [`add` for adding points, `sub` for subtracting points, `set` for setting the points to a specific value, `list` for showing all the points, and `clear` for resetting the points to zero] and specific value [`int`] (required for `add`, `sub`, and `set` actions, otherwise optional).
+- Example: `points,add,5`, `points,sub,5`, `points,set,200`, `points,list`, `points,clear`
 #### `scene`
 - Changes the current scene to the provided scene.
 - Accepts only one argument: scene name [`string`].
