@@ -2,6 +2,9 @@
  * This line should be ignored by the parser
  */
 
+maxpoints 200
+switches 3000
+
 // Global messages
 messages
     // Fallback
@@ -29,7 +32,13 @@ actions
     talk|printr,t_1,t_2
     walk|printr,w_1,w_2
     quit|quit
-    inventory,check inventory,get inventory,inv,check inv,get inv|invlist
+    inventory,check inventory,get inventory,inv,check inv,get inv|inv,list
+    invclear|inv,clear
+    points+5|points,add,5
+    points-5|points,sub,5
+    points200|points,set,200
+    pointsc|points,clear
+    points|points,list
 end
 
 // Global command groups
@@ -124,7 +133,8 @@ scene initial
     group pick_rock
         if 99
             if_inv !rock
-                invset,rock,add
+                inv,add,rock
+                points,add,10
                 print,6
                 set,100,true
             else
@@ -139,6 +149,7 @@ scene initial
         if 100
             if !101
                 print,9
+                points,add,10
                 set,101,true
             else
                 print,10
@@ -152,6 +163,7 @@ scene initial
         if 100,101
             if !102
                 print,12
+                points,add,10
                 set,102,true
             else
                 print,13
@@ -164,8 +176,8 @@ scene initial
     actions
         rocka|goto,inventory_test
         rockb|goto,inventory_test_inverted
-        rockadd|invset,rock,add
-        rockrm|invset,rock,rm
+        rockadd|inv,add,rock
+        rockrm|inv,rm,rock
     end
 
     items
@@ -192,10 +204,10 @@ scene initial
 
     actions
         pp|goto,paper_pen
-        penadd|invset,pen,add
-        penrm|invset,pen,rm
-        paperadd|invset,paper,add
-        paperrm|invset,paper,rm
+        penadd|inv,add,pen
+        penrm|inv,rm,pen
+        paperadd|inv,add,paper
+        paperrm|inv,rm,paper
     end
     
     group paper_pen
@@ -268,7 +280,6 @@ scene initial
             print,HAS pen OR NOT paper
         end
     end
-    
 end
 
 // Scene: north
