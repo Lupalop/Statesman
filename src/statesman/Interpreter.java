@@ -71,7 +71,7 @@ public class Interpreter {
 
         while (_isRunning) {
             System.out.print("> ");
-            String currentKeyword = getScanner().nextLine().trim();
+            String currentKeyword = getScanner().nextLine().trim().toLowerCase();
             
             if (currentKeyword.isBlank()) {
                 continue;

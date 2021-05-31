@@ -270,7 +270,7 @@ public class Content {
                     if (parts.length != 2) {
                         throw new GameException("Incorrect argument count for the action in line " + lineNumber);
                     }
-                    String[] keywords = parts[0].split(",");
+                    String[] keywords = parts[0].toLowerCase().split(",");
                     String[] arguments = parts[1].split(",");
                     Command command = Interpreter.findCommand(arguments);
                     if (command == null) {
