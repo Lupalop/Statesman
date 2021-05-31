@@ -45,6 +45,24 @@ public class Interpreter {
         }
         return null;
     }
+    
+    public static Command findAction(String keyword) {
+        Command localAction = _currentScene.getActions().get(keyword);
+        Command globalAction = Content.getSource().getActions().get(keyword);
+        Command fallbackAction = Content.getSource().getActions().get("fallback");
+        
+        if (localAction != null) {
+            return localAction;
+        } else if (globalAction != null) {
+            return globalAction;
+        } else if (fallbackAction != null) {
+            return fallbackAction;
+        } else if (App.debugMode) {
+            System.out.println("Fallback message is missing");
+        }
+        
+        return null;
+    }
 
     public static void run() {
         if (_isRunning) {
@@ -71,61 +89,34 @@ public class Interpreter {
 
         while (_isRunning) {
             System.out.print("> ");
-            String currentKeyword = getScanner().nextLine().trim().toLowerCase();
+            String keyword = getScanner().nextLine().trim().toLowerCase();
             
-            if (currentKeyword.isBlank()) {
+            if (keyword.isBlank()) {
                 continue;
             }
+            
             System.out.println();
-            
-            Command currentAction = null;
 
-            boolean hasKeyword = _currentScene.getActions().containsKey(currentKeyword);
-            if (hasKeyword) {
-                currentAction = _currentScene.getActions().get(currentKeyword);
-                currentAction.execute();
-                continue;
-            }
-            
-            boolean hasGlobalKeyword = Content.getSource().getActions().containsKey(currentKeyword);
-            if (hasGlobalKeyword) {
-                currentAction = Content.getSource().getActions().get(currentKeyword);
-                currentAction.execute();
-                continue;
-            }
-            
+            Command currentAction = findAction(keyword);
+
             // Debug mode keywords
-            if (App.debugMode) {
-                if (currentKeyword.startsWith("*tp")) {
-                    String[] keywordParts = currentKeyword.split(" ");
-                    if (keywordParts.length == 2) {
-                        Command tpAction = new SceneCommand(keywordParts[1]);
-                        tpAction.execute();
-                        continue;
+            try {
+                if (App.debugMode) {
+                    String[] keywordParts = keyword.split(" ");
+                    if (keyword.startsWith("*tp")) {
+                        currentAction = _commands.get(SceneCommand.Id).createInstance(keywordParts);
+                    }
+                    if (keyword.startsWith("*set")) {
+                        currentAction = _commands.get(SwitchSetCommand.Id).createInstance(keywordParts);
                     }
                 }
-                if (currentKeyword.startsWith("*set")) {
-                    String[] keywordParts = currentKeyword.split(" ");
-                    if (keywordParts.length == 3) {
-                        try {
-                            int switchId = Integer.parseInt(keywordParts[1]);
-                            boolean value = Boolean.parseBoolean(keywordParts[2]);
-                            Command setAction = new SwitchSetCommand(switchId, value);
-                            setAction.execute();
-                        } 
-                        catch (Exception e) {
-                            System.out.println("Invalid arguments were passed to the set switch command.");
-                        }
-                        continue;
-                    }                    
-                }
+            } catch (Exception e) {
+                System.out.println("DEBUG: Invalid arguments.");
             }
-            
-            currentAction = Content.getSource().getActions().get("fallback");
-            if (currentAction == null && App.debugMode) {
-                System.out.println("Fallback message is missing");
-            } else {
+
+            if (currentAction != null) {
                 currentAction.execute();
+                continue;
             }
         }
     }
