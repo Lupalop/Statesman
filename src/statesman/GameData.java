@@ -78,5 +78,11 @@ public class GameData {
     public void setCommandGroups(HashMap<String, CommandGroup> _commandGroups) {
         this._commandGroups = _commandGroups;
     }
+    
+    public String getMessage(String key) {
+        String template = "[Missing message: `%s`]";
+        String defaultValue = String.format(template, key);
+        return getMessages().getOrDefault(key, defaultValue);
+    }
 
 }
