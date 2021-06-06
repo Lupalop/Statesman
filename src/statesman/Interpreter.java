@@ -32,6 +32,8 @@ public class Interpreter {
         _commands.put(InventoryConditionalCommand.Id, new InventoryConditionalCommand());
         _commands.put(PointsCommand.Id, new PointsCommand());
         _commands.put(QuitCommand.Id, new QuitCommand());
+        _commands.put(SaveCommand.Id, new SaveCommand());
+        _commands.put(LoadCommand.Id, new LoadCommand());
 
         _currentScene = null;
         _inventory = new HashMap<String, InventoryItem>();

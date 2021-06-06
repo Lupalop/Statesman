@@ -1,6 +1,9 @@
 package statesman;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -403,6 +406,57 @@ public class Content {
         _dataPath = Paths.get(location);
         _dataParsed = false;
         _source = null;
+    }
+    
+    public static void saveState(String name) throws IOException {
+        String filename = name + ".sav";
+        File output = new File(filename);
+        PrintWriter writer = new PrintWriter(new FileWriter(output));
+        // current scene, points, inventory, switches
+        writer.printf("scene %s%n", Interpreter.getCurrentScene().getName());
+        writer.printf("points %s%n", Interpreter.getPoints());
+        writer.print("switches ");
+        for (int i = 0; i < Interpreter.getSwitches().length; i++) {
+            writer.print(Interpreter.getSwitches()[i]);
+            if (i < Interpreter.getSwitches().length - 1) {
+                writer.print(",");
+            } else {
+                writer.println();
+            }
+        }
+        // FIXME: save inventory
+        writer.flush();
+        writer.close();
+    }
+    
+    public static void loadState(String name) throws IOException {
+        String filename = name + ".sav";
+        Path savePath = Path.of(filename);
+        List<String> data = Files.readAllLines(savePath);
+        for (int i = 0; i < data.size(); i++) {
+            String line = data.get(i);
+            String[] parts = line.split(" ");
+            // FIXME: sanity checking
+            switch (parts[0]) {
+            case "scene":
+                Interpreter.setCurrentScene(getSource().getScenes().get(parts[1]));
+                break;
+            case "points":
+                Interpreter.setPoints(Integer.valueOf(parts[1]));
+                break;
+            case "switches":
+                String[] boolParts = parts[1].split(",");
+                for (int j = 0; j < Interpreter.getSwitches().length; j++) {
+                    Interpreter.getSwitches()[j] = Boolean.valueOf(boolParts[j]);
+                }
+                break;
+            case "inventory":
+                // TODO: missing impl
+                break;
+            default:
+                break;
+            }
+        }
     }
 
 }
