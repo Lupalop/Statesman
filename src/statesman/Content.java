@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import statesman.commands.*;
@@ -358,7 +360,7 @@ public class Content {
                     if (currentScene.getItems().containsKey(keyword)) {
                         throw new GameException("Duplicate key was specified by the inventory item in line " + lineNumber);
                     }
-                    InventoryItem item = new InventoryItem(keyword, description);
+                    InventoryItem item = new InventoryItem(keyword, description, currentScene);
                     currentScene.getItems().put(keyword, item);
                     continue;
                 }
@@ -424,7 +426,21 @@ public class Content {
                 writer.println();
             }
         }
-        // FIXME: save inventory
+        if (Interpreter.getInventory().size() > 0) {
+            writer.print("inventory ");
+            Iterator<InventoryItem> inventoryIterator = Interpreter.getInventory().values().iterator();
+            while (inventoryIterator.hasNext()) {
+                InventoryItem currentItem = inventoryIterator.next();
+                writer.print(currentItem.getOwnerScene().getName());
+                writer.print(";");
+                writer.print(currentItem.getName());
+                if (inventoryIterator.hasNext()) {
+                    writer.print(",");
+                } else {
+                    writer.println();
+                }
+            }
+        }
         writer.flush();
         writer.close();
     }
@@ -451,7 +467,22 @@ public class Content {
                 }
                 break;
             case "inventory":
-                // TODO: missing impl
+                HashMap<String, InventoryItem> inventory = new HashMap<String, InventoryItem>();
+                String[] items = parts[1].split(",");
+                for (int j = 0; j < items.length; j++) {
+                    String[] itemParts = items[j].split(";");
+                    // get scene name (first part)
+                    Scene targetScene = getSource().getScenes().get(itemParts[0]);
+                    // get item name (second part)
+                    String itemName = itemParts[1];
+                    // If scene exists, try to get the inventory item
+                    if (targetScene != null) {
+                        InventoryItem item = targetScene.getItems().get(itemName);
+                        if (item != null) {
+                            Interpreter.getInventory().put(itemName, item);
+                        }
+                    }
+                }
                 break;
             default:
                 break;
