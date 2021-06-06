@@ -89,8 +89,8 @@ public class PointsCommand implements Command {
             Interpreter.setPoints(0);
             break;
         case List:
-            // TODO: use messages provided by the interpreter's source
-            System.out.printf("You currently have %s of %s points.%n",
+            System.out.printf(
+                    Content.getSource().getMessage("p_1"),
                     Interpreter.getPoints(),
                     Content.getSource().getMaxPoints());
             break;

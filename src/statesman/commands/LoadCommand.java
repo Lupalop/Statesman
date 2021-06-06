@@ -20,28 +20,27 @@ public class LoadCommand implements Command {
 
     @Override
     public void execute() {
-        // TODO: move to messages
-        System.out.println("Enter the name of your saved game:");
+        System.out.println(Content.getSource().getMessage("sl_1"));
         String name = Interpreter.getScanner().nextLine().trim().toLowerCase();
         if (name.isBlank()) {
-            System.out.println("Invalid name.");
+            System.out.println(Content.getSource().getMessage("sl_2"));
             return;
         }
         if (name.length() > 255) {
-            System.out.println("Name too long! Try a shorter name for your saved game.");
+            System.out.println(Content.getSource().getMessage("sl_3"));
         }
         boolean gameLoaded = false;
         try {
             Content.loadState(name);
             gameLoaded = true;
         } catch (IOException e) {
-            System.out.println("The specified saved game was not found.");
+            System.out.println(Content.getSource().getMessage("sl_4"));
         } catch (GameException e) {
             System.out.println(e.getMessage());
         }
         
         if (gameLoaded) {
-            System.out.println("Your game has been loaded!");
+            System.out.println(Content.getSource().getMessage("sl_5"));
         }
     }
 

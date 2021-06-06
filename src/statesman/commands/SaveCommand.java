@@ -19,15 +19,14 @@ public class SaveCommand implements Command {
 
     @Override
     public void execute() {
-        // TODO: move to messages
-        System.out.println("Enter the name of your saved game:");
+        System.out.println(Content.getSource().getMessage("sl_1"));
         String name = Interpreter.getScanner().nextLine().trim().toLowerCase();
         if (name.isBlank()) {
-            System.out.println("Invalid name.");
+            System.out.println(Content.getSource().getMessage("sl_2"));
             return;
         }
         if (name.length() > 255) {
-            System.out.println("Name too long! Try a shorter name for your saved game.");
+            System.out.println(Content.getSource().getMessage("sl_3"));
             return;
         }
         boolean gameSaved = false;
@@ -35,11 +34,11 @@ public class SaveCommand implements Command {
             Content.saveState(name);
             gameSaved = true;
         } catch (IOException e) {
-            System.out.println("Your game cannot be saved.");
+            System.out.println(Content.getSource().getMessage("sl_6"));
         }
         
         if (gameSaved) {
-            System.out.println("Your game has been saved!");
+            System.out.println(Content.getSource().getMessage("sl_7"));
         }
     }
 

@@ -18,6 +18,27 @@ messages
     // Walk
     w_1|Where?
     w_2|May I know which direction?
+    // Inventory
+    i_1|This item is already in your inventory!
+    i_2|This item is NOT in your inventory!
+    i_3|You only have one item in your inventory:
+    i_4|You have %s items in your inventory:%n
+    i_5|%s: %s%n
+    i_6|Your inventory is empty!
+    // Points
+    p_1|You currently have %s of %s points.%n
+    // Save/Load Game
+    sl_1|Enter the name of your saved game:
+    sl_2|Invalid name.
+    sl_3|Name too long! Try a shorter name for your saved game.
+    sl_4|The specified saved game was not found.
+    sl_5|Your game has been loaded!
+    sl_6|Your game cannot be saved.
+    sl_7|Your game has been saved!
+end
+
+// Test messages
+messages
     // Dummies
     dummy|Dummy message.
     junk|You are a piece of junk too!

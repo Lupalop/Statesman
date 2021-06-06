@@ -2,6 +2,7 @@ package statesman.commands;
 
 import java.util.Iterator;
 
+import statesman.Content;
 import statesman.Interpreter;
 import statesman.InventoryItem;
 
@@ -79,11 +80,10 @@ public class InventoryCommand implements Command {
     public void execute() {
         InventoryItem item = getItem();
         if (item != null) {
-            // TODO: use messages provided by the interpreter's source
             switch (_action) {
             case Add:
                 if (Interpreter.getInventory().containsKey(item.getName())) {
-                    System.out.println("This item is already in your inventory!");
+                    System.out.println(Content.getSource().getMessage("i_1"));
                     break;
                 }
                 Interpreter.getInventory().put(item.getName(), item);
@@ -93,7 +93,7 @@ public class InventoryCommand implements Command {
                     Interpreter.getInventory().remove(_itemName);
                     break;
                 }
-                System.out.println("This item is NOT in your inventory!");
+                System.out.println(Content.getSource().getMessage("i_2"));
                 break;
             default:
                 break;
@@ -103,20 +103,21 @@ public class InventoryCommand implements Command {
             case List:
                 int inventorySize = Interpreter.getInventory().size();
                 if (inventorySize > 0) {
-                    // TODO: use messages provided by the interpreter's source
                     if (inventorySize == 1) {
-                        System.out.printf("You only have one item in your inventory:%n", inventorySize);
+                        System.out.println(Content.getSource().getMessage("i_3"));
                     } else {
-                        System.out.printf("You have %s items in your inventory:%n", inventorySize);
+                        System.out.printf(Content.getSource().getMessage("i_4"), inventorySize);
                     }
                     Iterator<InventoryItem> iterator = Interpreter.getInventory().values().iterator();
                     while (iterator.hasNext()) {
                         InventoryItem currentItem = iterator.next();
-                        System.out.printf("%s: %s%n", currentItem.getName(), currentItem.getDescription());
+                        System.out.printf(
+                                Content.getSource().getMessage("i_5"),
+                                currentItem.getName(),
+                                currentItem.getDescription());
                     }
                 } else {
-                    // TODO: use messages provided by the interpreter's source
-                    System.out.println("Your inventory is empty!");
+                    System.out.println(Content.getSource().getMessage("i_6"));
                 }
                 break;
             case Clear:
