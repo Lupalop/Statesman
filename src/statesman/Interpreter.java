@@ -51,12 +51,15 @@ public class Interpreter {
     public static Command findAction(String keyword) {
         Command localAction = _currentScene.getActions().get(keyword);
         Command globalAction = Content.getSource().getActions().get(keyword);
+        Command localFallbackAction = _currentScene.getActions().get("fallback");
         Command fallbackAction = Content.getSource().getActions().get("fallback");
         
         if (localAction != null) {
             return localAction;
         } else if (globalAction != null) {
             return globalAction;
+        } else if (localFallbackAction != null) {
+            return localFallbackAction;
         } else if (fallbackAction != null) {
             return fallbackAction;
         } else if (App.debugMode) {
