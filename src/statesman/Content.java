@@ -298,17 +298,7 @@ public class Content {
                     if (currentGroup == null) {
                         throw new GameException("Invalid command group in line " + lineNumber);
                     }
-                    String[] arguments;
-                    // With line numbers
-                    if (parts.length == 2) {
-                        arguments = parts[1].split(",");
-                    // Without line numbers
-                    } else if (parts.length == 1) {
-                        arguments = parts[0].split(",");
-                    // Weird argument count
-                    } else {
-                        throw new GameException("Incorrect argument count was specified by the command in line " + lineNumber);
-                    }
+                    String[] arguments = parts[0].split(",");
                     Command command = Interpreter.findCommand(arguments);
                     if (command == null) {
                         throw new GameException("Unknown command was referenced in line " + lineNumber);
