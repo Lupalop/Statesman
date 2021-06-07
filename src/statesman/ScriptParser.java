@@ -215,7 +215,7 @@ public class ScriptParser {
         }
         
         if (_section == Section.Group) {
-            if (parts[0].equals("else")) {
+            if (parts.length == 1 && parts[0].equals("else")) {
                 if (_conditionals[_depth] == null || _conditionalsElse[_depth]) {
                     throw new GameException("Stray else tag, see line " + _lineNumber);
                 }
@@ -223,28 +223,37 @@ public class ScriptParser {
                 return true;
             }
             if (parts.length == 2) {
-                ConditionalCommand command = null;
-                if (parts[0].equals("if")) {
-                    command = (ConditionalCommand)Interpreter
-                            .getCommands()
-                            .get(SwitchConditionalCommand.Id)
-                            .createInstance(parts);
-                } else if (parts[0].equals("if_inv")) {
-                    command = (ConditionalCommand)Interpreter
-                            .getCommands()
-                            .get(InventoryConditionalCommand.Id)
-                            .createInstance(parts);
+                String Id = null;
+                if (parts[0].equals("if") ||
+                    parts[0].equals("elsif")) {
+                    Id = SwitchConditionalCommand.Id;
+                } else if (parts[0].equals("if_inv") ||
+                           parts[0].equals("elsif_inv")) {
+                    Id = InventoryConditionalCommand.Id;
                 }
-                if (command != null) {
-                    _depth++;
-                    _conditionals[_depth] = command;
-                    if (_section == Section.Group) {
+                if (Id != null) {
+                    boolean isElseIf = parts[0].startsWith("els");
+                    if (isElseIf) {
+                        _conditionalsElse[_depth] = true;
+                    }
+                    ConditionalCommand command =
+                            (ConditionalCommand)Interpreter
+                            .getCommands()
+                            .get(Id)
+                            .createInstance(parts);
+                    if (_depth == 0 && _section == Section.Group) {
                         _group.getCommands().add(command);
                     } else if (_conditionalsElse[_depth]) {
                         _conditionals[_depth].getElseGroup().getCommands().add(command);
                     } else {
                         _conditionals[_depth].getGroup().getCommands().add(command);
                     }
+                    if (isElseIf) {
+                        _conditionalsElse[_depth] = false;
+                    } else {
+                        _depth++;
+                    }
+                    _conditionals[_depth] = command;
                     return true;
                 }
             }
