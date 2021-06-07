@@ -28,7 +28,7 @@ public class Content {
             return;
         }
         
-        List<String> _data = Files.readAllLines(_dataPath);
+        List<String> data = Files.readAllLines(_dataPath);
         _source = new GameData();
 
         try {
@@ -40,9 +40,9 @@ public class Content {
             boolean[] conditionalsElse = new boolean[255];
             int conditionalDepth = 0;
             
-            for (int i = 0; i < _data.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 int lineNumber = i + 1;
-                String line = _data.get(i).trim();
+                String line = data.get(i).trim();
 
                 // Block comment start tag
                 if (!blockComment && line.startsWith("/*")) {
