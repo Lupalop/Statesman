@@ -33,7 +33,7 @@ public class GameData {
         if (maxPoints < 0) {
             throw new IllegalArgumentException("The maximum number of points must be greater than or equal to zero");
         }
-        this._maxPoints = maxPoints;
+        _maxPoints = maxPoints;
     }
 
     public int getSwitchSize() {
@@ -51,32 +51,32 @@ public class GameData {
         return _messages;
     }
 
-    public void setMessages(HashMap<String, String> _messages) {
-        this._messages = _messages;
+    public void setMessages(HashMap<String, String> messages) {
+        _messages = messages;
     }
 
     public HashMap<String, Scene> getScenes() {
         return _scenes;
     }
 
-    public void setScenes(HashMap<String, Scene> _scenes) {
-        this._scenes = _scenes;
+    public void setScenes(HashMap<String, Scene> scenes) {
+        _scenes = scenes;
     }
 
     public HashMap<String, Command> getActions() {
         return _actions;
     }
 
-    public void setActions(HashMap<String, Command> _actions) {
-        this._actions = _actions;
+    public void setActions(HashMap<String, Command> actions) {
+        _actions = actions;
     }
 
     public HashMap<String, CommandGroup> getCommandGroups() {
         return _commandGroups;
     }
 
-    public void setCommandGroups(HashMap<String, CommandGroup> _commandGroups) {
-        this._commandGroups = _commandGroups;
+    public void setCommandGroups(HashMap<String, CommandGroup> commandGroups) {
+        _commandGroups = commandGroups;
     }
     
     public String getMessage(String key) {
