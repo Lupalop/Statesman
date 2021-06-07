@@ -12,8 +12,12 @@ public class InventoryConditionalCommand extends ConditionalCommand {
         super();
     }
 
-    public InventoryConditionalCommand(CommandGroup group, CommandGroup elseGroup, String[] itemNames,
-            boolean[] targetValues, boolean orMode) {
+    public InventoryConditionalCommand(
+            CommandGroup group,
+            CommandGroup elseGroup,
+            String[] itemNames,
+            boolean[] targetValues,
+            boolean orMode) {
         super();
         _group = group;
         _elseGroup = elseGroup;

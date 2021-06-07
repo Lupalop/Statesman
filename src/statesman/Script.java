@@ -5,7 +5,7 @@ import java.util.HashMap;
 import statesman.commands.Command;
 import statesman.commands.CommandGroup;
 
-public class GameData {
+public class Script {
 
     public static final int defaultSwitchSize = 2000;
     
@@ -16,7 +16,7 @@ public class GameData {
     private HashMap<String, Command> _actions;
     private HashMap<String, CommandGroup> _commandGroups;
     
-    public GameData() {
+    public Script() {
         _maxPoints = 0;
         _switchSize = defaultSwitchSize;
         _messages = new HashMap<String, String>();

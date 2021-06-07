@@ -64,11 +64,11 @@ end
 
 // Global command groups
 group junk
-    0|sjmp,0,1,3
-    1|print,otherjunk
-    2|ret
-    3|set,0,true
-    4|print,junk
+    sjmp,0,1,3
+    print,otherjunk
+    ret
+    set,0,true
+    print,junk
 end
 
 // Scene: initial (called upon start-up)
@@ -121,11 +121,11 @@ scene initial
     // Command group: view
     group view
         // conditional jump, switch #, line if true, line if false
-        0|sjmp,1,1,3
-        1|print,0
-        2|ret
-        3|set,1,true
-        4|print,dummy
+        sjmp,1,1,3
+        print,0
+        ret
+        set,1,true
+        print,dummy
     end
 
     /*
@@ -318,19 +318,19 @@ scene north
     // Command group: view
     group view
         // conditional jump, switch #, line if true, line if false
-        0|sjmp,2,1,3
-        1|print,nothing2
-        2|ret
-        3|set,2,true
-        4|print,nothing
+        sjmp,2,1,3
+        print,nothing2
+        ret
+        set,2,true
+        print,nothing
     end
 
     // Overriden global command group test: junk
     group junk
-        0|print,this is an inline message
-        1|print,this message is inline
-        2|print,this message is not in the source
-        3|print,nothing
-        4|print,nothing2
+        print,this is an inline message
+        print,this message is inline
+        print,this message is not in the source
+        print,nothing
+        print,nothing2
     end
 end
