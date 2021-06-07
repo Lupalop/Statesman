@@ -223,27 +223,27 @@ public class ScriptParser {
                 return true;
             }
             if (parts.length == 2) {
-                ConditionalCommand instance = null;
+                ConditionalCommand command = null;
                 if (parts[0].equals("if")) {
-                    instance = (ConditionalCommand)Interpreter
+                    command = (ConditionalCommand)Interpreter
                             .getCommands()
                             .get(SwitchConditionalCommand.Id)
                             .createInstance(parts);
                 } else if (parts[0].equals("if_inv")) {
-                    instance = (ConditionalCommand)Interpreter
+                    command = (ConditionalCommand)Interpreter
                             .getCommands()
                             .get(InventoryConditionalCommand.Id)
                             .createInstance(parts);
                 }
-                if (instance != null) {
+                if (command != null) {
                     _depth++;
-                    _conditionals[_depth] = instance;
+                    _conditionals[_depth] = command;
                     if (_section == Section.Group) {
-                        _group.getCommands().add(instance);
+                        _group.getCommands().add(command);
                     } else if (_conditionalsElse[_depth]) {
-                        _conditionals[_depth].getElseGroup().getCommands().add(instance);
+                        _conditionals[_depth].getElseGroup().getCommands().add(command);
                     } else {
-                        _conditionals[_depth].getGroup().getCommands().add(instance);
+                        _conditionals[_depth].getGroup().getCommands().add(command);
                     }
                     return true;
                 }
