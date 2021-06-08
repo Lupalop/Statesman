@@ -271,7 +271,7 @@ public class ScriptParser {
                 String[] arguments = parts[1].split(",");
                 Command command = Interpreter.findCommand(arguments);
                 if (command == null) {
-                    throw new GameException("Unknown command was referenced by the action in line " + _lineNumber);
+                    throw new GameException("Unknown command was referenced in line " + _lineNumber);
                 }
                 for (int i = 0; i < keywords.length; i++) {
                     if (_scene == null) {
@@ -281,12 +281,12 @@ public class ScriptParser {
                     }
                 }
             } else {
-                throw new GameException("Invalid arguments in action, see line " + _lineNumber);
+                throw new GameException("Invalid action, see line " + _lineNumber);
             }
             break;
         case Group:
             if (_group == null) {
-                throw new GameException("Invalid command group in line " + _lineNumber);
+                throw new GameException("Invalid command group, see line " + _lineNumber);
             }
             if (parts.length == 1) {
                 String[] arguments = parts[0].split(",");
