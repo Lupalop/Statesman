@@ -186,6 +186,9 @@ public class ScriptParser {
         String[] parts = _line.split(" ");
         if (_section == Section.ROOT || _section == Section.SCENE) {
             Section nextSection = Section.valueOfTag(parts[0]);
+            if (nextSection == null) {
+                return false;
+            }
             switch (nextSection) {
             case ACTION:
             case STRING:
@@ -232,7 +235,7 @@ public class ScriptParser {
                 }
                 break;
             default:
-                throw new GameException("Invalid or unknown section tag, see line " + _lineNumber);
+                return false;
             }
             _section = nextSection;
             return true;
