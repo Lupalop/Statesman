@@ -19,14 +19,14 @@ public class SaveCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println(Content.getSource().getMessage("sl_1"));
+        System.out.println(Content.getScript().getMessage("sl_1"));
         String name = Interpreter.getScanner().nextLine().trim().toLowerCase();
         if (name.isBlank()) {
-            System.out.println(Content.getSource().getMessage("sl_2"));
+            System.out.println(Content.getScript().getMessage("sl_2"));
             return;
         }
         if (name.length() > 255) {
-            System.out.println(Content.getSource().getMessage("sl_3"));
+            System.out.println(Content.getScript().getMessage("sl_3"));
             return;
         }
         boolean gameSaved = false;
@@ -34,11 +34,11 @@ public class SaveCommand implements Command {
             Content.saveState(name);
             gameSaved = true;
         } catch (IOException e) {
-            System.out.println(Content.getSource().getMessage("sl_6"));
+            System.out.println(Content.getScript().getMessage("sl_6"));
         }
         
         if (gameSaved) {
-            System.out.println(Content.getSource().getMessage("sl_7"));
+            System.out.println(Content.getScript().getMessage("sl_7"));
         }
     }
 

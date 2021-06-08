@@ -20,27 +20,27 @@ public class LoadCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println(Content.getSource().getMessage("sl_1"));
+        System.out.println(Content.getScript().getMessage("sl_1"));
         String name = Interpreter.getScanner().nextLine().trim().toLowerCase();
         if (name.isBlank()) {
-            System.out.println(Content.getSource().getMessage("sl_2"));
+            System.out.println(Content.getScript().getMessage("sl_2"));
             return;
         }
         if (name.length() > 255) {
-            System.out.println(Content.getSource().getMessage("sl_3"));
+            System.out.println(Content.getScript().getMessage("sl_3"));
         }
         boolean gameLoaded = false;
         try {
             Content.loadState(name);
             gameLoaded = true;
         } catch (IOException e) {
-            System.out.println(Content.getSource().getMessage("sl_4"));
+            System.out.println(Content.getScript().getMessage("sl_4"));
         } catch (GameException e) {
             System.out.println(e.getMessage());
         }
         
         if (gameLoaded) {
-            System.out.println(Content.getSource().getMessage("sl_5"));
+            System.out.println(Content.getScript().getMessage("sl_5"));
         }
     }
 

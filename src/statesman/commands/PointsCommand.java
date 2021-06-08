@@ -90,9 +90,9 @@ public class PointsCommand implements Command {
             break;
         case List:
             System.out.printf(
-                    Content.getSource().getMessage("p_1"),
+                    Content.getScript().getMessage("p_1"),
                     Interpreter.getPoints(),
-                    Content.getSource().getMaxPoints());
+                    Content.getScript().getMaxPoints());
             break;
         default:
             break;

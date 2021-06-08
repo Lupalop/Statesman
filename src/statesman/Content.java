@@ -13,23 +13,23 @@ import java.util.List;
 
 public class Content {
 
-    private static boolean _manualSource = false;
-    private static boolean _dataParsed = false;
     private static Path _dataPath = null;
-    private static Script _source = null;
+    private static boolean _manualScript = false;
+    private static boolean _scriptParsed = false;
+    private static Script _script = null;
     private static ScriptParser _parser = null;
 
     public static void loadData() throws IOException, GameException {
-        // Refuse to parse data if the source was set manually
-        if (_manualSource) {
+        // Refuse to parse data if the script was set manually
+        if (_manualScript) {
             return;
         }
 
         List<String> data = Files.readAllLines(_dataPath);
         _parser = new ScriptParser(data);
         
-        _source = _parser.read();
-        _dataParsed = true;
+        _script = _parser.read();
+        _scriptParsed = true;
     }
 
     public static boolean tryLoadData() {
@@ -44,18 +44,18 @@ public class Content {
         return true;
     }
 
-    public static Script getSource() {
-        if (!_manualSource && !_dataParsed) {
+    public static Script getScript() {
+        if (!_manualScript && !_scriptParsed) {
             tryLoadData();
         }
-        return _source;
+        return _script;
     }
     
-    public static void setSource(Script source) {
-        _manualSource = true;
+    public static void setScript(Script script) {
+        _manualScript = true;
         _dataPath = null;
-        _dataParsed = false;
-        _source = source;
+        _scriptParsed = false;
+        _script = script;
     }
 
     public static Path getDataPath() {
@@ -63,10 +63,10 @@ public class Content {
     }
 
     public static void setDataPath(String location) {
-        _manualSource = false;
+        _manualScript = false;
         _dataPath = Paths.get(location);
-        _dataParsed = false;
-        _source = null;
+        _scriptParsed = false;
+        _script = null;
     }
     
     public static void saveState(String name) throws IOException {
@@ -124,7 +124,7 @@ public class Content {
                     throw new GameException("Invalid save file: multiple declarations of `scene`");
                 }
                 // Try to get the named scene if it exists
-                Scene currentScene = getSource().getScenes().get(lineParts[1]);
+                Scene currentScene = getScript().getScenes().get(lineParts[1]);
                 if (currentScene != null) {
                     Interpreter.setCurrentScene(currentScene);
                     sceneFound = true;
@@ -156,7 +156,7 @@ public class Content {
                 for (int j = 0; j < items.length; j++) {
                     String[] itemParts = items[j].split(";");
                     // get scene name (first part)
-                    Scene targetScene = getSource().getScenes().get(itemParts[0]);
+                    Scene targetScene = getScript().getScenes().get(itemParts[0]);
                     // get item name (second part)
                     String itemName = itemParts[1];
                     // If scene exists, try to get the inventory item

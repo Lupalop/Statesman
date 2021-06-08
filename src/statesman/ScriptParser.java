@@ -16,7 +16,7 @@ public class ScriptParser {
     private List<String> _data;
     private String _line;
     private int _lineNumber;
-    private Script _source;
+    private Script _script;
     
     // Parser fields
     private Section _section;
@@ -32,7 +32,7 @@ public class ScriptParser {
         _data = null;
         _line = "";
         _lineNumber = 0;
-        _source = null;
+        _script = null;
         
         _section = Section.Root;
         _depth = 0;
@@ -50,7 +50,7 @@ public class ScriptParser {
     }
 
     public Script read() throws GameException {
-        _source = new Script();
+        _script = new Script();
         
         for (int i = 0; i < _data.size(); i++) {
             _lineNumber = i + 1;
@@ -75,7 +75,7 @@ public class ScriptParser {
             throw new GameException("Invalid string in line " + _lineNumber);
         }
         
-        return _source;
+        return _script;
     }
     
     private boolean isComment() {
@@ -137,14 +137,14 @@ public class ScriptParser {
                 if (maxPoints < 0) {
                     throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
                 }
-                _source.setMaxPoints(maxPoints);
+                _script.setMaxPoints(maxPoints);
                 break;
             case "switches":
                 int switchSize = Integer.parseInt(parts[1]);
                 if (switchSize < 0) {
                     throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
                 }
-                _source.setSwitchSize(switchSize);
+                _script.setSwitchSize(switchSize);
                 break;
             default:
                 return false;
@@ -169,7 +169,7 @@ public class ScriptParser {
                         if (_group.getName().equals(Scene.entryCommandGroup)) {
                             throw new GameException("Use of reserved command group name, see line " + _lineNumber);
                         }
-                        _source.getCommandGroups().put(_group.getName(), _group);
+                        _script.getCommandGroups().put(_group.getName(), _group);
                     } else {
                         // Group name already in use locally
                         if (_scene.getCommandGroups().containsKey(_group.getName())) {
@@ -199,10 +199,10 @@ public class ScriptParser {
                 if (parts.length == 2) {
                     _scene = new Scene(parts[1]);
                     // Scene name already in use
-                    if (_source.getScenes().containsKey(_scene.getName())) {
+                    if (_script.getScenes().containsKey(_scene.getName())) {
                         throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
                     }
-                    _source.getScenes().put(_scene.getName(), _scene);
+                    _script.getScenes().put(_scene.getName(), _scene);
                     _section = Section.Scene;
                 } else {
                     throw new GameException("Invalid scene section tag, see line " + _lineNumber);
@@ -275,7 +275,7 @@ public class ScriptParser {
                 }
                 for (int i = 0; i < keywords.length; i++) {
                     if (_scene == null) {
-                        _source.getActions().put(keywords[i], command);
+                        _script.getActions().put(keywords[i], command);
                     } else {
                         _scene.getActions().put(keywords[i], command);
                     }
@@ -334,10 +334,10 @@ public class ScriptParser {
                     throw new GameException("Missing message key, see line " + _lineNumber);
                 }
                 // Key already in use 
-                if (_source.getMessages().containsKey(key)) {
+                if (_script.getMessages().containsKey(key)) {
                     throw new GameException("Duplicate key was specified by the message in line " + _lineNumber);
                 }
-                _source.getMessages().put(key, value);
+                _script.getMessages().put(key, value);
             } else {
                 throw new GameException("Invalid message, see line " + _lineNumber);
             }

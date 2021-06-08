@@ -22,7 +22,7 @@ public class PrintCommand implements Command {
     @Override
     public void execute() {
         if (!_initialized) {
-            _message = Content.getSource().getMessages().getOrDefault(_message, _message);
+            _message = Content.getScript().getMessages().getOrDefault(_message, _message);
             _initialized = true;
         }
         

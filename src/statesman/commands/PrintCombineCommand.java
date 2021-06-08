@@ -33,7 +33,7 @@ public class PrintCombineCommand implements Command {
     public void execute() {
         if (!_initialized) {
             for (int i = 0; i < _messages.length; i++) {
-                _messages[i] = Content.getSource().getMessages().getOrDefault(_messages[i], _messages[i]);
+                _messages[i] = Content.getScript().getMessages().getOrDefault(_messages[i], _messages[i]);
             }
             _initialized = true;
         }

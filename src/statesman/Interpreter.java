@@ -50,9 +50,9 @@ public class Interpreter {
     
     public static Command findAction(String keyword) {
         Command localAction = _currentScene.getActions().get(keyword);
-        Command globalAction = Content.getSource().getActions().get(keyword);
+        Command globalAction = Content.getScript().getActions().get(keyword);
         Command localFallbackAction = _currentScene.getActions().get("fallback");
-        Command fallbackAction = Content.getSource().getActions().get("fallback");
+        Command fallbackAction = Content.getScript().getActions().get("fallback");
         
         if (localAction != null) {
             return localAction;
@@ -75,15 +75,15 @@ public class Interpreter {
             return;
         }
         
-        if (Content.getSource() == null) {
-            System.out.println("Source is missing.");
+        if (Content.getScript() == null) {
+            System.out.println("The game script is missing.");
             return;
         }
 
-        _switches = new boolean[Content.getSource().getSwitchSize()];
+        _switches = new boolean[Content.getScript().getSwitchSize()];
         Arrays.fill(_switches, false);
 
-        Scene initialScene = Content.getSource().getScenes().get("initial");
+        Scene initialScene = Content.getScript().getScenes().get("initial");
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");
             return;

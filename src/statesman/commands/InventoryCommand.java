@@ -83,7 +83,7 @@ public class InventoryCommand implements Command {
             switch (_action) {
             case Add:
                 if (Interpreter.getInventory().containsKey(item.getName())) {
-                    System.out.println(Content.getSource().getMessage("i_1"));
+                    System.out.println(Content.getScript().getMessage("i_1"));
                     break;
                 }
                 Interpreter.getInventory().put(item.getName(), item);
@@ -93,7 +93,7 @@ public class InventoryCommand implements Command {
                     Interpreter.getInventory().remove(_itemName);
                     break;
                 }
-                System.out.println(Content.getSource().getMessage("i_2"));
+                System.out.println(Content.getScript().getMessage("i_2"));
                 break;
             default:
                 break;
@@ -104,20 +104,20 @@ public class InventoryCommand implements Command {
                 int inventorySize = Interpreter.getInventory().size();
                 if (inventorySize > 0) {
                     if (inventorySize == 1) {
-                        System.out.println(Content.getSource().getMessage("i_3"));
+                        System.out.println(Content.getScript().getMessage("i_3"));
                     } else {
-                        System.out.printf(Content.getSource().getMessage("i_4"), inventorySize);
+                        System.out.printf(Content.getScript().getMessage("i_4"), inventorySize);
                     }
                     Iterator<InventoryItem> iterator = Interpreter.getInventory().values().iterator();
                     while (iterator.hasNext()) {
                         InventoryItem currentItem = iterator.next();
                         System.out.printf(
-                                Content.getSource().getMessage("i_5"),
+                                Content.getScript().getMessage("i_5"),
                                 currentItem.getName(),
                                 currentItem.getDescription());
                     }
                 } else {
-                    System.out.println(Content.getSource().getMessage("i_6"));
+                    System.out.println(Content.getScript().getMessage("i_6"));
                 }
                 break;
             case Clear:
