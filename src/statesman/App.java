@@ -14,7 +14,7 @@ public class App {
         if (Content.tryLoadData()) {
             Interpreter.run();
         } else {
-            System.out.println("Data file is missing!");
+            System.out.println("Unable to load the game's data file.");
         }
     }
 
