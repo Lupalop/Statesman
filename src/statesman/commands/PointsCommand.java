@@ -5,12 +5,12 @@ import statesman.Interpreter;
 
 public class PointsCommand implements Command {
 
-    public static final String Id = "points";
+    public static final String ID = "points";
 
     private PointsAction _action;
     private int _value;
 
-    public enum PointsAction { Add, Subtract, Set, Clear, List };
+    public enum PointsAction { ADD, SUBTRACT, SET, CLEAR, LIST };
     
     public PointsCommand() {
         _action = null;
@@ -40,10 +40,10 @@ public class PointsCommand implements Command {
             PointsAction action = null;
             switch (actionString) {
             case "list":
-                action = PointsAction.List;
+                action = PointsAction.LIST;
                 break;
             case "clear":
-                action = PointsAction.Clear;
+                action = PointsAction.CLEAR;
                 break;
             default:
                 action = null;
@@ -55,13 +55,13 @@ public class PointsCommand implements Command {
             PointsAction action = null;
             switch (actionString) {
             case "add":
-                action = PointsAction.Add;
+                action = PointsAction.ADD;
                 break;
             case "sub":
-                action = PointsAction.Subtract;
+                action = PointsAction.SUBTRACT;
                 break;
             case "set":
-                action = PointsAction.Set;
+                action = PointsAction.SET;
                 break;
             default:
                 action = null;
@@ -76,19 +76,19 @@ public class PointsCommand implements Command {
     @Override
     public void execute() {
         switch (_action) {
-        case Add:
+        case ADD:
             Interpreter.setPoints(Interpreter.getPoints() + _value);
             break;
-        case Subtract:
+        case SUBTRACT:
             Interpreter.setPoints(Interpreter.getPoints() - _value);
             break;
-        case Set:
+        case SET:
             Interpreter.setPoints(_value);
             break;
-        case Clear:
+        case CLEAR:
             Interpreter.setPoints(0);
             break;
-        case List:
+        case LIST:
             System.out.printf(
                     Content.getScript().getMessage("p_1"),
                     Interpreter.getPoints(),

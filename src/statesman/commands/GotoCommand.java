@@ -5,7 +5,7 @@ import statesman.Interpreter;
 
 public class GotoCommand implements Command {
 
-    public static final String Id = "goto";
+    public static final String ID = "goto";
 
     private String _groupName;
 

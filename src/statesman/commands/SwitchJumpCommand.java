@@ -4,7 +4,7 @@ import statesman.Interpreter;
 
 public class SwitchJumpCommand extends JumpCommand {
 
-    public static final String Id = "sjmp";
+    public static final String ID = "sjmp";
 
     private int _switchId;
 

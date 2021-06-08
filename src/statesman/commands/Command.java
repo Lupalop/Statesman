@@ -2,7 +2,7 @@ package statesman.commands;
 
 public interface Command {
 
-    public static final String Id = "";
+    public static final String ID = "";
 
     public abstract Command createInstance(String[] arguments);
 

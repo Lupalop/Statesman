@@ -4,7 +4,7 @@ import statesman.Interpreter;
 
 public class SwitchSetCommand implements Command {
 
-    public static final String Id = "set";
+    public static final String ID = "set";
 
     private int _switchId;
     private boolean _value;

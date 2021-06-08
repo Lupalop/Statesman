@@ -6,10 +6,10 @@ import statesman.commands.*;
 
 public class ScriptParser {
 
-    public static final int maxDepth = 1024;
+    public static final int MAX_DEPTH = 1024;
     
     private enum Section {
-        None, Root, Scene, Group, Actions, Messages, Items
+        NONE, ROOT, SCENE, GROUP, ACTION, MESSAGE, ITEM
     };
 
     // Data fields
@@ -34,14 +34,14 @@ public class ScriptParser {
         _lineNumber = 0;
         _script = null;
         
-        _section = Section.Root;
+        _section = Section.ROOT;
         _depth = 0;
         _scene = null;
         _group = null;
         _blockComment = false;
         
-        _conditionals = new ConditionalCommand[maxDepth];
-        _conditionalsElse = new boolean[maxDepth];
+        _conditionals = new ConditionalCommand[MAX_DEPTH];
+        _conditionalsElse = new boolean[MAX_DEPTH];
     }
     
     public ScriptParser(List<String> data) {
@@ -99,13 +99,13 @@ public class ScriptParser {
     private boolean isTerminator() throws GameException {
         if (_line.startsWith("end")) {
             switch (_section) {
-            case Root:
-            case None:
+            case ROOT:
+            case NONE:
                 throw new GameException("Stray end tag in line " + _lineNumber);
-            case Scene:
+            case SCENE:
                 _scene = null;
                 break;
-            case Group:
+            case GROUP:
                 if (_depth > 0) {
                     _conditionalsElse[_depth] = false;
                     _conditionals[_depth] = null;
@@ -119,9 +119,9 @@ public class ScriptParser {
                 break;
             }
             if (_scene != null) {
-                _section = Section.Scene;
+                _section = Section.SCENE;
             } else {
-                _section = Section.Root;
+                _section = Section.ROOT;
             }
             return true;
         }
@@ -130,7 +130,7 @@ public class ScriptParser {
     
     private boolean isPreference() throws GameException {
         String[] parts = _line.split(" ");
-        if (_section == Section.Root && parts.length == 2) {
+        if (_section == Section.ROOT && parts.length == 2) {
             switch (parts[0]) {
             case "maxpoints":
                 int maxPoints = Integer.parseInt(parts[1]);
@@ -156,17 +156,17 @@ public class ScriptParser {
     
     private boolean isSection() throws GameException {
         String[] parts = _line.split(" ");
-        if (_section == Section.Root || _section == Section.Scene) {
+        if (_section == Section.ROOT || _section == Section.SCENE) {
             switch (parts[0]) {
             case "actions":
-                _section = Section.Actions;
+                _section = Section.ACTION;
                 break;
             case "group":
                 if (parts.length == 2) {
                     _group = new CommandGroup(parts[1]);
-                    if (_section == Section.Root) {
+                    if (_section == Section.ROOT) {
                         // Reserved group name (command ran on entry)
-                        if (_group.getName().equals(Scene.entryCommandGroup)) {
+                        if (_group.getName().equals(Scene.CG_ENTRY)) {
                             throw new GameException("Use of reserved command group name, see line " + _lineNumber);
                         }
                         _script.getCommandGroups().put(_group.getName(), _group);
@@ -177,23 +177,23 @@ public class ScriptParser {
                         }
                         _scene.getCommandGroups().put(_group.getName(), _group);
                     }
-                    _section = Section.Group;
+                    _section = Section.GROUP;
                 } else {
                     throw new GameException("Invalid group section tag, see line " + _lineNumber);
                 }
                 break;
             case "items":
-                if (_section != Section.Scene) {
+                if (_section != Section.SCENE) {
                     throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
                 }
-                _section = Section.Items;
+                _section = Section.ITEM;
                 break;
             case "messages":
-                _section = Section.Messages;
+                _section = Section.MESSAGE;
                 break;
             case "scene":
                 // Nested scenes
-                if (_section == Section.Scene || _scene != null) {
+                if (_section == Section.SCENE || _scene != null) {
                     throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
                 }
                 if (parts.length == 2) {
@@ -203,7 +203,7 @@ public class ScriptParser {
                         throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
                     }
                     _script.getScenes().put(_scene.getName(), _scene);
-                    _section = Section.Scene;
+                    _section = Section.SCENE;
                 } else {
                     throw new GameException("Invalid scene section tag, see line " + _lineNumber);
                 }
@@ -214,7 +214,7 @@ public class ScriptParser {
             return true;
         }
         
-        if (_section == Section.Group) {
+        if (_section == Section.GROUP) {
             if (parts.length == 1 && parts[0].equals("else")) {
                 if (_conditionals[_depth] == null || _conditionalsElse[_depth]) {
                     throw new GameException("Stray else tag, see line " + _lineNumber);
@@ -226,10 +226,10 @@ public class ScriptParser {
                 String Id = null;
                 if (parts[0].equals("if") ||
                     parts[0].equals("elsif")) {
-                    Id = SwitchConditionalCommand.Id;
+                    Id = SwitchConditionalCommand.ID;
                 } else if (parts[0].equals("if_inv") ||
                            parts[0].equals("elsif_inv")) {
-                    Id = InventoryConditionalCommand.Id;
+                    Id = InventoryConditionalCommand.ID;
                 }
                 if (Id != null) {
                     boolean isElseIf = parts[0].startsWith("els");
@@ -241,7 +241,7 @@ public class ScriptParser {
                             .getCommands()
                             .get(Id)
                             .createInstance(parts);
-                    if (_depth == 0 && _section == Section.Group) {
+                    if (_depth == 0 && _section == Section.GROUP) {
                         _group.getCommands().add(command);
                     } else if (_conditionalsElse[_depth]) {
                         _conditionals[_depth].getElseGroup().getCommands().add(command);
@@ -265,7 +265,7 @@ public class ScriptParser {
     private boolean isInnerSection() throws GameException {
         String[] parts = _line.split("\\|");
         switch (_section) {
-        case Actions:
+        case ACTION:
             if (parts.length == 2) {
                 String[] keywords = parts[0].toLowerCase().split(",");
                 String[] arguments = parts[1].split(",");
@@ -284,7 +284,7 @@ public class ScriptParser {
                 throw new GameException("Invalid action, see line " + _lineNumber);
             }
             break;
-        case Group:
+        case GROUP:
             if (_group == null) {
                 throw new GameException("Invalid command group, see line " + _lineNumber);
             }
@@ -307,7 +307,7 @@ public class ScriptParser {
                 throw new GameException("Invalid command, see line " + _lineNumber);
             }
             break;
-        case Items:
+        case ITEM:
             if (parts.length == 2) {
                 String keyword = parts[0];
                 String description = parts[1];
@@ -325,7 +325,7 @@ public class ScriptParser {
                 throw new GameException("Invalid inventory item, see line " + _lineNumber);
             }
             break;
-        case Messages:
+        case MESSAGE:
             if (parts.length == 2) {
                 String key = parts[0];
                 String value = parts[1];

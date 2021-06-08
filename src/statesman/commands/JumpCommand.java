@@ -2,7 +2,7 @@ package statesman.commands;
 
 public class JumpCommand implements Command {
 
-    public static final String Id = "jmp";
+    public static final String ID = "jmp";
 
     protected int _lineIfTrue;
     protected int _lineIfFalse;

@@ -4,7 +4,7 @@ import statesman.Interpreter;
 
 public class InventoryJumpCommand extends JumpCommand {
 
-    public static final String Id = "ijmp";
+    public static final String ID = "ijmp";
 
     private String _itemName;
 

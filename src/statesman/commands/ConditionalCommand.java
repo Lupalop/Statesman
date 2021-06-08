@@ -2,7 +2,7 @@ package statesman.commands;
 
 public abstract class ConditionalCommand implements Command {
 
-    public static final String Id = "cond";
+    public static final String ID = "cond";
 
     protected CommandGroup _group;
     protected CommandGroup _elseGroup;

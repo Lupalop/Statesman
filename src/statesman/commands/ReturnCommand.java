@@ -2,7 +2,7 @@ package statesman.commands;
 
 public class ReturnCommand extends JumpCommand {
 
-    public static final String Id = "ret";
+    public static final String ID = "ret";
 
     public ReturnCommand() {
         super();

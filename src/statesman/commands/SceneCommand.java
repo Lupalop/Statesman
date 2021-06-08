@@ -5,7 +5,7 @@ import statesman.Interpreter;
 
 public class SceneCommand implements Command {
 
-    public static final String Id = "scene";
+    public static final String ID = "scene";
 
     private String _targetScene;
     private boolean _hasKey;

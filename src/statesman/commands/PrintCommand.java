@@ -4,7 +4,7 @@ import statesman.Content;
 
 public class PrintCommand implements Command {
 
-    public static final String Id = "print";
+    public static final String ID = "print";
 
     private boolean _initialized;
     private String _message;

@@ -5,7 +5,7 @@ import statesman.Content;
 
 public class PrintRandomCommand implements Command {
 
-    public static final String Id = "printr";
+    public static final String ID = "printr";
 
     private boolean _initialized;
     private String[] _messages;

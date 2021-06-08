@@ -4,7 +4,7 @@ import statesman.Content;
 
 public class PrintCombineCommand implements Command {
 
-    public static final String Id = "printc";
+    public static final String ID = "printc";
 
     private boolean _initialized;
     private String[] _messages;

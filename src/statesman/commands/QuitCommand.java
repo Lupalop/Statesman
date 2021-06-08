@@ -2,7 +2,7 @@ package statesman.commands;
 
 public class QuitCommand implements Command {
 
-    public static final String Id = "quit";
+    public static final String ID = "quit";
     
     public QuitCommand() {
     }

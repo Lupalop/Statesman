@@ -4,7 +4,7 @@ import statesman.Interpreter;
 
 public class SwitchConditionalCommand extends ConditionalCommand {
 
-    public static final String Id = "swcond";
+    public static final String ID = "swcond";
 
     private int[] _switchIds;
 

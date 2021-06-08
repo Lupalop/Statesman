@@ -6,7 +6,7 @@ import statesman.commands.*;
 
 public class Scene {
 
-    public static final String entryCommandGroup = "$";
+    public static final String CG_ENTRY = "$";
     
     private String _name;
     private HashMap<String, Command> _actions;
@@ -52,8 +52,8 @@ public class Scene {
     }
 
     public void runEntry() {
-        if (_commandGroups.containsKey(Scene.entryCommandGroup)) {
-            _commandGroups.get(Scene.entryCommandGroup).execute();
+        if (_commandGroups.containsKey(Scene.CG_ENTRY)) {
+            _commandGroups.get(Scene.CG_ENTRY).execute();
         }
     }
 

@@ -7,7 +7,7 @@ import statesman.commands.CommandGroup;
 
 public class Script {
 
-    public static final int defaultSwitchSize = 2000;
+    public static final int DEFAULT_SWITCH_SIZE = 2000;
     
     private int _maxPoints;
     private int _switchSize;
@@ -18,7 +18,7 @@ public class Script {
     
     public Script() {
         _maxPoints = 0;
-        _switchSize = defaultSwitchSize;
+        _switchSize = DEFAULT_SWITCH_SIZE;
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();

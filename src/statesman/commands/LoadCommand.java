@@ -8,7 +8,7 @@ import statesman.Interpreter;
 
 public class LoadCommand implements Command {
 
-    public static final String Id = "load";
+    public static final String ID = "load";
     
     public LoadCommand() {
     }

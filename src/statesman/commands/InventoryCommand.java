@@ -8,12 +8,12 @@ import statesman.InventoryItem;
 
 public class InventoryCommand implements Command {
 
-    public static final String Id = "inv";
+    public static final String ID = "inv";
     
     private String _itemName;
     private InventoryAction _action;
     
-    public enum InventoryAction { Add, Remove, Clear, List };
+    public enum InventoryAction { ADD, REMOVE, CLEAR, LIST };
     
     public InventoryCommand() {
         _itemName = null;
@@ -47,10 +47,10 @@ public class InventoryCommand implements Command {
             actionString = arguments[1].trim().toLowerCase();
             switch (actionString) {
             case "list":
-                action = InventoryAction.List;
+                action = InventoryAction.LIST;
                 break;
             case "clear":
-                action = InventoryAction.Clear;
+                action = InventoryAction.CLEAR;
                 break;
             default:
                 action = null;
@@ -61,10 +61,10 @@ public class InventoryCommand implements Command {
             actionString = arguments[1].trim().toLowerCase();
             switch (actionString) {
             case "add":
-                action = InventoryAction.Add;
+                action = InventoryAction.ADD;
                 break;
             case "rm":
-                action = InventoryAction.Remove;
+                action = InventoryAction.REMOVE;
                 break;
             default:
                 action = null;
@@ -81,14 +81,14 @@ public class InventoryCommand implements Command {
         InventoryItem item = getItem();
         if (item != null) {
             switch (_action) {
-            case Add:
+            case ADD:
                 if (Interpreter.getInventory().containsKey(item.getName())) {
                     System.out.println(Content.getScript().getMessage("i_1"));
                     break;
                 }
                 Interpreter.getInventory().put(item.getName(), item);
                 break;
-            case Remove:
+            case REMOVE:
                 if (Interpreter.getInventory().containsKey(item.getName())) {
                     Interpreter.getInventory().remove(_itemName);
                     break;
@@ -100,7 +100,7 @@ public class InventoryCommand implements Command {
             }
         } else {
             switch (_action) {
-            case List:
+            case LIST:
                 int inventorySize = Interpreter.getInventory().size();
                 if (inventorySize > 0) {
                     if (inventorySize == 1) {
@@ -120,7 +120,7 @@ public class InventoryCommand implements Command {
                     System.out.println(Content.getScript().getMessage("i_6"));
                 }
                 break;
-            case Clear:
+            case CLEAR:
                 Interpreter.getInventory().clear();
                 break;
             default:

@@ -17,23 +17,23 @@ public class Interpreter {
     static {
         _commands = new HashMap<String, Command>();
         // XXX: manually input IDs of new commands here!
-        _commands.put(PrintCommand.Id, new PrintCommand());
-        _commands.put(PrintRandomCommand.Id, new PrintRandomCommand());
-        _commands.put(PrintCombineCommand.Id, new PrintCombineCommand());
-        _commands.put(SceneCommand.Id, new SceneCommand());
-        _commands.put(GotoCommand.Id, new GotoCommand());
-        _commands.put(JumpCommand.Id, new JumpCommand());
-        _commands.put(ReturnCommand.Id, new ReturnCommand());
-        _commands.put(SwitchSetCommand.Id, new SwitchSetCommand());
-        _commands.put(SwitchJumpCommand.Id, new SwitchJumpCommand());
-        _commands.put(SwitchConditionalCommand.Id, new SwitchConditionalCommand());
-        _commands.put(InventoryCommand.Id, new InventoryCommand());
-        _commands.put(InventoryJumpCommand.Id, new InventoryJumpCommand());
-        _commands.put(InventoryConditionalCommand.Id, new InventoryConditionalCommand());
-        _commands.put(PointsCommand.Id, new PointsCommand());
-        _commands.put(QuitCommand.Id, new QuitCommand());
-        _commands.put(SaveCommand.Id, new SaveCommand());
-        _commands.put(LoadCommand.Id, new LoadCommand());
+        _commands.put(PrintCommand.ID, new PrintCommand());
+        _commands.put(PrintRandomCommand.ID, new PrintRandomCommand());
+        _commands.put(PrintCombineCommand.ID, new PrintCombineCommand());
+        _commands.put(SceneCommand.ID, new SceneCommand());
+        _commands.put(GotoCommand.ID, new GotoCommand());
+        _commands.put(JumpCommand.ID, new JumpCommand());
+        _commands.put(ReturnCommand.ID, new ReturnCommand());
+        _commands.put(SwitchSetCommand.ID, new SwitchSetCommand());
+        _commands.put(SwitchJumpCommand.ID, new SwitchJumpCommand());
+        _commands.put(SwitchConditionalCommand.ID, new SwitchConditionalCommand());
+        _commands.put(InventoryCommand.ID, new InventoryCommand());
+        _commands.put(InventoryJumpCommand.ID, new InventoryJumpCommand());
+        _commands.put(InventoryConditionalCommand.ID, new InventoryConditionalCommand());
+        _commands.put(PointsCommand.ID, new PointsCommand());
+        _commands.put(QuitCommand.ID, new QuitCommand());
+        _commands.put(SaveCommand.ID, new SaveCommand());
+        _commands.put(LoadCommand.ID, new LoadCommand());
 
         _scene = null;
         _inventory = new HashMap<String, InventoryItem>();
@@ -109,10 +109,10 @@ public class Interpreter {
                 if (App.debugMode) {
                     String[] keywordParts = keyword.split(" ");
                     if (keyword.startsWith("*tp")) {
-                        currentAction = _commands.get(SceneCommand.Id).createInstance(keywordParts);
+                        currentAction = _commands.get(SceneCommand.ID).createInstance(keywordParts);
                     }
                     if (keyword.startsWith("*set")) {
-                        currentAction = _commands.get(SwitchSetCommand.Id).createInstance(keywordParts);
+                        currentAction = _commands.get(SwitchSetCommand.ID).createInstance(keywordParts);
                     }
                 }
             } catch (Exception e) {

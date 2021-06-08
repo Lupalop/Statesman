@@ -7,7 +7,7 @@ import statesman.Interpreter;
 
 public class SaveCommand implements Command {
 
-    public static final String Id = "save";
+    public static final String ID = "save";
     
     public SaveCommand() {
     }

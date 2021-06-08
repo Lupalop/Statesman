@@ -4,7 +4,7 @@ import statesman.Interpreter;
 
 public class InventoryConditionalCommand extends ConditionalCommand {
 
-    public static final String Id = "invcond";
+    public static final String ID = "invcond";
 
     private String[] _itemNames;
 
