@@ -9,7 +9,7 @@ public class ScriptParser {
     public static final int MAX_DEPTH = 1024;
     
     private enum Section {
-        NONE, ROOT, SCENE, GROUP, ACTION, MESSAGE, ITEM
+        ROOT, SCENE, GROUP, ACTION, MESSAGE, ITEM
     };
 
     // Data fields
@@ -100,7 +100,6 @@ public class ScriptParser {
         if (_line.startsWith("end")) {
             switch (_section) {
             case ROOT:
-            case NONE:
                 throw new GameException("Stray end tag in line " + _lineNumber);
             case SCENE:
                 _scene = null;
