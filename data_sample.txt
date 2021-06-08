@@ -128,9 +128,9 @@ scene initial
         print,dummy
     end
 
-    /*
-     * Sample conversation
-     */
+    #<
+    # Sample conversation
+    #>
     group conversation
         if !100
             print,1
