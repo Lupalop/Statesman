@@ -1,5 +1,6 @@
 package statesman;
 
+import java.util.HashMap;
 import java.util.List;
 
 import statesman.commands.*;
@@ -9,7 +10,35 @@ public class ScriptParser {
     public static final int MAX_DEPTH = 1024;
     
     private enum Section {
-        ROOT, SCENE, GROUP, ACTION, MESSAGE, ITEM
+        
+        ACTION("actions"),
+        GROUP("group"),
+        ITEM("items"),
+        MESSAGE("messages"),
+        ROOT("root"),
+        SCENE("scene");
+        
+        private final String _tag;
+        private static final HashMap<String, Section> BY_TAG = new HashMap<>();
+
+        static {
+            for (int i = 0; i < values().length; i++) {
+                BY_TAG.put(values()[i].getTag(), values()[i]);
+            }
+        }
+
+        private Section(String tag) {
+            _tag = tag;
+        }
+
+        public String getTag() {
+            return _tag;
+        }
+
+        public static Section valueOfTag(String tag) {
+            return BY_TAG.get(tag);
+        }
+        
     };
 
     // Data fields
@@ -156,11 +185,17 @@ public class ScriptParser {
     private boolean isSection() throws GameException {
         String[] parts = _line.split(" ");
         if (_section == Section.ROOT || _section == Section.SCENE) {
-            switch (parts[0]) {
-            case "actions":
-                _section = Section.ACTION;
+            Section nextSection = Section.valueOfTag(parts[0]);
+            switch (nextSection) {
+            case ACTION:
+            case MESSAGE:
                 break;
-            case "group":
+            case ITEM:
+                if (_section != Section.SCENE) {
+                    throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
+                }
+                break;
+            case GROUP:
                 if (parts.length == 2) {
                     _group = new CommandGroup(parts[1]);
                     if (_section == Section.ROOT) {
@@ -176,21 +211,11 @@ public class ScriptParser {
                         }
                         _scene.getCommandGroups().put(_group.getName(), _group);
                     }
-                    _section = Section.GROUP;
                 } else {
                     throw new GameException("Invalid group section tag, see line " + _lineNumber);
                 }
                 break;
-            case "items":
-                if (_section != Section.SCENE) {
-                    throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
-                }
-                _section = Section.ITEM;
-                break;
-            case "messages":
-                _section = Section.MESSAGE;
-                break;
-            case "scene":
+            case SCENE:
                 // Nested scenes
                 if (_section == Section.SCENE || _scene != null) {
                     throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
@@ -202,7 +227,6 @@ public class ScriptParser {
                         throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
                     }
                     _script.getScenes().put(_scene.getName(), _scene);
-                    _section = Section.SCENE;
                 } else {
                     throw new GameException("Invalid scene section tag, see line " + _lineNumber);
                 }
@@ -210,6 +234,7 @@ public class ScriptParser {
             default:
                 throw new GameException("Invalid or unknown section tag, see line " + _lineNumber);
             }
+            _section = nextSection;
             return true;
         }
         
