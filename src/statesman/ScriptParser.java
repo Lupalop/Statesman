@@ -11,10 +11,10 @@ public class ScriptParser {
     
     private enum Section {
         
-        ACTION("actions"),
+        ACTION("action"),
         GROUP("group"),
-        ITEM("items"),
-        MESSAGE("messages"),
+        ITEM("item"),
+        STRING("string"),
         ROOT("root"),
         SCENE("scene");
         
@@ -188,7 +188,7 @@ public class ScriptParser {
             Section nextSection = Section.valueOfTag(parts[0]);
             switch (nextSection) {
             case ACTION:
-            case MESSAGE:
+            case STRING:
                 break;
             case ITEM:
                 if (_section != Section.SCENE) {
@@ -349,7 +349,7 @@ public class ScriptParser {
                 throw new GameException("Invalid inventory item, see line " + _lineNumber);
             }
             break;
-        case MESSAGE:
+        case STRING:
             if (parts.length == 2) {
                 String key = parts[0];
                 String value = parts[1];
