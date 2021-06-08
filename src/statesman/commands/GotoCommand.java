@@ -33,8 +33,8 @@ public class GotoCommand implements Command {
     public void execute() {
         CommandGroup group = Content.getScript().getCommandGroups().get(_groupName);
         // Local scene groups override the global group
-        if (Interpreter.getCurrentScene() != null) {
-            CommandGroup localGroup = Interpreter.getCurrentScene().getCommandGroups().get(_groupName);
+        if (Interpreter.getScene() != null) {
+            CommandGroup localGroup = Interpreter.getScene().getCommandGroups().get(_groupName);
             if (localGroup != null) {
                 group = localGroup;
             }

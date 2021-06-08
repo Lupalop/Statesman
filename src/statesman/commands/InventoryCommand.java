@@ -137,7 +137,7 @@ public class InventoryCommand implements Command {
         if (_itemName == null) {
             return null;
         }
-        return Interpreter.getCurrentScene().getItems().get(_itemName);
+        return Interpreter.getScene().getItems().get(_itemName);
     }
 
 }

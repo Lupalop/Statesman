@@ -8,7 +8,7 @@ public class Interpreter {
 
     private static Scanner _scanner;
     private static HashMap<String, Command> _commands;
-    private static Scene _currentScene;
+    private static Scene _scene;
     private static boolean[] _switches;
     private static HashMap<String, InventoryItem> _inventory;
     private static int _points;
@@ -35,7 +35,7 @@ public class Interpreter {
         _commands.put(SaveCommand.Id, new SaveCommand());
         _commands.put(LoadCommand.Id, new LoadCommand());
 
-        _currentScene = null;
+        _scene = null;
         _inventory = new HashMap<String, InventoryItem>();
     }
 
@@ -49,9 +49,9 @@ public class Interpreter {
     }
     
     public static Command findAction(String keyword) {
-        Command localAction = _currentScene.getActions().get(keyword);
+        Command localAction = _scene.getActions().get(keyword);
         Command globalAction = Content.getScript().getActions().get(keyword);
-        Command localFallbackAction = _currentScene.getActions().get("fallback");
+        Command localFallbackAction = _scene.getActions().get("fallback");
         Command fallbackAction = Content.getScript().getActions().get("fallback");
         
         if (localAction != null) {
@@ -88,7 +88,7 @@ public class Interpreter {
             System.out.println("Initial scene is missing.");
             return;
         }
-        setCurrentScene(initialScene);
+        setScene(initialScene);
         
         _isRunning = true;
 
@@ -142,13 +142,13 @@ public class Interpreter {
         return _commands;
     }
 
-    public static Scene getCurrentScene() {
-        return _currentScene;
+    public static Scene getScene() {
+        return _scene;
     }
 
-    public static void setCurrentScene(Scene scene) {
-        _currentScene = scene;
-        _currentScene.runEntry();
+    public static void setScene(Scene scene) {
+        _scene = scene;
+        _scene.runEntry();
     }
 
     public static boolean[] getSwitches() {

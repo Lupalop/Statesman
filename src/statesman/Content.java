@@ -74,7 +74,7 @@ public class Content {
         File output = new File(filename);
         PrintWriter writer = new PrintWriter(new FileWriter(output));
         // current scene, points, inventory, switches
-        writer.printf("scene %s%n", Interpreter.getCurrentScene().getName());
+        writer.printf("scene %s%n", Interpreter.getScene().getName());
         writer.printf("points %s%n", Interpreter.getPoints());
         writer.print("switches ");
         for (int i = 0; i < Interpreter.getSwitches().length; i++) {
@@ -126,7 +126,7 @@ public class Content {
                 // Try to get the named scene if it exists
                 Scene currentScene = getScript().getScenes().get(lineParts[1]);
                 if (currentScene != null) {
-                    Interpreter.setCurrentScene(currentScene);
+                    Interpreter.setScene(currentScene);
                     sceneFound = true;
                 }
                 break;

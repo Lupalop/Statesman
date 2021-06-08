@@ -34,7 +34,7 @@ public class SceneCommand implements Command {
     @Override
     public void execute() {
         if (_hasKey || Content.getScript().getScenes().containsKey(_targetScene)) {
-            Interpreter.setCurrentScene(Content.getScript().getScenes().get(_targetScene));
+            Interpreter.setScene(Content.getScript().getScenes().get(_targetScene));
             _hasKey = true;
         }
     }
