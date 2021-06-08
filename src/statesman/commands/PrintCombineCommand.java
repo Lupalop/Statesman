@@ -33,7 +33,7 @@ public class PrintCombineCommand implements Command {
     public void execute() {
         initializeStrings();
         for (int i = 0; i < _messages.length; i++) {
-            System.out.printf(_messages[i] + "%n");
+            System.out.printf(_messages[i]);
         }
     }
 
