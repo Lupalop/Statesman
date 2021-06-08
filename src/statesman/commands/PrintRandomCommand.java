@@ -1,19 +1,15 @@
 package statesman.commands;
 
 import java.util.Random;
-import statesman.Content;
 
-public class PrintRandomCommand implements Command {
+public class PrintRandomCommand extends PrintCombineCommand {
 
     public static final String ID = "printr";
 
-    private boolean _initialized;
-    private String[] _messages;
     private Random _random;
 
     public PrintRandomCommand() {
-        _initialized = false;
-        _messages = null;
+        super();
         _random = new Random();
     }
 
@@ -34,17 +30,7 @@ public class PrintRandomCommand implements Command {
 
     @Override
     public void execute() {
-        if (!_initialized) {
-            for (int i = 0; i < _messages.length; i++) {
-                boolean unescapeString = _messages[i].startsWith("@");
-                _messages[i] = Content.getScript().getMessages().getOrDefault(_messages[i], _messages[i]);
-                if (unescapeString) {
-                    _messages[i] = _messages[i].replace("\\e", "\033");
-                }
-            }
-            _initialized = true;
-        }
-
+        initializeStrings();
         int i = _random.nextInt(_messages.length);
         System.out.printf(_messages[i] + "%n");
     }

@@ -6,8 +6,8 @@ public class PrintCombineCommand implements Command {
 
     public static final String ID = "printc";
 
-    private boolean _initialized;
-    private String[] _messages;
+    protected boolean _initialized;
+    protected String[] _messages;
 
     public PrintCombineCommand() {
         _initialized = false;
@@ -31,6 +31,13 @@ public class PrintCombineCommand implements Command {
 
     @Override
     public void execute() {
+        initializeStrings();
+        for (int i = 0; i < _messages.length; i++) {
+            System.out.printf(_messages[i] + "%n");
+        }
+    }
+
+    protected void initializeStrings() {
         if (!_initialized) {
             for (int i = 0; i < _messages.length; i++) {
                 boolean unescapeString = _messages[i].startsWith("@");
@@ -41,10 +48,6 @@ public class PrintCombineCommand implements Command {
             }
             _initialized = true;
         }
-        
-        for (int i = 0; i < _messages.length; i++) {
-            System.out.printf(_messages[i] + "%n");
-        }
     }
-
+    
 }
