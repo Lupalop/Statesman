@@ -33,7 +33,11 @@ public class PrintCombineCommand implements Command {
     public void execute() {
         if (!_initialized) {
             for (int i = 0; i < _messages.length; i++) {
+                boolean unescapeString = _messages[i].startsWith("@");
                 _messages[i] = Content.getScript().getMessages().getOrDefault(_messages[i], _messages[i]);
+                if (unescapeString) {
+                    _messages[i] = _messages[i].replace("\\e", "\033");
+                }
             }
             _initialized = true;
         }

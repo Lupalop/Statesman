@@ -22,7 +22,11 @@ public class PrintCommand implements Command {
     @Override
     public void execute() {
         if (!_initialized) {
+            boolean unescapeString = _message.startsWith("@");
             _message = Content.getScript().getMessages().getOrDefault(_message, _message);
+            if (unescapeString) {
+                _message = _message.replace("\\e", "\033");
+            }
             _initialized = true;
         }
         
