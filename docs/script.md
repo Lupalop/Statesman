@@ -11,21 +11,21 @@ scene home
 end
 ```
 
-## Messages
-Messages are strings that are linked to a key and are used by the several available print commands. Message section blocks can be placed either inside or outside of scenes, and regardless of their placement, messages inside these blocks are always global (can be used by all scenes). The messages themselves can only be placed inside a message section block, which always starts with the keyword `messages`.
+## Strings
+Strings can be accessed using a key and are used by the several available print commands. String section blocks can be placed either inside or outside of scenes, and regardless of their placement, strings inside these blocks are always global (can be used by all scenes). The strings themselves can only be placed inside a string section block, which always starts with the keyword `string`.
 
-### Message section block (global)
+### String section block (global)
 ```
-messages
+string
     test|This is a test message.
     bored|Are you bored yet?
 end
 ```
 
-### Message section block (local/inside a scene)
+### String section block (local/inside a scene)
 ```
 scene home
-    messages
+    string
         test|This is a test message.
         bored|Are you bored yet?
     end
@@ -33,11 +33,11 @@ end
 ```
 
 ## Actions
-Actions are commands associated with an input or a set of inputs. Inputs are the text that you type in the game's console. Only one command can be associated with an action, but you can use the `goto` command to reference a command group which can execute multiple commands. Action section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Action section blocks that are outside of scenes (global) apply to all scenes, while section blocks that are placed inside a scene only affects that individual scene. Local action section blocks can override or replace the behavior of actions defined in global action section blocks. An action section block always starts with the `actions` keyword.
+Actions are commands associated with an input or a set of inputs. Inputs are the text that you type in the game's console. Only one command can be associated with an action, but you can use the `goto` command to reference a command group which can execute multiple commands. Action section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Action section blocks that are outside of scenes (global) apply to all scenes, while section blocks that are placed inside a scene only affects that individual scene. Local action section blocks can override or replace the behavior of actions defined in global action section blocks. An action section block always starts with the `action` keyword.
 
 ### Action section block (global)
 ```
-actions
+action
     talk|print,test
     walk|print,bored
 end
@@ -46,7 +46,7 @@ end
 ### Action section block (local/inside a scene)
 ```
 scene home
-    actions
+    action
         talk|print,test
         walk|print,bored
     end
@@ -101,22 +101,22 @@ end
 ### Command group section block (if-style conditional)
 ```
 group wave
-    // Checks if switch #100 is TRUE
+    # Checks if switch no. 100 is TRUE
     if 100
-        // Checks if switch #101 is FALSE
+        # Checks if switch no. 101 is FALSE
         if !101
-            // Print message with a key of `9`
+            # Print message with a key of `9`
             print,9
-            // Sets switch #101 to TRUE
+            # Sets switch no. 101 to TRUE
             set,101,true
-        // If switch 101 is TRUE, execute commands below
+        # If switch no. 101 is TRUE, execute commands below
         else
-            // Print message with a key of `10`
+            # Print message with a key of `10`
             print,10
         end
-    // If switch 100 is FALSE, execute commands below
+    # If switch 100 is FALSE, execute commands below
     else
-        // Print message with a key of `11`
+        # Print message with a key of `11`
         print,11
     end
 end
@@ -125,13 +125,13 @@ end
 ### Command group section block (if-style conditional - inventory)
 ```
 group check_rock
-    // Checks if the item "rock" exists in the global inventory
+    # Checks if the item "rock" exists in the global inventory
     if_inv rock
-        // Print message with a key of `9`
+        # Print message with a key of `9`
         print,9
-    // If the item "rock" is NOT in the global inventory
+    # If the item "rock" is NOT in the global inventory
     else
-        // Print message with a key of `11`
+        # Print message with a key of `11`
         print,11
     end
 end
@@ -140,30 +140,30 @@ end
 ### Command group section block (conditional jump)
 ```
 group view
-    // Conditional jump, check value of switch #2, if TRUE jump to line 1, if FALSE jump to line 3
-    0|cjmp,2,1,3
-    // Print message with a key of `nothing2`
-    1|print,nothing2
-    // RETURN (meaning stop execution of current block)
-    2|ret
-    // Set switch #2 to TRUE
-    3|set,2,true
-    // Print message with a key of `nothing`
-    4|print,nothing
+    # Conditional jump, check value of switch #2, if TRUE jump to line 1, if FALSE jump to line 3
+    cjmp,2,1,3
+    # Print message with a key of `nothing2`
+    print,nothing2
+    # RETURN (meaning stop execution of current block)
+    ret
+    # Set switch #2 to TRUE
+    set,2,true
+    # Print message with a key of `nothing`
+    print,nothing
 end
 ```
 
-## Other section tags
-These section tags are optional, and follow a key-value pair format.
+## Preference tags
+Preference tags are optional and follow a key-value pair format.
 
 ### `maxpoints`
-This tag sets the highest number of points that a player can achieve in-game. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to zero (0).
+This preference sets the highest number of points that a player can achieve in-game. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to zero (0).
 ```
 maxpoints 200
 ```
 
 ### `switches`
-This tag sets the number of switches that is allocated by the game's interpreter. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to two thousand (2000).
+This preference sets the number of switches that is allocated by the game's interpreter. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to two thousand (2000).
 ```
 switches 5000
 ```
@@ -173,34 +173,34 @@ Statesman allows both single-line and block comments, with the following syntax:
 
 ### Single-line comments
 ```
-// This is a comment
-// This is a comment (another)
-// This is a comment (and another one)
+# This is a comment
+# This is a comment (another)
+# This is a comment (and another one)
 ```
 
 ### Block comments
 ```
-/*
- * This is a block comment.
- * This line is ignored by the parser.
- This one too!
- */
+#<
+  This is a block comment.
+  This line is ignored by the parser.
+  This one too!
+#>
 ```
 
 ### Notes
-The start tag for block comments [`/*`] must appear as the first sequence (white space is excluded). The end tag for block comments [`*/`] must appear either as the first or the last sequence and it MUST NOT be placed in between.
+The start tag for block comments [`#<`] must appear as the first sequence (white space is excluded). The end tag for block comments [`#>`] must appear either as the first or the last sequence and MUST NOT be placed in between.
 
 The following locations for comments are not allowed:
 ```
-/* This is not allowed */
- blabla /* This is not allowed */
- bla /*
+#< This is not allowed #>
+ blabla #< This is not allowed #>
+ bla #<
  This is not allowed
- */ bla
+ #> bla
  
-group test // This comment is not allowed
+group test # This comment is not allowed
     messages
-        test|//This comment is treated as a message and is read by the parser.
+        test|# This comment is treated as a message and is read by the parser.
     end
 end
 ```
