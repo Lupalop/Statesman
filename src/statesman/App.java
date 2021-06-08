@@ -9,8 +9,13 @@ public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Interpreter.setScanner(scanner);
+        
+        String location = "./data.txt";
+        if (args.length == 1) {
+            location = args[0];
+        }
 
-        Content.setDataPath("./data.txt");
+        Content.setDataPath(location);
         if (Content.tryLoadData()) {
             Interpreter.run();
         } else {
