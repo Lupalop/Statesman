@@ -1,5 +1,5 @@
 <NotepadPlus>
-    <UserLang name="Statesman Script" ext="" udlVersion="2.1">
+    <UserLang name="Statesman Script" ext="gs gsdisabled" udlVersion="2.1">
         <Settings>
             <Global caseIgnored="no" allowFoldOfComments="no" foldCompact="no" forcePureLC="2" decimalSeparator="0" />
             <Prefix Keywords1="no" Keywords2="no" Keywords3="no" Keywords4="no" Keywords5="no" Keywords6="no" Keywords7="no" Keywords8="no" />
@@ -18,14 +18,14 @@
             <Keywords name="Folders in code1, open"></Keywords>
             <Keywords name="Folders in code1, middle"></Keywords>
             <Keywords name="Folders in code1, close">end</Keywords>
-            <Keywords name="Folders in code2, open">string group action scene items string if</Keywords>
-            <Keywords name="Folders in code2, middle">else elsif</Keywords>
+            <Keywords name="Folders in code2, open">string group action scene item string if if_inv</Keywords>
+            <Keywords name="Folders in code2, middle">else elsif elsif_inv</Keywords>
             <Keywords name="Folders in code2, close"></Keywords>
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
             <Keywords name="Keywords1">maxpoints switches</Keywords>
-            <Keywords name="Keywords2">$_f $_t $_w $_l $_i $_p&#x000D;&#x000A;$_ss $_sl&#x000D;&#x000A;$</Keywords>
+            <Keywords name="Keywords2">$_f $_t $_w $_l $_i $_p $_o&#x000D;&#x000A;$_ss $_sl $_go&#x000D;&#x000A;$</Keywords>
             <Keywords name="Keywords3"></Keywords>
             <Keywords name="Keywords4"></Keywords>
             <Keywords name="Keywords5"></Keywords>
