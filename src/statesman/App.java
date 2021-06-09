@@ -10,7 +10,7 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         Interpreter.setScanner(scanner);
         
-        String location = "./data.txt";
+        String location = "./scripts";
         if (args.length == 1) {
             location = args[0];
         }
@@ -19,7 +19,7 @@ public class App {
         if (Content.tryLoadData()) {
             Interpreter.run();
         } else {
-            System.out.println("Unable to load the game's data file.");
+            System.out.println("An error occurred while loading the game scripts.");
         }
     }
 

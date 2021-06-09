@@ -1,15 +1,8 @@
 package statesman;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 public class Content {
 
@@ -24,12 +17,32 @@ public class Content {
         if (_manualScript) {
             return;
         }
-
-        List<String> data = Files.readAllLines(_dataPath);
-        _parser = new ScriptParser(data);
-        
-        _script = _parser.read();
-        _scriptParsed = true;
+        // Check for existence of the data path
+        if (Files.notExists(_dataPath)) {
+            throw new GameException("The data directory does not exist");
+        }
+        // Read all game scripts from the given directory 
+        String filter = "*.gs";
+        DirectoryStream<Path> stream =
+                Files.newDirectoryStream(_dataPath, filter);
+        Iterator<Path> iterator = stream.iterator();
+        // Merged game script collection
+        int scriptCount = 0;
+        List<String> scriptLines = new LinkedList<String>();
+        while (iterator.hasNext()) {
+            Path currentPath = iterator.next();
+            List<String> currentData = Files.readAllLines(currentPath); 
+            scriptLines.addAll(currentData);
+            scriptCount++;
+        }
+        // Initialize and run the script parser
+        if (scriptCount > 0) {
+            _parser = new ScriptParser(scriptLines);
+            _script = _parser.read();
+            _scriptParsed = true;
+        } else {
+            throw new GameException("No game scripts found");
+        }
     }
 
     public static boolean tryLoadData() {
