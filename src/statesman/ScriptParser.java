@@ -268,6 +268,11 @@ public class ScriptParser {
                             .getCommands()
                             .get(Id)
                             .createInstance(parts);
+                    // Set the name of the command groups contained within
+                    // conditional commands to be the same with the group
+                    // that contains them
+                    command.getGroup().setName(_group.getName());
+                    command.getElseGroup().setName(_group.getName());
                     if (_depth == 0 && _section == Section.GROUP) {
                         _group.getCommands().add(command);
                     } else if (_conditionalsElse[_depth]) {

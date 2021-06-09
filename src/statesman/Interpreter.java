@@ -34,6 +34,7 @@ public class Interpreter {
         _commands.put(QuitCommand.ID, new QuitCommand());
         _commands.put(SaveCommand.ID, new SaveCommand());
         _commands.put(LoadCommand.ID, new LoadCommand());
+        _commands.put(GotoBaseCommand.ID, new GotoBaseCommand());
 
         _scene = null;
         _inventory = new HashMap<String, InventoryItem>();
