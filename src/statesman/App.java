@@ -14,13 +14,28 @@ public class App {
         if (args.length == 1) {
             location = args[0];
         }
-
-        Content.setDataPath(location);
+        
+        initialize(location);
+    }
+    
+    public static void initialize(String scriptLocation, String overrideInitialScene) {
+        if (Interpreter.isRunning()) {
+            Interpreter.stop();
+        }
+        Content.setDataPath(scriptLocation);
         if (Content.tryLoadData()) {
-            Interpreter.run();
+            if (overrideInitialScene == null) {
+                Interpreter.run();
+            } else {
+                Interpreter.run(overrideInitialScene);
+            }
         } else {
             System.out.println("An error occurred while loading the game scripts.");
         }
+    }
+    
+    public static void initialize(String scriptLocation) {
+        initialize(scriptLocation, null);
     }
 
 }

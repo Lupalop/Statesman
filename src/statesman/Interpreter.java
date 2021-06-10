@@ -37,7 +37,6 @@ public class Interpreter {
         _commands.put(GotoBaseCommand.ID, new GotoBaseCommand());
 
         _scene = null;
-        _inventory = new HashMap<String, InventoryItem>();
     }
 
     public static Command findCommand(String[] arguments) {
@@ -70,7 +69,7 @@ public class Interpreter {
         return null;
     }
 
-    public static void run() {
+    public static void run(String initialSceneName) {
         if (_isRunning) {
             System.out.println("The interpreter is already running.");
             return;
@@ -81,10 +80,14 @@ public class Interpreter {
             return;
         }
 
+        _inventory = new HashMap<String, InventoryItem>();
         _switches = new boolean[Content.getScript().getSwitchSize()];
         Arrays.fill(_switches, false);
 
-        Scene initialScene = Content.getScript().getScenes().get("initial");
+        if (initialSceneName == null) {
+            initialSceneName = "initial";
+        }
+        Scene initialScene = Content.getScript().getScenes().get(initialSceneName);
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");
             return;
@@ -115,6 +118,15 @@ public class Interpreter {
                     if (keyword.startsWith("*set")) {
                         currentAction = _commands.get(SwitchSetCommand.ID).createInstance(keywordParts);
                     }
+                    if (keyword.equalsIgnoreCase("*reload")) {
+                        String location = Content.getDataPath().toString();
+                        String oldScene = getScene().getName();
+                        App.initialize(location, oldScene);
+                    }
+                    if (keyword.equalsIgnoreCase("*restart")) {
+                        String location = Content.getDataPath().toString();
+                        App.initialize(location);
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("DEBUG: Invalid arguments.");
@@ -125,6 +137,10 @@ public class Interpreter {
                 continue;
             }
         }
+    }
+    
+    public static void run() {
+        run(null);
     }
     
     public static void stop() {
@@ -170,6 +186,10 @@ public class Interpreter {
 
     public static void setPoints(int points) {
         _points = points;
+    }
+    
+    public static boolean isRunning() {
+        return _isRunning;
     }
 
 }
