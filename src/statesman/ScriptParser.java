@@ -109,17 +109,17 @@ public class ScriptParser {
     
     private boolean isComment() {
         // Block comment start tag
-        if (_line.startsWith("#<")) {
+        if (_line.startsWith("/*")) {
             _blockComment = true;
             return true;
         }
         // Block comment end tag
-        if (_line.endsWith("#>")) {
+        if (_line.endsWith("*/")) {
             _blockComment = false;
             return true;
         }
         // Ignore blank lines and comments
-        if (_blockComment || _line.isBlank() || _line.startsWith("#")) {
+        if (_blockComment || _line.isBlank() || _line.startsWith("//")) {
             return true;
         }
         return false;
