@@ -28,6 +28,7 @@ public class LoadCommand implements Command {
         }
         if (name.length() > 255) {
             System.out.println(Content.getScript().getMessage("sl_3"));
+            return;
         }
         boolean gameLoaded = false;
         try {
