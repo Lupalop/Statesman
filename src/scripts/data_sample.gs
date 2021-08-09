@@ -1,33 +1,33 @@
-#<
-# This line should be ignored by the parser
-#>
+/*
+// This line should be ignored by the parser
+*/
 
 maxpoints 200
 switches 3000
 
-# Global messages
+// Global messages
 string
-    # Fallback
+    // Fallback
     f_1|I don't understand that!
     f_2|I don't know that word.
     f_3|What?
     f_4|You're confusing!
-    # Talk
+    // Talk
     t_1|There's nobody in here.
     t_2|There's no one to talk to.
-    # Walk
+    // Walk
     w_1|Where?
     w_2|May I know which direction?
-    # Inventory
+    // Inventory
     i_1|This item is already in your inventory!
     i_2|This item is NOT in your inventory!
     i_3|You only have one item in your inventory:
     i_4|You have %s items in your inventory:%n
     i_5|%s: %s%n
     i_6|Your inventory is empty!
-    # Points
+    // Points
     p_1|You currently have %s of %s points.%n
-    # Save/Load Game
+    // Save/Load Game
     sl_1|Enter the name of your saved game:
     sl_2|Invalid name.
     sl_3|Name too long! Try a shorter name for your saved game.
@@ -37,15 +37,15 @@ string
     sl_7|Your game has been saved!
 end
 
-# Test messages
+// Test messages
 string
-    # Dummies
+    // Dummies
     dummy|Dummy message.
     junk|You are a piece of junk too!
     otherjunk|You are a huge steaming pile of junk, man!
 end
 
-# Global actions
+// Global actions
 action
     fallback|printr,f_1,f_2,f_3,f_4
     junk|print,junk
@@ -62,7 +62,7 @@ action
     points|points,list
 end
 
-# Global command groups
+// Global command groups
 group junk
     sjmp,0,1,3
     print,otherjunk
@@ -71,9 +71,9 @@ group junk
     print,junk
 end
 
-# Scene: initial (called upon start-up)
+// Scene: initial (called upon start-up)
 scene initial
-    # Messages
+    // Messages
     string
         0|Welcome to the year 1914, situated in the Philippines, a colony of the United States of America. You are currently standing in front of a branch of the Intercontinental Bank, holding a leather briefcase containing thousands of pesos. You were instructed by your manager to deposit a large sum of money to a private account in another bank. What are you going to do now?%n
         1|You are talking to someone now.
@@ -91,12 +91,12 @@ scene initial
         13|You've already said no, weirdo.
     end
     
-    # Intro
+    // Intro
     group $
         print,0
     end
     
-    # Actions
+    // Actions
     action
         look,view,see|goto,view
         #look,view,see|print,0
@@ -108,19 +108,19 @@ scene initial
         combine|printc,1,2,3,4
         walk north, walk n|scene,north
         
-        # Global command group test
+        // Global command group test
         junked|goto,junk
         
-		# Sample convo
+		// Sample convo
         talk|goto,conversation
         pick rock|goto,pick_rock
         wave|goto,wave
         no|goto,response_no
     end
 
-    # Command group: view
+    // Command group: view
     group view
-        # conditional jump, switch #, line if true, line if false
+        // conditional jump, switch #, line if true, line if false
         sjmp,1,1,3
         print,0
         ret
@@ -128,9 +128,9 @@ scene initial
         print,dummy
     end
 
-    #<
-    # Sample conversation
-    #>
+    /*
+    // Sample conversation
+    */
     group conversation
         if !100
             print,1
@@ -303,7 +303,7 @@ scene initial
     end
 end
 
-# Scene: north
+// Scene: north
 scene north
     string
         nothing|There's nothing here.
@@ -315,9 +315,9 @@ scene north
         walk south,walk s|scene,initial
     end
 
-    # Command group: view
+    // Command group: view
     group view
-        # conditional jump, switch #, line if true, line if false
+        // conditional jump, switch #, line if true, line if false
         sjmp,2,1,3
         print,nothing2
         ret
@@ -325,7 +325,7 @@ scene north
         print,nothing
     end
 
-    # Overriden global command group test: junk
+    // Overriden global command group test: junk
     group junk
         print,this is an inline message
         print,this message is inline
