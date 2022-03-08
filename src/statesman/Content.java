@@ -164,7 +164,6 @@ public class Content {
                 if (inventoryFound) {
                     throw new GameException("Invalid save file: multiple declarations of `inventory`");
                 }
-                HashMap<String, InventoryItem> inventory = new HashMap<String, InventoryItem>();
                 String[] items = lineParts[1].split(",");
                 for (int j = 0; j < items.length; j++) {
                     String[] itemParts = items[j].split(";");
