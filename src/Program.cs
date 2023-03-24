@@ -4,7 +4,12 @@ namespace Statesman
 {
     internal class Program
     {
-        public static readonly bool debugMode = true;
+        public static readonly bool DebugMode =
+#if DEBUG
+            true;
+#else
+            false;
+#endif
 
         static void Main(string[] args)
         {
@@ -14,37 +19,24 @@ namespace Statesman
                 location = args[0];
             }
 
-            initialize(location);
+            Initialize(location);
         }
 
-        public static void initialize(string scriptLocation, string overrideInitialScene)
+        public static void Initialize(string scriptLocation, string overrideInitialScene = null)
         {
-            if (Interpreter.isRunning())
+            if (Interpreter.IsRunning)
             {
-                Interpreter.stop();
+                Interpreter.Stop();
             }
-            Content.setDataPath(scriptLocation);
-            if (Content.tryLoadData())
+            Content.DataPath = scriptLocation;
+            if (Content.TryLoadData())
             {
-                if (overrideInitialScene == null)
-                {
-                    Interpreter.run();
-                }
-                else
-                {
-                    Interpreter.run(overrideInitialScene);
-                }
+                Interpreter.Run(overrideInitialScene);
             }
             else
             {
                 Console.WriteLine("An error occurred while loading the game scripts.");
             }
         }
-
-        public static void initialize(string scriptLocation)
-        {
-            initialize(scriptLocation, null);
-        }
-
     }
 }

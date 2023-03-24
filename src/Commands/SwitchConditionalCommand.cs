@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class SwitchConditionalCommand : ConditionalCommand
     {
         public static readonly string ID = "swcond";
 
-        private int[] _switchIds;
+        public int[] SwitchIds { get; }
 
         public SwitchConditionalCommand()
                 : base()
@@ -27,18 +21,18 @@ namespace Statesman.Commands
         {
             _group = group;
             _elseGroup = elseGroup;
-            _switchIds = switchIds;
+            SwitchIds = switchIds;
             _targetValues = targetValues;
             _orMode = orMode;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 2)
             {
                 string condition = arguments[1];
-                bool orMode = useOrOperator(condition);
-                string[] parts = getConditionParts(condition, orMode);
+                bool orMode = UseOrOperator(condition);
+                string[] parts = GetConditionParts(condition, orMode);
                 bool[] targetValues = new bool[parts.Length];
                 int[] switchIds = new int[parts.Length];
 
@@ -66,25 +60,19 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            for (int i = 0; i < _switchIds.Length; i++)
+            for (int i = 0; i < SwitchIds.Length; i++)
             {
-                bool currentState = false;
-                currentState =
-                        (Interpreter.getSwitches()[_switchIds[i]] == _targetValues[i]);
-                bool stopLooping = updateState(currentState);
+                bool currentState =
+                    Interpreter.Switches[SwitchIds[i]] == _targetValues[i];
+                bool stopLooping = UpdateState(currentState);
                 if (stopLooping)
                 {
                     break;
                 }
             }
-            base.execute();
-        }
-
-        public int[] getSwitchIds()
-        {
-            return _switchIds;
+            base.Execute();
         }
     }
 }

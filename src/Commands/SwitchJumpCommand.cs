@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -10,7 +6,7 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "sjmp";
 
-        private int _switchId;
+        private readonly int _switchId;
 
         public SwitchJumpCommand()
             : base()
@@ -22,28 +18,28 @@ namespace Statesman.Commands
         {
             if (switchId < 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Switch ID must be a positive number");
             }
             _switchId = switchId;
             _lineIfTrue = lineIfTrue;
             _lineIfFalse = lineIfFalse;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 4)
             {
                 int switchId = int.Parse(arguments[1]);
-                int lineIfTrue = getLineNumberFromString(arguments[2]);
-                int lineIfFalse = getLineNumberFromString(arguments[3]);
+                int lineIfTrue = GetLineNumberFromString(arguments[2]);
+                int lineIfFalse = GetLineNumberFromString(arguments[3]);
                 return new SwitchJumpCommand(switchId, lineIfTrue, lineIfFalse);
             }
             return null;
         }
 
-        public override int getJumpIndex()
+        public override int GetJumpIndex()
         {
-            if (Interpreter.getSwitches()[_switchId])
+            if (Interpreter.Switches[_switchId])
             {
                 return _lineIfTrue;
             }

@@ -1,21 +1,31 @@
-﻿using System;
+﻿using Statesman.Commands;
+using System;
 using System.Collections.Generic;
-using Statesman.Commands;
 
 namespace Statesman
 {
     public class Interpreter
     {
-        private static Dictionary<string, Command> _commands;
         private static Scene _scene;
-        private static bool[] _switches;
-        private static Dictionary<string, InventoryItem> _inventory;
-        private static int _points;
-        private static bool _isRunning = false;
+        public static Scene Scene
+        {
+            get => _scene;
+            set
+            {
+                _scene = value;
+                _scene.RunEntry();
+            }
+        }
+
+        public static Dictionary<string, Command> Commands { get; private set; }
+        public static bool[] Switches { get; private set; }
+        public static Dictionary<string, InventoryItem> Inventory { get; set; }
+        public static int Points { get; set; }
+        public static bool IsRunning { get; private set; } = false;
 
         static Interpreter()
         {
-            _commands = new Dictionary<string, Command>
+            Commands = new Dictionary<string, Command>
             {
                 // XXX: manually input IDs of new commands here!
                 { PrintCommand.ID, new PrintCommand() },
@@ -40,97 +50,74 @@ namespace Statesman
             _scene = null;
         }
 
-        public static Command findCommand(string[] arguments)
+        public static Command FindCommand(string[] arguments)
         {
             string commandId = arguments[0].ToLowerInvariant();
-            Command command = null;
-            if (getCommands().TryGetValue(commandId, out command))
+            if (Commands.TryGetValue(commandId, out Command command))
             {
-                return command.createInstance(arguments);
+                return command.CreateInstance(arguments);
             }
             return null;
         }
 
-        public static Command findAction(string keyword)
+        public static Command FindAction(string keyword)
         {
-            Command localAction = null;
-            if (_scene.getActions().ContainsKey(keyword))
+            if (_scene.Actions.TryGetValue(keyword, out Command value))
             {
-                localAction = _scene.getActions()[keyword];
+                return value;
             }
-            Command globalAction = null;
-            if (Content.getScript().getActions().ContainsKey(keyword))
+            else if (Content.Script.Actions.TryGetValue(keyword, out value))
             {
-                globalAction = Content.getScript().getActions()[keyword];
+                return value;
             }
-            Command localFallbackAction = null;
-            if (_scene.getActions().ContainsKey("fallback"))
+            else if (_scene.Actions.TryGetValue("fallback", out value))
             {
-                localFallbackAction = _scene.getActions()["fallback"];
+                return value;
             }
-            Command fallbackAction = null;
-            if (Content.getScript().getActions().ContainsKey("fallback"))
+            else if (Content.Script.Actions.TryGetValue("fallback", out value))
             {
-                fallbackAction = Content.getScript().getActions()["fallback"];
+                return value;
             }
-
-            if (localAction != null)
-            {
-                return localAction;
-            }
-            else if (globalAction != null)
-            {
-                return globalAction;
-            }
-            else if (localFallbackAction != null)
-            {
-                return localFallbackAction;
-            }
-            else if (fallbackAction != null)
-            {
-                return fallbackAction;
-            }
-            else if (Program.debugMode)
+            else if (Program.DebugMode)
             {
                 Console.WriteLine("Fallback message is missing");
             }
-
             return null;
         }
 
-        public static void run(string initialSceneName)
+        public static void Run(string initialSceneName = null)
         {
-            if (_isRunning)
+            if (IsRunning)
             {
                 Console.WriteLine("The interpreter is already running.");
                 return;
             }
 
-            if (Content.getScript() == null)
+            if (Content.Script == null)
             {
                 Console.WriteLine("The game script is missing.");
                 return;
             }
 
-            _inventory = new Dictionary<string, InventoryItem>();
-            _switches = new bool[Content.getScript().getSwitchSize()];
-            Array.Fill(_switches, false);
+            Inventory = new Dictionary<string, InventoryItem>();
+            Switches = new bool[Content.Script.SwitchSize];
+            Array.Fill(Switches, false);
 
             if (initialSceneName == null)
             {
                 initialSceneName = "initial";
             }
-            Scene initialScene = Content.getScript().getScenes()[initialSceneName];
+            Scene initialScene = Content.Script.Scenes[initialSceneName];
             if (initialScene == null)
             {
                 Console.WriteLine("Initial scene is missing.");
                 return;
             }
-            setScene(initialScene);
+            Scene = initialScene;
 
-            _isRunning = true;
+            IsRunning = true;
 
-            while (_isRunning)
+            while (IsRunning)
             {
                 Console.Write("> ");
                 string keyword = Console.ReadLine().Trim().ToLowerInvariant();
@@ -142,32 +129,32 @@ namespace Statesman
 
                 Console.WriteLine();
 
-                Command currentAction = findAction(keyword);
+                Command currentAction = FindAction(keyword);
 
                 // Debug mode keywords
                 try
                 {
-                    if (Program.debugMode)
+                    if (Program.DebugMode)
                     {
                         string[] keywordParts = keyword.Split(" ");
                         if (keyword.StartsWith("*tp"))
                         {
-                            currentAction = _commands[SceneCommand.ID].createInstance(keywordParts);
+                            currentAction = Commands[SceneCommand.ID].CreateInstance(keywordParts);
                         }
                         if (keyword.StartsWith("*set"))
                         {
-                            currentAction = _commands[SwitchSetCommand.ID].createInstance(keywordParts);
+                            currentAction = Commands[SwitchSetCommand.ID].CreateInstance(keywordParts);
                         }
                         if (keyword.Equals("*reload", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            string location = Content.getDataPath();
-                            string oldScene = getScene().getName();
-                            Program.initialize(location, oldScene);
+                            string location = Content.DataPath;
+                            string oldScene = Scene.Name;
+                            Program.Initialize(location, oldScene);
                         }
                         if (keyword.Equals("*restart", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            string location = Content.getDataPath();
-                            Program.initialize(location);
+                            string location = Content.DataPath;
+                            Program.Initialize(location);
                         }
                     }
                 }
@@ -178,66 +165,15 @@ namespace Statesman
 
                 if (currentAction != null)
                 {
-                    currentAction.execute();
+                    currentAction.Execute();
                     continue;
                 }
             }
         }
 
-        public static void run()
+        public static void Stop()
         {
-            run(null);
-        }
-
-        public static void stop()
-        {
-            _isRunning = false;
-        }
-
-        public static Dictionary<string, Command> getCommands()
-        {
-            return _commands;
-        }
-
-        public static Scene getScene()
-        {
-            return _scene;
-        }
-
-        public static void setScene(Scene scene)
-        {
-            _scene = scene;
-            _scene.runEntry();
-        }
-
-        public static bool[] getSwitches()
-        {
-            return _switches;
-        }
-
-        public static Dictionary<string, InventoryItem> getInventory()
-        {
-            return _inventory;
-        }
-
-        public static void setInventory(Dictionary<string, InventoryItem> inventory)
-        {
-            _inventory = inventory;
-        }
-
-        public static int getPoints()
-        {
-            return _points;
-        }
-
-        public static void setPoints(int points)
-        {
-            _points = points;
-        }
-
-        public static bool isRunning()
-        {
-            return _isRunning;
+            IsRunning = false;
         }
     }
 }

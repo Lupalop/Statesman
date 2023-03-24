@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -25,7 +21,7 @@ namespace Statesman.Commands
             _messages = messages;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length > 2)
             {
@@ -36,31 +32,30 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            initializeStrings();
+            InitializeStrings();
             for (int i = 0; i < _messages.Length; i++)
             {
                 Console.Write(_messages[i]);
             }
         }
 
-        protected void initializeStrings()
+        protected void InitializeStrings()
         {
             if (!_initialized)
             {
                 for (int i = 0; i < _messages.Length; i++)
                 {
                     bool unescapeString = _messages[i].StartsWith("@");
-                    if (Content.getScript().getMessages().TryGetValue(_messages[i], out string messageValue))
+                    if (Content.Script.Messages.TryGetValue(_messages[i], out string messageValue))
                     {
                         _messages[i] = messageValue;
                     }
                     if (unescapeString)
                     {
                         _messages[i] = _messages[i].Replace("\\e", "\033");
-                    }
-                }
+                    }                }
                 _initialized = true;
             }
         }

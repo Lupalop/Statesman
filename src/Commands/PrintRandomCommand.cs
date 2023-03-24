@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -10,7 +6,7 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "printr";
 
-        private Random _random;
+        private readonly Random _random;
 
         public PrintRandomCommand()
             : base()
@@ -24,7 +20,7 @@ namespace Statesman.Commands
             _messages = messages;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length > 2)
             {
@@ -35,9 +31,9 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            initializeStrings();
+            InitializeStrings();
             int i = _random.Next(_messages.Length);
             Console.WriteLine(_messages[i]);
         }

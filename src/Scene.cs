@@ -6,12 +6,12 @@ namespace Statesman
 {
     public class Scene
     {
-        public static readonly string CG_ENTRY = "$";
+        public static readonly string CommandGroupEntry = "$";
 
-        private string _name;
-        private Dictionary<string, Command> _actions;
-        private Dictionary<string, CommandGroup> _commandGroups;
-        private Dictionary<string, InventoryItem> _items;
+        public string Name { get; }
+        public Dictionary<string, Command> Actions { get; }
+        public Dictionary<string, CommandGroup> CommandGroups { get; }
+        public Dictionary<string, InventoryItem> Items { get; }
 
         public Scene(
                 string name,
@@ -21,12 +21,12 @@ namespace Statesman
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Scene name cannot be empty");
             }
-            _name = name;
-            _actions = actions;
-            _commandGroups = commandGroups;
-            _items = items;
+            Name = name;
+            Actions = actions;
+            CommandGroups = commandGroups;
+            Items = items;
         }
 
         public Scene(string name) : this(
@@ -37,31 +37,11 @@ namespace Statesman
         {
         }
 
-        public string getName()
+        public void RunEntry()
         {
-            return _name;
-        }
-
-        public Dictionary<string, Command> getActions()
-        {
-            return _actions;
-        }
-
-        public Dictionary<string, CommandGroup> getCommandGroups()
-        {
-            return _commandGroups;
-        }
-
-        public Dictionary<string, InventoryItem> getItems()
-        {
-            return _items;
-        }
-
-        public void runEntry()
-        {
-            if (_commandGroups.ContainsKey(CG_ENTRY))
+            if (CommandGroups.TryGetValue(CommandGroupEntry, out CommandGroup value))
             {
-                _commandGroups[CG_ENTRY].execute();
+                value.Execute();
             }
         }
     }

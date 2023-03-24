@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -25,7 +21,7 @@ namespace Statesman.Commands
             _lineIfTrue = line;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 2)
             {
@@ -35,21 +31,20 @@ namespace Statesman.Commands
             return null;
         }
 
-        protected int getLineNumberFromString(string lineNumber)
+        protected static int GetLineNumberFromString(string lineNumber)
         {
-            int index = 0;
             if (lineNumber.Equals("ret", StringComparison.InvariantCultureIgnoreCase))
             {
-                index = int.MaxValue;
+                return int.MaxValue;
             }
-            else
+            else if (int.TryParse(lineNumber, out int index))
             {
-                index = int.Parse(lineNumber);
+                return index;
             }
-            return index;
+            return 0;
         }
 
-        public virtual int getJumpIndex()
+        public virtual int GetJumpIndex()
         {
             return _lineIfTrue;
         }

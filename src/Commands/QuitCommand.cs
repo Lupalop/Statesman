@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -14,12 +10,12 @@ namespace Statesman.Commands
         {
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             return new QuitCommand();
         }
 
-        public override void execute()
+        public override void Execute()
         {
             Environment.Exit(0);
         }

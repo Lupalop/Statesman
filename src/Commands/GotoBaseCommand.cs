@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class GotoBaseCommand : Command
     {
@@ -14,13 +8,9 @@ namespace Statesman.Commands
         {
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             return new GotoBaseCommand();
-        }
-
-        public override void execute()
-        {
         }
     }
 }

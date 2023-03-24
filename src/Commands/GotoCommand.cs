@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -10,7 +6,7 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "goto";
 
-        private string _groupName;
+        private readonly string _groupName;
 
         public GotoCommand()
         {
@@ -22,12 +18,12 @@ namespace Statesman.Commands
         {
             if (string.IsNullOrWhiteSpace(commandGroupName))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Goto command group name cannot be empty");
             }
             _groupName = commandGroupName;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 2)
             {
@@ -36,32 +32,23 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            CommandGroup group = null;
-            if (Content.getScript().getCommandGroups().ContainsKey(_groupName))
-            {
-                group = Content.getScript().getCommandGroups()[_groupName];
-            }
+            Content.Script.CommandGroups.TryGetValue(_groupName, out CommandGroup group);
 
             // Local scene groups override the global group
-            if (Interpreter.getScene() != null)
+            if (Interpreter.Scene != null)
             {
-                CommandGroup localGroup = null;
-                if (Interpreter.getScene().getCommandGroups().ContainsKey(_groupName))
+                if (Interpreter.Scene.CommandGroups.TryGetValue(_groupName, out CommandGroup localGroup))
                 {
-                    localGroup = Interpreter.getScene().getCommandGroups()[_groupName];
-                }
-                if (localGroup != null)
-                {
-                    group = localGroup;
+                    if (localGroup != null)
+                    {
+                        group = localGroup;
+                    }
                 }
             }
 
-            if (group != null)
-            {
-                group.execute();
-            }
+            group?.Execute();
         }
     }
 }

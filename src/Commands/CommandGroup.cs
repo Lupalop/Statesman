@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Statesman.Commands
 {
     public class CommandGroup
     {
-        private string _name;
-        private List<Command> _commands;
+        public string Name { get; set; }
+        public List<Command> Commands { get; }
 
         public CommandGroup(string name, List<Command> commands)
         {
-            _name = name;
-            _commands = commands;
+            Name = name;
+            Commands = commands;
         }
 
         public CommandGroup(string name)
@@ -19,46 +18,33 @@ namespace Statesman.Commands
         {
         }
 
-        public string getName()
-        {
-            return _name;
-        }
-
-        public void setName(string name)
-        {
-            _name = name;
-        }
-
-        public List<Command> getCommands()
-        {
-            return _commands;
-        }
-
-        public void execute()
+        public void Execute()
         {
             int i = 0;
-            while (i < _commands.Count)
+            while (i < Commands.Count)
             {
-                Command command = _commands[i];
+                Command command = Commands[i];
                 // Handle jumps
                 if (command is JumpCommand ||
-                    command is ReturnCommand) {
-                    i = (command as JumpCommand).getJumpIndex();
+                    command is ReturnCommand)
+                {
+                    i = (command as JumpCommand).GetJumpIndex();
                     // Stop execution if the index is invalid
-                    if (i < 0 || i > _commands.Count)
+                    if (i < 0 || i > Commands.Count)
                     {
                         break;
                     }
                     continue;
                 }
                 // Call overridden global command
-                if (command is GotoBaseCommand) {
-                    if (Content.getScript().getCommandGroups().TryGetValue(_name, out CommandGroup group))
+                if (command is GotoBaseCommand)
+                {
+                    if (Content.Script.CommandGroups.TryGetValue(Name, out CommandGroup group))
                     {
-                        group.execute();
+                        group.Execute();
                     }
                 }
-                command.execute();
+                command.Execute();
                 i++;
             }
         }

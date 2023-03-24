@@ -1,16 +1,9 @@
-﻿using System;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public abstract class Command
     {
-        public virtual Command createInstance(string[] arguments)
-        {
-            return null;
-        }
+        public virtual Command CreateInstance(string[] arguments) => null;
 
-        public virtual void execute()
-        {
-        }
+        public virtual void Execute() { }
     }
 }

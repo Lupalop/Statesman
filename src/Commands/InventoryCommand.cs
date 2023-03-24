@@ -6,15 +6,26 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "inv";
 
-        private string _itemName;
-        private InventoryAction _action;
+        public string ItemName { get; }
+        private InventoryItem Item
+        {
+            get
+            {
+                if (ItemName == null)
+                {
+                    return null;
+                }
+                return Interpreter.Scene.Items[ItemName];
+            }
+        }
+        public InventoryAction Action { get; set; }
 
-        public enum InventoryAction { ADD, REMOVE, CLEAR, LIST, NONE };
+        public enum InventoryAction { Add, Remove, Clear, List, None };
 
         public InventoryCommand()
         {
-            _itemName = null;
-            _action = InventoryAction.NONE;
+            ItemName = null;
+            Action = InventoryAction.None;
         }
 
         private InventoryCommand(InventoryAction action, string itemName, bool nameRequired)
@@ -23,12 +34,12 @@ namespace Statesman.Commands
             {
                 throw new ArgumentException("Inventory item name cannot be blank");
             }
-            if (action == InventoryAction.NONE)
+            if (action == InventoryAction.None)
             {
                 throw new ArgumentException("Invalid value was passed to the action parameter");
             }
-            _itemName = itemName;
-            _action = action;
+            ItemName = itemName;
+            Action = action;
         }
 
         public InventoryCommand(InventoryAction action, string itemName)
@@ -41,23 +52,23 @@ namespace Statesman.Commands
         {
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
-            string actionString = null;
-            InventoryAction action = InventoryAction.NONE;
+            string actionString;
+            InventoryAction action;
             if (arguments.Length == 2)
             {
                 actionString = arguments[1].Trim().ToLowerInvariant();
                 switch (actionString)
                 {
                     case "list":
-                        action = InventoryAction.LIST;
+                        action = InventoryAction.List;
                         break;
                     case "clear":
-                        action = InventoryAction.CLEAR;
+                        action = InventoryAction.Clear;
                         break;
                     default:
-                        action = InventoryAction.NONE;
+                        action = InventoryAction.None;
                         break;
                 }
                 return new InventoryCommand(action);
@@ -68,13 +79,13 @@ namespace Statesman.Commands
                 switch (actionString)
                 {
                     case "add":
-                        action = InventoryAction.ADD;
+                        action = InventoryAction.Add;
                         break;
                     case "rm":
-                        action = InventoryAction.REMOVE;
+                        action = InventoryAction.Remove;
                         break;
                     default:
-                        action = InventoryAction.NONE;
+                        action = InventoryAction.None;
                         break;
                 }
                 string itemName = arguments[2].Trim();
@@ -83,83 +94,67 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            InventoryItem item = getItem();
+            InventoryItem item = Item;
             if (item != null)
             {
-                switch (_action)
+                switch (Action)
                 {
-                    case InventoryAction.ADD:
-                        if (Interpreter.getInventory().ContainsKey(item.getName()))
+                    case InventoryAction.Add:
+                        if (Interpreter.Inventory.ContainsKey(item.Name))
                         {
-                            Console.WriteLine(Content.getScript().getMessage("i_1"));
+                            Console.WriteLine(Content.Script.FindMessage("i_1"));
                             break;
                         }
-                        Interpreter.getInventory().Add(item.getName(), item);
+                        Interpreter.Inventory.Add(item.Name, item);
                         break;
-                    case InventoryAction.REMOVE:
-                        if (Interpreter.getInventory().ContainsKey(item.getName()))
+                    case InventoryAction.Remove:
+                        if (Interpreter.Inventory.Remove(ItemName))
                         {
-                            Interpreter.getInventory().Remove(_itemName);
                             break;
                         }
-                        Console.WriteLine(Content.getScript().getMessage("i_2"));
+                        Console.WriteLine(Content.Script.FindMessage("i_2"));
                         break;
                     default:
                         break;
                 }
+                return;
             }
-            else
+
+            switch (Action)
             {
-                switch (_action)
-                {
-                    case InventoryAction.LIST:
-                        int inventorySize = Interpreter.getInventory().Count;
-                        if (inventorySize > 0)
+                case InventoryAction.List:
+                    int inventorySize = Interpreter.Inventory.Count;
+                    if (inventorySize > 0)
+                    {
+                        if (inventorySize == 1)
                         {
-                            if (inventorySize == 1)
-                            {
-                                Console.WriteLine(Content.getScript().getMessage("i_3"));
-                            }
-                            else
-                            {
-                                Console.Write(Content.getScript().getMessage("i_4"), inventorySize);
-                            }
-                            foreach (var inventoryItem in Interpreter.getInventory().Values)
-                            {
-                                Console.Write(
-                                        Content.getScript().getMessage("i_5"),
-                                        inventoryItem.getName(),
-                                        inventoryItem.getDescription());
-                            }
+                            Console.WriteLine(Content.Script.FindMessage("i_3"));
                         }
                         else
                         {
-                            Console.WriteLine(Content.getScript().getMessage("i_6"));
+                            Console.Write(Content.Script.FindMessage("i_4"), inventorySize);
                         }
-                        break;
-                    case InventoryAction.CLEAR:
-                        Interpreter.getInventory().Clear();
-                        break;
-                    default:
-                        break;
-                }
+                        foreach (var inventoryItem in Interpreter.Inventory.Values)
+                        {
+                            Console.Write(
+                                    Content.Script.FindMessage("i_5"),
+                                    inventoryItem.Name,
+                                    inventoryItem.Description);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine(Content.Script.FindMessage("i_6"));
+                    }
+                    break;
+                case InventoryAction.Clear:
+                    Interpreter.Inventory.Clear();
+                    break;
+                default:
+                    break;
             }
-        }
-
-        public string getItemName()
-        {
-            return _itemName;
-        }
-
-        private InventoryItem getItem()
-        {
-            if (_itemName == null)
-            {
-                return null;
-            }
-            return Interpreter.getScene().getItems()[_itemName];
         }
     }
 }

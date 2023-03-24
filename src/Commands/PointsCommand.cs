@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -10,14 +6,14 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "points";
 
-        private PointsAction _action;
-        private int _value;
+        private readonly PointsAction _action;
+        private readonly int _value;
 
-        public enum PointsAction { ADD, SUBTRACT, SET, CLEAR, LIST, NONE };
+        public enum PointsAction { Add, Subtract, Set, Clear, List, None };
 
         public PointsCommand()
         {
-            _action = PointsAction.NONE;
+            _action = PointsAction.None;
             _value = 0;
         }
 
@@ -27,7 +23,7 @@ namespace Statesman.Commands
             {
                 throw new ArgumentException("Target points value cannot be less than zero");
             }
-            if (action == PointsAction.NONE)
+            if (action == PointsAction.None)
             {
                 throw new ArgumentException("Invalid value was passed to the action parameter");
             }
@@ -40,23 +36,23 @@ namespace Statesman.Commands
         {
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
-            string actionString = null;
+            string actionString;
             if (arguments.Length == 2)
             {
                 actionString = arguments[1].Trim().ToLowerInvariant();
-                PointsAction action = PointsAction.NONE;
+                PointsAction action;
                 switch (actionString)
                 {
                     case "list":
-                        action = PointsAction.LIST;
+                        action = PointsAction.List;
                         break;
                     case "clear":
-                        action = PointsAction.CLEAR;
+                        action = PointsAction.Clear;
                         break;
                     default:
-                        action = PointsAction.NONE;
+                        action = PointsAction.None;
                         break;
                 }
                 return new PointsCommand(action, 0);
@@ -64,20 +60,20 @@ namespace Statesman.Commands
             else if (arguments.Length == 3)
             {
                 actionString = arguments[1].Trim().ToLowerInvariant();
-                PointsAction action = PointsAction.NONE;
+                PointsAction action;
                 switch (actionString)
                 {
                     case "add":
-                        action = PointsAction.ADD;
+                        action = PointsAction.Add;
                         break;
                     case "sub":
-                        action = PointsAction.SUBTRACT;
+                        action = PointsAction.Subtract;
                         break;
                     case "set":
-                        action = PointsAction.SET;
+                        action = PointsAction.Set;
                         break;
                     default:
-                        action = PointsAction.NONE;
+                        action = PointsAction.None;
                         break;
                 }
                 int value = int.Parse(arguments[2]);
@@ -86,27 +82,27 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
             switch (_action)
             {
-                case PointsAction.ADD:
-                    Interpreter.setPoints(Interpreter.getPoints() + _value);
+                case PointsAction.Add:
+                    Interpreter.Points += _value;
                     break;
-                case PointsAction.SUBTRACT:
-                    Interpreter.setPoints(Interpreter.getPoints() - _value);
+                case PointsAction.Subtract:
+                    Interpreter.Points -= _value;
                     break;
-                case PointsAction.SET:
-                    Interpreter.setPoints(_value);
+                case PointsAction.Set:
+                    Interpreter.Points = _value;
                     break;
-                case PointsAction.CLEAR:
-                    Interpreter.setPoints(0);
+                case PointsAction.Clear:
+                    Interpreter.Points = 0;
                     break;
-                case PointsAction.LIST:
+                case PointsAction.List:
                     Console.Write(
-                            Content.getScript().getMessage("p_1"),
-                            Interpreter.getPoints(),
-                            Content.getScript().getMaxPoints());
+                            Content.Script.FindMessage("p_1"),
+                            Interpreter.Points,
+                            Content.Script.MaxPoints);
                     break;
                 default:
                     break;

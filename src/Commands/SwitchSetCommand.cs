@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -10,8 +6,8 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "set";
 
-        private int _switchId;
-        private bool _value;
+        private readonly int _switchId;
+        private readonly bool _value;
 
         public SwitchSetCommand()
         {
@@ -23,13 +19,13 @@ namespace Statesman.Commands
         {
             if (switchId < 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Switch ID must be a positive number");
             }
             _switchId = switchId;
             _value = value;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 3)
             {
@@ -40,9 +36,9 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            Interpreter.getSwitches()[_switchId] = _value;
+            Interpreter.Switches[_switchId] = _value;
         }
     }
 }

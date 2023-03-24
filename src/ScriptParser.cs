@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Statesman.Commands;
+using System;
 using System.Collections.Generic;
-using Statesman.Commands;
 
 namespace Statesman
 {
     public class ScriptParser
     {
-        public static readonly int MAX_DEPTH = 1024;
+        public static readonly int MaxDepth = 1024;
 
         private enum Section
         {
@@ -19,7 +19,7 @@ namespace Statesman
         };
 
         // Data fields
-        private List<string> _data;
+        private readonly List<string> _data;
         private string _line;
         private int _lineNumber;
         private Script _script;
@@ -30,13 +30,13 @@ namespace Statesman
         private CommandGroup _group;
         private bool _blockComment;
 
-        private ConditionalCommand[] _conditionals;
-        private bool[] _conditionalsElse;
+        private readonly ConditionalCommand[] _conditionals;
+        private readonly bool[] _conditionalsElse;
         private int _depth;
 
-        private ScriptParser()
+        public ScriptParser(List<string> data)
         {
-            _data = null;
+            _data = data;
             _line = "";
             _lineNumber = 0;
             _script = null;
@@ -47,16 +47,11 @@ namespace Statesman
             _group = null;
             _blockComment = false;
 
-            _conditionals = new ConditionalCommand[MAX_DEPTH];
-            _conditionalsElse = new bool[MAX_DEPTH];
+            _conditionals = new ConditionalCommand[MaxDepth];
+            _conditionalsElse = new bool[MaxDepth];
         }
 
-        public ScriptParser(List<string> data) : this()
-        {
-            _data = data;
-        }
-
-        public Script read()
+        public Script Read()
         {
             _script = new Script();
 
@@ -65,23 +60,23 @@ namespace Statesman
                 _lineNumber = i + 1;
                 _line = _data[i].Trim();
 
-                if (isComment())
+                if (IsComment())
                 {
                     continue;
                 }
-                if (isTerminator())
+                if (IsTerminator())
                 {
                     continue;
                 }
-                if (isPreference())
+                if (IsPreference())
                 {
                     continue;
                 }
-                if (isSection())
+                if (IsSection())
                 {
                     continue;
                 }
-                if (isInnerSection())
+                if (IsInnerSection())
                 {
                     continue;
                 }
@@ -92,7 +87,7 @@ namespace Statesman
             return _script;
         }
 
-        private bool isComment()
+        private bool IsComment()
         {
             // Block comment start tag
             if (_line.StartsWith("/*"))
@@ -114,7 +109,7 @@ namespace Statesman
             return false;
         }
 
-        private bool isTerminator()
+        private bool IsTerminator()
         {
             if (_line.StartsWith("end"))
             {
@@ -154,7 +149,7 @@ namespace Statesman
             return false;
         }
 
-        private bool isPreference()
+        private bool IsPreference()
         {
             string[] parts = _line.Split(" ");
             if (_section == Section.Root && parts.Length == 2)
@@ -167,7 +162,7 @@ namespace Statesman
                         {
                             throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
                         }
-                        _script.setMaxPoints(maxPoints);
+                        _script.MaxPoints = maxPoints;
                         break;
                     case "switches":
                         int switchSize = int.Parse(parts[1]);
@@ -175,7 +170,7 @@ namespace Statesman
                         {
                             throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
                         }
-                        _script.setSwitchSize(switchSize);
+                        _script.SwitchSize = switchSize;
                         break;
                     default:
                         return false;
@@ -185,7 +180,7 @@ namespace Statesman
             return false;
         }
 
-        private bool isSection()
+        private bool IsSection()
         {
             string[] parts = _line.Split(" ");
             if (_section == Section.Root || _section == Section.Scene)
@@ -213,20 +208,20 @@ namespace Statesman
                             if (_section == Section.Root)
                             {
                                 // Reserved group name (command ran on entry)
-                                if (_group.getName().Equals(Scene.CG_ENTRY, StringComparison.InvariantCultureIgnoreCase))
+                                if (_group.Name.Equals(Scene.CommandGroupEntry, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     throw new GameException("Use of reserved command group name, see line " + _lineNumber);
                                 }
-                                _script.getCommandGroups()[_group.getName()] = _group;
+                                _script.CommandGroups[_group.Name] = _group;
                             }
                             else
                             {
                                 // Group name already in use locally
-                                if (_scene.getCommandGroups().ContainsKey(_group.getName()))
+                                if (_scene.CommandGroups.ContainsKey(_group.Name))
                                 {
                                     throw new GameException("Command group name already used in current scene, see line " + _lineNumber);
                                 }
-                                _scene.getCommandGroups()[_group.getName()] = _group;
+                                _scene.CommandGroups[_group.Name] = _group;
                             }
                         }
                         else
@@ -244,11 +239,11 @@ namespace Statesman
                         {
                             _scene = new Scene(parts[1]);
                             // Scene name already in use
-                            if (_script.getScenes().ContainsKey(_scene.getName()))
+                            if (_script.Scenes.ContainsKey(_scene.Name))
                             {
                                 throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
                             }
-                            _script.getScenes().Add(_scene.getName(), _scene);
+                            _script.Scenes.Add(_scene.Name, _scene);
                         }
                         else
                         {
@@ -295,24 +290,30 @@ namespace Statesman
                         }
                         ConditionalCommand command =
                                 (ConditionalCommand)Interpreter
-                                .getCommands()[Id]
-                                .createInstance(parts);
+                                .Commands[Id]
+                                .CreateInstance(parts);
                         // Set the name of the command groups contained within
                         // conditional commands to be the same with the group
                         // that contains them
-                        command.getGroup().setName(_group.getName());
-                        command.getElseGroup().setName(_group.getName());
+                        command.                        // Set the name of the command groups contained within
+                        // conditional commands to be the same with the group
+                        // that contains them
+                        Group.                        // Set the name of the command groups contained within
+                        // conditional commands to be the same with the group
+                        // that contains them
+                        Name = _group.Name;
+                        command.ElseGroup.Name = _group.Name;
                         if (_depth == 0 && _section == Section.Group)
                         {
-                            _group.getCommands().Add(command);
+                            _group.Commands.Add(command);
                         }
                         else if (_conditionalsElse[_depth])
                         {
-                            _conditionals[_depth].getElseGroup().getCommands().Add(command);
+                            _conditionals[_depth].ElseGroup.Commands.Add(command);
                         }
                         else
                         {
-                            _conditionals[_depth].getGroup().getCommands().Add(command);
+                            _conditionals[_depth].Group.Commands.Add(command);
                         }
                         if (isElseIf)
                         {
@@ -331,7 +332,7 @@ namespace Statesman
             return false;
         }
 
-        private bool isInnerSection()
+        private bool IsInnerSection()
         {
             string[] parts = _line.Split("|");
             switch (_section)
@@ -341,7 +342,7 @@ namespace Statesman
                     {
                         string[] keywords = parts[0].ToLowerInvariant().Split(",");
                         string[] arguments = parts[1].Split(",");
-                        Command command = Interpreter.findCommand(arguments);
+                        Command command = Interpreter.FindCommand(arguments);
                         if (command == null)
                         {
                             throw new GameException("Unknown command was referenced in line " + _lineNumber);
@@ -350,11 +351,11 @@ namespace Statesman
                         {
                             if (_scene == null)
                             {
-                                _script.getActions().Add(keywords[i], command);
+                                _script.Actions.Add(keywords[i], command);
                             }
                             else
                             {
-                                _scene.getActions().Add(keywords[i], command);
+                                _scene.Actions.Add(keywords[i], command);
                             }
                         }
                     }
@@ -371,7 +372,7 @@ namespace Statesman
                     if (parts.Length == 1)
                     {
                         string[] arguments = parts[0].Split(",");
-                        Command command = Interpreter.findCommand(arguments);
+                        Command command = Interpreter.FindCommand(arguments);
                         if (command == null)
                         {
                             throw new GameException("Unknown command was referenced in line " + _lineNumber);
@@ -380,16 +381,16 @@ namespace Statesman
                         {
                             if (_conditionalsElse[_depth])
                             {
-                                _conditionals[_depth].getElseGroup().getCommands().Add(command);
+                                _conditionals[_depth].ElseGroup.Commands.Add(command);
                             }
                             else
                             {
-                                _conditionals[_depth].getGroup().getCommands().Add(command);
+                                _conditionals[_depth].Group.Commands.Add(command);
                             }
                         }
                         else
                         {
-                            _group.getCommands().Add(command);
+                            _group.Commands.Add(command);
                         }
                     }
                     else
@@ -408,12 +409,12 @@ namespace Statesman
                             throw new GameException("Missing inventory item key in line " + _lineNumber);
                         }
                         // Key already in use 
-                        if (_scene.getItems().ContainsKey(keyword))
+                        if (_scene.Items.ContainsKey(keyword))
                         {
                             throw new GameException("Duplicate key was specified by the inventory item in line " + _lineNumber);
                         }
-                        InventoryItem item = new InventoryItem(keyword, description, _scene);
-                        _scene.getItems().Add(keyword, item);
+                        InventoryItem item = new(keyword, description, _scene);
+                        _scene.Items.Add(keyword, item);
                     }
                     else
                     {
@@ -431,11 +432,11 @@ namespace Statesman
                             throw new GameException("Missing message key, see line " + _lineNumber);
                         }
                         // Key already in use 
-                        if (_script.getMessages().ContainsKey(key))
+                        if (_script.Messages.ContainsKey(key))
                         {
                             throw new GameException("Duplicate key was specified by the message in line " + _lineNumber);
                         }
-                        _script.getMessages().Add(key, value);
+                        _script.Messages.Add(key, value);
                     }
                     else
                     {

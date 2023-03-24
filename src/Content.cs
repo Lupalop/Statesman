@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
 namespace Statesman
 {
@@ -13,7 +13,7 @@ namespace Statesman
         private static Script _script = null;
         private static ScriptParser _parser = null;
 
-        public static void loadData()
+        public static void LoadData()
         {
             // Refuse to parse data if the script was set manually
             if (_manualScript)
@@ -30,7 +30,7 @@ namespace Statesman
             IEnumerable<string> filePaths = Directory.EnumerateFiles(_dataPath, filter);
             // Merged game script collection
             int scriptCount = 0;
-            List<string> scriptLines = new List<string>();
+            List<string> scriptLines = new();
             foreach (var scriptPath in filePaths)
             {
                 string[] scriptData = File.ReadAllLines(scriptPath);
@@ -41,7 +41,7 @@ namespace Statesman
             if (scriptCount > 0)
             {
                 _parser = new ScriptParser(scriptLines);
-                _script = _parser.read();
+                _script = _parser.Read();
                 _scriptParsed = true;
             }
             else
@@ -50,15 +50,15 @@ namespace Statesman
             }
         }
 
-        public static bool tryLoadData()
+        public static bool TryLoadData()
         {
             try
             {
-                loadData();
+                LoadData();
             }
             catch (Exception)
             {
-                if (Program.debugMode)
+                if (Program.DebugMode)
                 {
                     throw;
                 }
@@ -67,49 +67,51 @@ namespace Statesman
             return true;
         }
 
-        public static Script getScript()
+        public static Script Script
         {
-            if (!_manualScript && !_scriptParsed)
+            get
             {
-                tryLoadData();
+                if (!_manualScript && !_scriptParsed)
+                {
+                    TryLoadData();
+                }
+                return _script;
             }
-            return _script;
+
+            set
+            {
+                _manualScript = true;
+                _dataPath = null;
+                _scriptParsed = false;
+                _script = value;
+            }
         }
 
-        public static void setScript(Script script)
+        public static string DataPath
         {
-            _manualScript = true;
-            _dataPath = null;
-            _scriptParsed = false;
-            _script = script;
+            get => _dataPath;
+            set
+            {
+                _manualScript = false;
+                _dataPath = value;
+                _scriptParsed = false;
+                _script = null;
+            }
         }
 
-        public static string getDataPath()
-        {
-            return _dataPath;
-        }
-
-        public static void setDataPath(string path)
-        {
-            _manualScript = false;
-            _dataPath = path;
-            _scriptParsed = false;
-            _script = null;
-        }
-
-        public static void saveState(string name)
+        public static void SaveState(string name)
         {
             string filename = name + ".sav";
-            StreamWriter writer = new StreamWriter(filename);
+            using StreamWriter writer = new(filename);
 
             // current scene, points, inventory, switches
-            writer.WriteLine("scene {0}", Interpreter.getScene().getName());
-            writer.WriteLine("points {0}", Interpreter.getPoints());
+            writer.WriteLine("scene {0}", Interpreter.Scene.Name);
+            writer.WriteLine("points {0}", Interpreter.Points);
             writer.Write("switches ");
-            for (int i = 0; i < Interpreter.getSwitches().Length; i++)
+            for (int i = 0; i < Interpreter.Switches.Length; i++)
             {
-                writer.Write(Interpreter.getSwitches()[i]);
-                if (i < Interpreter.getSwitches().Length - 1)
+                writer.Write(Interpreter.Switches[i]);
+                if (i < Interpreter.Switches.Length - 1)
                 {
                     writer.Write(",");
                 }
@@ -118,7 +120,7 @@ namespace Statesman
                     writer.WriteLine();
                 }
             }
-            var inventory = Interpreter.getInventory();
+            var inventory = Interpreter.Inventory;
             if (inventory.Count > 0)
             {
                 writer.Write("inventory ");
@@ -126,9 +128,9 @@ namespace Statesman
                 var lastItem = inventory.Last().Value;
                 foreach (var item in inventory.Values)
                 {
-                    writer.Write(item.getOwnerScene().getName());
+                    writer.Write(item.OwnerScene.Name);
                     writer.Write(";");
-                    writer.Write(item.getName());
+                    writer.Write(item.Name);
                     if (item != lastItem)
                     {
                         writer.Write(",");
@@ -139,11 +141,9 @@ namespace Statesman
                     }
                 }
             }
-            writer.Flush();
-            writer.Close();
         }
 
-        public static void loadState(string name)
+        public static void LoadState(string name)
         {
             string savePath = name + ".sav";
             string[] data = File.ReadAllLines(savePath);
@@ -166,10 +166,10 @@ namespace Statesman
                             throw new GameException("Invalid save file: multiple declarations of `scene`");
                         }
                         // Try to get the named scene if it exists
-                        Scene currentScene = getScript().getScenes()[lineParts[1]];
+                        Scene currentScene = Script.Scenes[lineParts[1]];
                         if (currentScene != null)
                         {
-                            Interpreter.setScene(currentScene);
+                            Interpreter.Scene = currentScene;
                             sceneFound = true;
                         }
                         break;
@@ -178,7 +178,7 @@ namespace Statesman
                         {
                             throw new GameException("Invalid save file: multiple declarations of `points`");
                         }
-                        Interpreter.setPoints(int.Parse(lineParts[1]));
+                        Interpreter.Points = int.Parse(lineParts[1]);
                         pointsFound = true;
                         break;
                     case "switches":
@@ -187,9 +187,9 @@ namespace Statesman
                             throw new GameException("Invalid save file: multiple declarations of `switches`");
                         }
                         string[] boolParts = lineParts[1].Split(",");
-                        for (int j = 0; j < Interpreter.getSwitches().Length; j++)
+                        for (int j = 0; j < Interpreter.Switches.Length; j++)
                         {
-                            Interpreter.getSwitches()[j] = bool.Parse(boolParts[j]);
+                            Interpreter.Switches[j] = bool.Parse(boolParts[j]);
                         }
                         switchesFound = true;
                         break;
@@ -203,16 +203,16 @@ namespace Statesman
                         {
                             string[] itemParts = items[j].Split(";");
                             // get scene name (first part)
-                            Scene targetScene = getScript().getScenes()[itemParts[0]];
+                            Scene targetScene = Script.Scenes[itemParts[0]];
                             // get item name (second part)
                             string itemName = itemParts[1];
                             // If scene exists, try to get the inventory item
                             if (targetScene != null)
                             {
-                                InventoryItem item = targetScene.getItems()[itemName];
+                                InventoryItem item = targetScene.Items[itemName];
                                 if (item != null)
                                 {
-                                    Interpreter.getInventory().Add(itemName, item);
+                                    Interpreter.Inventory.Add(itemName, item);
                                 }
                             }
                             // Silently ignore if either the inventory item or scene does not exist 

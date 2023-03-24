@@ -7,9 +7,15 @@ namespace Statesman.Commands
         public static readonly string ID = "cond";
 
         protected CommandGroup _group;
+        public CommandGroup Group => _group;
+
         protected CommandGroup _elseGroup;
-        protected bool _orMode;
+        public CommandGroup ElseGroup => _elseGroup;
+
         protected bool[] _targetValues;
+        public bool[] TargetValues => _targetValues;
+
+        protected bool _orMode;
         protected bool? _shouldExecute;
 
         public ConditionalCommand()
@@ -21,25 +27,20 @@ namespace Statesman.Commands
             _shouldExecute = null;
         }
 
-        public override Command createInstance(string[] arguments)
-        {
-            return null;
-        }
-
-        public override void execute()
+        public override void Execute()
         {
             if (_shouldExecute.Value)
             {
-                _group.execute();
+                _group.Execute();
             }
             else
             {
-                _elseGroup.execute();
+                _elseGroup.Execute();
             }
             _shouldExecute = null;
         }
 
-        protected bool updateState(bool newState)
+        protected bool UpdateState(bool newState)
         {
             if (newState)
             {
@@ -60,7 +61,7 @@ namespace Statesman.Commands
             return false;
         }
 
-        protected bool useOrOperator(string condition)
+        protected static bool UseOrOperator(string condition)
         {
             bool orMode = condition.Contains(';');
             bool andMode = condition.Contains(',');
@@ -73,7 +74,7 @@ namespace Statesman.Commands
             return orMode;
         }
 
-        protected string[] getConditionParts(string condition, bool orMode)
+        protected static string[] GetConditionParts(string condition, bool orMode)
         {
             string delimiter = ",";
 
@@ -83,21 +84,6 @@ namespace Statesman.Commands
             }
 
             return condition.Split(delimiter);
-        }
-
-        public CommandGroup getGroup()
-        {
-            return _group;
-        }
-
-        public CommandGroup getElseGroup()
-        {
-            return _elseGroup;
-        }
-
-        public bool[] getTargetValues()
-        {
-            return _targetValues;
         }
     }
 }

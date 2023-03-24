@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Statesman.Commands
 {
@@ -10,7 +6,7 @@ namespace Statesman.Commands
     {
         public static readonly string ID = "scene";
 
-        private string _targetScene;
+        private readonly string _targetScene;
         private bool _hasKey;
 
         public SceneCommand()
@@ -23,13 +19,13 @@ namespace Statesman.Commands
         {
             if (string.IsNullOrWhiteSpace(targetScene))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Target scene name cannot be empty");
             }
             _targetScene = targetScene;
             _hasKey = false;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 2)
             {
@@ -38,11 +34,11 @@ namespace Statesman.Commands
             return null;
         }
 
-        public override void execute()
+        public override void Execute()
         {
-            if (_hasKey || Content.getScript().getScenes().ContainsKey(_targetScene))
+            if (_hasKey || Content.Script.Scenes.ContainsKey(_targetScene))
             {
-                Interpreter.setScene(Content.getScript().getScenes()[_targetScene]);
+                Interpreter.Scene = Content.Script.Scenes[_targetScene];
                 _hasKey = true;
             }
         }

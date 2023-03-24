@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class InventoryJumpCommand : JumpCommand
     {
         public static readonly string ID = "ijmp";
 
-        private string _itemName;
+        private readonly string _itemName;
 
         public InventoryJumpCommand()
             : base()
@@ -25,21 +19,21 @@ namespace Statesman.Commands
             _lineIfFalse = lineIfFalse;
         }
 
-        public override Command createInstance(string[] arguments)
+        public override Command CreateInstance(string[] arguments)
         {
             if (arguments.Length == 4)
             {
                 string itemName = arguments[1];
-                int lineIfTrue = getLineNumberFromString(arguments[2]);
-                int lineIfFalse = getLineNumberFromString(arguments[3]);
+                int lineIfTrue = GetLineNumberFromString(arguments[2]);
+                int lineIfFalse = GetLineNumberFromString(arguments[3]);
                 return new InventoryJumpCommand(itemName, lineIfTrue, lineIfFalse);
             }
             return null;
         }
 
-        public override int getJumpIndex()
+        public override int GetJumpIndex()
         {
-            if (Interpreter.getInventory().ContainsKey(_itemName))
+            if (Interpreter.Inventory.ContainsKey(_itemName))
             {
                 return _lineIfTrue;
             }
