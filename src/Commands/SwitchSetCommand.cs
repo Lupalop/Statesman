@@ -2,32 +2,22 @@
 {
     public class SwitchSetCommand : Command
     {
-        public static readonly string ID = "set";
+        public const string CommandSwitchSet = "set";
 
-        private readonly int _switchId;
+        private readonly string _switchId;
         private readonly bool _value;
 
-        public SwitchSetCommand()
+        public SwitchSetCommand(string switchId, bool value)
         {
-            _switchId = 0;
-            _value = false;
-        }
-
-        public SwitchSetCommand(int switchId, bool value)
-        {
-            if (switchId < 0)
-            {
-                throw new ArgumentException("Switch ID must be a positive number");
-            }
             _switchId = switchId;
             _value = value;
         }
 
-        public override Command CreateInstance(string[] arguments)
+        public new static Command CreateInstance(string commandName, string[] arguments)
         {
-            if (arguments.Length == 3)
+            if (commandName == CommandSwitchSet && arguments.Length == 3)
             {
-                int switchId = int.Parse(arguments[1]);
+                string switchId = arguments[1];
                 bool value = bool.Parse(arguments[2]);
                 return new SwitchSetCommand(switchId, value);
             }
@@ -36,7 +26,22 @@
 
         public override void Execute()
         {
-            Interpreter.Switches[_switchId] = _value;
+            if (Interpreter.Inventory.TryGetValue(_switchId, out InventoryItem item))
+            {
+                if (item != null && !item.IsSwitch)
+                {
+                    throw new InvalidDataException("Attempted to modify an inventory item using a switch command.");
+                }
+            }
+
+            if (_value)
+            {
+                Interpreter.Inventory[_switchId] = new InventoryItem(_switchId);
+            }
+            else
+            {
+                Interpreter.Inventory.Remove(_switchId);
+            }
         }
     }
 }

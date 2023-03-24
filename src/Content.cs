@@ -102,19 +102,6 @@
             // current scene, points, inventory, switches
             writer.WriteLine("scene {0}", Interpreter.Scene.Name);
             writer.WriteLine("points {0}", Interpreter.Points);
-            writer.Write("switches ");
-            for (int i = 0; i < Interpreter.Switches.Length; i++)
-            {
-                writer.Write(Interpreter.Switches[i]);
-                if (i < Interpreter.Switches.Length - 1)
-                {
-                    writer.Write(",");
-                }
-                else
-                {
-                    writer.WriteLine();
-                }
-            }
             var inventory = Interpreter.Inventory;
             if (inventory.Count > 0)
             {
@@ -123,8 +110,11 @@
                 var lastItem = inventory.Last().Value;
                 foreach (var item in inventory.Values)
                 {
-                    writer.Write(item.OwnerScene.Name);
-                    writer.Write(";");
+                    if (item.OwnerScene != null)
+                    {
+                        writer.Write(item.OwnerScene.Name);
+                        writer.Write(";");
+                    }
                     writer.Write(item.Name);
                     if (item != lastItem)
                     {
@@ -145,7 +135,6 @@
 
             bool sceneFound = false;
             bool pointsFound = false;
-            bool switchesFound = false;
             bool inventoryFound = false;
 
             for (int i = 0; i < data.Length; i++)
@@ -176,18 +165,6 @@
                         Interpreter.Points = int.Parse(lineParts[1]);
                         pointsFound = true;
                         break;
-                    case "switches":
-                        if (switchesFound)
-                        {
-                            throw new GameException("Invalid save file: multiple declarations of `switches`");
-                        }
-                        string[] boolParts = lineParts[1].Split(",");
-                        for (int j = 0; j < Interpreter.Switches.Length; j++)
-                        {
-                            Interpreter.Switches[j] = bool.Parse(boolParts[j]);
-                        }
-                        switchesFound = true;
-                        break;
                     case "inventory":
                         if (inventoryFound)
                         {
@@ -197,19 +174,24 @@
                         for (int j = 0; j < items.Length; j++)
                         {
                             string[] itemParts = items[j].Split(";");
-                            // get scene name (first part)
-                            Scene targetScene = Script.Scenes[itemParts[0]];
-                            // get item name (second part)
-                            string itemName = itemParts[1];
-                            // If scene exists, try to get the inventory item
-                            if (targetScene != null)
+                            // We have a switch disguised as an inventory item.
+                            if (itemParts.Length == 1)
                             {
+                                string switchName = itemParts[0];
+                                Interpreter.Inventory[switchName] = new InventoryItem(switchName);
+                            }
+                            else if (itemParts.Length == 2 &&
+                                     Script.Scenes.TryGetValue(itemParts[0], out Scene targetScene))
+                            {
+                                string itemName = itemParts[1];
+                                // If the scene exists, try to get the inventory item.
                                 InventoryItem item = targetScene.Items[itemName];
                                 if (item != null)
                                 {
-                                    Interpreter.Inventory.Add(itemName, item);
+                                    Interpreter.Inventory[itemName] = item;
                                 }
                             }
+
                             // Silently ignore if either the inventory item or scene does not exist 
                         }
                         inventoryFound = true;
@@ -226,10 +208,6 @@
             if (!pointsFound)
             {
                 throw new GameException("Invalid save file: missing points");
-            }
-            if (!switchesFound)
-            {
-                throw new GameException("Invalid save file: missing switches");
             }
         }
     }

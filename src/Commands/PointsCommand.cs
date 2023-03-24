@@ -2,18 +2,12 @@
 {
     public class PointsCommand : Command
     {
-        public static readonly string ID = "points";
+        public const string CommandPoints = "points";
 
         private readonly PointsAction _action;
         private readonly int _value;
 
         public enum PointsAction { Add, Subtract, Set, Clear, List, None };
-
-        public PointsCommand()
-        {
-            _action = PointsAction.None;
-            _value = 0;
-        }
 
         public PointsCommand(PointsAction action, int value)
         {
@@ -34,8 +28,12 @@
         {
         }
 
-        public override Command CreateInstance(string[] arguments)
+        public new static Command CreateInstance(string commandName, string[] arguments)
         {
+            if (commandName != CommandPoints)
+            {
+                return null;
+            }
             string actionString;
             if (arguments.Length == 2)
             {

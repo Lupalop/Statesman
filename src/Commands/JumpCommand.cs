@@ -2,49 +2,85 @@
 {
     public class JumpCommand : Command
     {
-        public static readonly string ID = "jmp";
+        public const string CommandJump = "jmp";
+        public const string CommandInventoryJump = "ijmp";
+        public const string CommandSwitchJump = "sjmp";
+        public const string CommandReturn = "ret";
+
+        private readonly string _itemName;
+        private readonly bool _isUnconditional;
 
         protected int _lineIfTrue;
         protected int _lineIfFalse;
 
-        public JumpCommand()
+        public JumpCommand(string itemName, int lineIfTrue, int lineIfFalse)
         {
-            _lineIfTrue = 0;
-            _lineIfFalse = 0;
-        }
-
-        public JumpCommand(int line)
-            : this()
-        {
-            _lineIfTrue = line;
-        }
-
-        public override Command CreateInstance(string[] arguments)
-        {
-            if (arguments.Length == 2)
+            if (itemName == null)
             {
-                int line = int.Parse(arguments[1]);
-                return new JumpCommand(line);
+                _isUnconditional = true;
+            }
+            _itemName = itemName;
+            _lineIfTrue = lineIfTrue;
+            _lineIfFalse = lineIfFalse;
+        }
+
+        public new static Command CreateInstance(string commandName, string[] arguments)
+        {
+            if (arguments.Length == 1 && commandName == CommandReturn)
+            {
+                return new JumpCommand(null, int.MaxValue, -1);
+            }
+            else if (arguments.Length == 2 && commandName == CommandJump)
+            {
+                if (!GetLineNumberFromString(arguments[1], out int line))
+                {
+                    return null;
+                }
+                return new JumpCommand(null, line, -1);
+            }
+            else if (arguments.Length == 4 && (commandName == CommandInventoryJump || commandName == CommandSwitchJump))
+            {
+                string itemName = arguments[1];
+                if (!GetLineNumberFromString(arguments[2], out int lineIfTrue))
+                {
+                    return null;
+                }
+                if (!GetLineNumberFromString(arguments[3], out int lineIfFalse))
+                {
+                    return null;
+                }
+                return new JumpCommand(itemName, lineIfTrue, lineIfFalse);
             }
             return null;
         }
 
-        protected static int GetLineNumberFromString(string lineNumber)
+        protected static bool GetLineNumberFromString(string lineNumberText, out int lineNumber)
         {
-            if (lineNumber.Equals("ret", StringComparison.InvariantCultureIgnoreCase))
+            if (lineNumberText.Equals("ret", StringComparison.InvariantCultureIgnoreCase))
             {
-                return int.MaxValue;
+                lineNumber = int.MaxValue;
+                return true;
             }
-            else if (int.TryParse(lineNumber, out int index))
+            else if (int.TryParse(lineNumberText, out int index))
             {
-                return index;
+                lineNumber = index;
+                return true;
             }
-            return 0;
+            lineNumber = -1;
+            return false;
         }
 
         public virtual int GetJumpIndex()
         {
-            return _lineIfTrue;
+            if (_isUnconditional)
+            {
+                return _lineIfTrue;
+            }
+            else if (Interpreter.Inventory.ContainsKey(_itemName))
+            {
+                return _lineIfTrue;
+            }
+            return _lineIfFalse;
         }
     }
 }

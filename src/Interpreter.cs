@@ -15,7 +15,6 @@ namespace Statesman
             }
         }
 
-        public static bool[] Switches { get; private set; }
         public static Dictionary<string, InventoryItem> Inventory { get; set; }
         public static int Points { get; set; }
         public static bool IsRunning { get; private set; } = false;
@@ -65,8 +64,6 @@ namespace Statesman
             }
 
             Inventory = new Dictionary<string, InventoryItem>();
-            Switches = new bool[Content.Script.SwitchSize];
-            Array.Fill(Switches, false);
 
             if (initialSceneName == null)
             {
@@ -104,11 +101,11 @@ namespace Statesman
                         string[] keywordParts = keyword.Split(" ");
                         if (keyword.StartsWith("*tp"))
                         {
-                            currentAction = Command.All[SceneCommand.ID].CreateInstance(keywordParts);
+                            currentAction = SceneCommand.CreateInstance(keyword, keywordParts);
                         }
                         if (keyword.StartsWith("*set"))
                         {
-                            currentAction = Command.All[SwitchSetCommand.ID].CreateInstance(keywordParts);
+                            currentAction = SwitchSetCommand.CreateInstance(keyword, keywordParts);
                         }
                         if (keyword.Equals("*reload", StringComparison.InvariantCultureIgnoreCase))
                         {

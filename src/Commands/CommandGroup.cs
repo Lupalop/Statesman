@@ -23,8 +23,7 @@
             {
                 Command command = Commands[i];
                 // Handle jumps
-                if (command is JumpCommand ||
-                    command is ReturnCommand)
+                if (command is JumpCommand)
                 {
                     i = (command as JumpCommand).GetJumpIndex();
                     // Stop execution if the index is invalid

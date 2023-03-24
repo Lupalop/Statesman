@@ -1,18 +1,13 @@
 ﻿namespace Statesman.Commands
 {
-    public class GotoCommand : Command
+    public class CallCommand : Command
     {
-        public static readonly string ID = "goto";
+        public const string CommandGoto = "goto";
+        public const string CommandCall = "call";
 
         private readonly string _groupName;
 
-        public GotoCommand()
-        {
-            _groupName = "";
-        }
-
-        public GotoCommand(string commandGroupName)
-                : this()
+        public CallCommand(string commandGroupName)
         {
             if (string.IsNullOrWhiteSpace(commandGroupName))
             {
@@ -21,11 +16,15 @@
             _groupName = commandGroupName;
         }
 
-        public override Command CreateInstance(string[] arguments)
+        public new static Command CreateInstance(string commandName, string[] arguments)
         {
+            if (commandName != CommandGoto && commandName != CommandCall)
+            {
+                return null;
+            }
             if (arguments.Length == 2)
             {
-                return new GotoCommand(arguments[1]);
+                return new CallCommand(arguments[1]);
             }
             return null;
         }

@@ -284,18 +284,10 @@ namespace Statesman
             }
             else if (parts.Length == 2)
             {
-                string Id = null;
                 if (parts[0].Equals("if", StringComparison.InvariantCultureIgnoreCase) ||
-                    parts[0].Equals("elsif", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    Id = SwitchConditionalCommand.ID;
-                }
-                else if (parts[0].Equals("if_inv", StringComparison.InvariantCultureIgnoreCase) ||
-                           parts[0].Equals("elsif_inv", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    Id = InventoryConditionalCommand.ID;
-                }
-                if (Id != null)
+                    parts[0].Equals("elsif", StringComparison.InvariantCultureIgnoreCase) ||
+                    parts[0].Equals("if_inv", StringComparison.InvariantCultureIgnoreCase) ||
+                    parts[0].Equals("elsif_inv", StringComparison.InvariantCultureIgnoreCase))
                 {
                     bool isElseIf = parts[0].StartsWith("els");
                     if (isElseIf)
@@ -303,7 +295,8 @@ namespace Statesman
                         _conditionalsElse[_depth] = true;
                     }
                     ConditionalCommand command =
-                            Command.All[Id].CreateInstance(parts) as ConditionalCommand;
+                            ConditionalCommand.CreateInstance(
+                                ConditionalCommand.CommandConditional, parts) as ConditionalCommand;
                     // Set the name of the command groups contained within
                     // conditional commands to be the same with the group
                     // that contains them
@@ -356,11 +349,11 @@ namespace Statesman
                         {
                             if (_scene == null)
                             {
-                                _script.Actions.Add(keywords[i], command);
+                                _script.Actions[keywords[i]] = command;
                             }
                             else
                             {
-                                _scene.Actions.Add(keywords[i], command);
+                                _scene.Actions[keywords[i]] = command;
                             }
                         }
                     }

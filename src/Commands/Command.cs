@@ -2,44 +2,60 @@
 {
     public abstract class Command
     {
-        public static Dictionary<string, Command> All { get; private set; }
+        public static Dictionary<string, Type> All { get; private set; }
 
         static Command()
         {
-            All = new Dictionary<string, Command>
+            All = new Dictionary<string, Type>
             {
                 // XXX: manually input IDs of new commands here!
-                { PrintCommand.ID, new PrintCommand() },
-                { PrintRandomCommand.ID, new PrintRandomCommand() },
-                { PrintCombineCommand.ID, new PrintCombineCommand() },
-                { SceneCommand.ID, new SceneCommand() },
-                { GotoCommand.ID, new GotoCommand() },
-                { JumpCommand.ID, new JumpCommand() },
-                { ReturnCommand.ID, new ReturnCommand() },
-                { SwitchSetCommand.ID, new SwitchSetCommand() },
-                { SwitchJumpCommand.ID, new SwitchJumpCommand() },
-                { SwitchConditionalCommand.ID, new SwitchConditionalCommand() },
-                { InventoryCommand.ID, new InventoryCommand() },
-                { InventoryJumpCommand.ID, new InventoryJumpCommand() },
-                { InventoryConditionalCommand.ID, new InventoryConditionalCommand() },
-                { PointsCommand.ID, new PointsCommand() },
-                { QuitCommand.ID, new QuitCommand() },
-                { SaveCommand.ID, new SaveCommand() },
-                { LoadCommand.ID, new LoadCommand() }
+                { PrintCommand.CommandPrintSingle, typeof(PrintCommand) },
+                { PrintCommand.CommandPrintConcatenate, typeof(PrintCommand) },
+                { PrintCommand.CommandPrintRandom, typeof(PrintCommand) },
+                { JumpCommand.CommandJump, typeof(JumpCommand) },
+                { JumpCommand.CommandSwitchJump, typeof(JumpCommand) },
+                { JumpCommand.CommandInventoryJump, typeof(JumpCommand) },
+                { JumpCommand.CommandReturn, typeof(JumpCommand) },
+                { SwitchSetCommand.CommandSwitchSet, typeof(SwitchSetCommand) },
+                { ConditionalCommand.CommandConditional, typeof(ConditionalCommand) },
+                { InventoryCommand.CommandInventory, typeof(InventoryCommand) },
+                { SceneCommand.CommandScene, typeof(SceneCommand) },
+                { CallCommand.CommandCall, typeof(CallCommand) },
+                { CallCommand.CommandGoto, typeof(CallCommand) },
+                { MenuCommand.CommandQuit, typeof(MenuCommand) },
+                { MenuCommand.CommandSave, typeof(MenuCommand) },
+                { MenuCommand.CommandLoad, typeof(MenuCommand) },
+                { PointsCommand.CommandPoints, typeof(PointsCommand) },
             };
         }
 
         public static Command Find(string[] arguments)
         {
             string commandId = arguments[0].ToLowerInvariant();
-            if (All.TryGetValue(commandId, out Command command))
+            Command command;
+            if (All.TryGetValue(commandId, out Type commandType))
             {
-                return command.CreateInstance(arguments);
+                command = (Command)commandType.GetMethod(nameof(CreateInstance))
+                    .Invoke(null, new object[] { commandId, arguments });
+                return command;
             }
             return null;
         }
 
-        public virtual Command CreateInstance(string[] arguments) => null;
+        public static Command CreateInstance(string commandName, string[] arguments)
+        {
+            if (string.IsNullOrEmpty(commandName))
+            {
+                throw new ArgumentException($"'{nameof(commandName)}' cannot be null or empty.", nameof(commandName));
+            }
+
+            if (arguments is null)
+            {
+                throw new ArgumentNullException(nameof(arguments));
+            }
+
+            return null;
+        }
 
         public virtual void Execute() { }
     }

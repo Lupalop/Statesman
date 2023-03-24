@@ -1,44 +1,96 @@
+using System.Text.RegularExpressions;
+
 namespace Statesman.Commands
 {
-    public abstract class ConditionalCommand : Command
+    public class ConditionalCommand : Command
     {
-        public static readonly string ID = "cond";
+        public const string CommandConditional = "cond";
 
-        protected CommandGroup _group;
-        public CommandGroup Group => _group;
+        public string[] ItemNames { get; }
+        public CommandGroup Group { get; private set; }
+        public CommandGroup ElseGroup { get; private set; }
+        public bool[] TargetValues { get; private set; }
 
-        protected CommandGroup _elseGroup;
-        public CommandGroup ElseGroup => _elseGroup;
+        private bool _orMode;
+        private bool? _shouldExecute;
 
-        protected bool[] _targetValues;
-        public bool[] TargetValues => _targetValues;
-
-        protected bool _orMode;
-        protected bool? _shouldExecute;
-
-        public ConditionalCommand()
+        public ConditionalCommand(
+            CommandGroup group,
+            CommandGroup elseGroup,
+            string[] itemNames,
+            bool[] targetValues,
+            bool orMode)
         {
-            _group = null;
-            _elseGroup = null;
-            _orMode = false;
-            _targetValues = null;
+            Group = group;
+            ElseGroup = elseGroup;
+            ItemNames = itemNames;
+            TargetValues = targetValues;
             _shouldExecute = null;
+            _orMode = orMode;
+        }
+
+        public new static Command CreateInstance(string commandName, string[] arguments)
+        {
+            if (commandName != CommandConditional)
+            {
+                return null;
+            }
+            if (arguments.Length == 2)
+            {
+                string condition = arguments[1];
+                bool orMode = UseOrOperator(condition);
+                string[] parts = GetConditionParts(condition, orMode);
+                bool[] targetValues = new bool[parts.Length];
+                string[] itemNames = new string[parts.Length];
+
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    targetValues[i] = !parts[i].StartsWith("!");
+                    if (targetValues[i])
+                    {
+                        itemNames[i] = parts[i];
+                    }
+                    else
+                    {
+                        itemNames[i] = parts[i].Substring(1);
+                    }
+                }
+
+                return new ConditionalCommand(
+                        new CommandGroup(""),
+                        new CommandGroup(""),
+                        itemNames,
+                        targetValues,
+                        orMode);
+            }
+            return null;
         }
 
         public override void Execute()
         {
+            for (int i = 0; i < ItemNames.Length; i++)
+            {
+                bool currentState =
+                    Interpreter.Inventory.ContainsKey(ItemNames[i]) == TargetValues[i];
+                bool stopLooping = UpdateState(currentState);
+                if (stopLooping)
+                {
+                    break;
+                }
+            }
+
             if (_shouldExecute.Value)
             {
-                _group.Execute();
+                Group.Execute();
             }
             else
             {
-                _elseGroup.Execute();
+                ElseGroup.Execute();
             }
             _shouldExecute = null;
         }
 
-        protected bool UpdateState(bool newState)
+        private bool UpdateState(bool newState)
         {
             if (newState)
             {
@@ -59,7 +111,7 @@ namespace Statesman.Commands
             return false;
         }
 
-        protected static bool UseOrOperator(string condition)
+        private static bool UseOrOperator(string condition)
         {
             bool orMode = condition.Contains(';');
             bool andMode = condition.Contains(',');
@@ -72,7 +124,7 @@ namespace Statesman.Commands
             return orMode;
         }
 
-        protected static string[] GetConditionParts(string condition, bool orMode)
+        private static string[] GetConditionParts(string condition, bool orMode)
         {
             string delimiter = ",";
 

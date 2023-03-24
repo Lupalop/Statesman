@@ -2,16 +2,10 @@
 {
     public class SceneCommand : Command
     {
-        public static readonly string ID = "scene";
+        public const string CommandScene = "scene";
 
         private readonly string _targetScene;
         private bool _hasKey;
-
-        public SceneCommand()
-        {
-            _targetScene = "";
-            _hasKey = false;
-        }
 
         public SceneCommand(string targetScene)
         {
@@ -23,8 +17,12 @@
             _hasKey = false;
         }
 
-        public override Command CreateInstance(string[] arguments)
+        public new static Command CreateInstance(string commandName, string[] arguments)
         {
+            if (commandName != CommandScene)
+            {
+                return null;
+            }
             if (arguments.Length == 2)
             {
                 return new SceneCommand(arguments[1]);

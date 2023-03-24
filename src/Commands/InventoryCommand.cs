@@ -2,7 +2,7 @@
 {
     public class InventoryCommand : Command
     {
-        public static readonly string ID = "inv";
+        public const string CommandInventory = "inv";
 
         public string ItemName { get; }
         private InventoryItem Item
@@ -19,12 +19,6 @@
         public InventoryAction Action { get; set; }
 
         public enum InventoryAction { Add, Remove, Clear, List, None };
-
-        public InventoryCommand()
-        {
-            ItemName = null;
-            Action = InventoryAction.None;
-        }
 
         private InventoryCommand(InventoryAction action, string itemName, bool nameRequired)
         {
@@ -50,8 +44,12 @@
         {
         }
 
-        public override Command CreateInstance(string[] arguments)
+        public new static Command CreateInstance(string commandName, string[] arguments)
         {
+            if (commandName != CommandInventory)
+            {
+                return null;
+            }
             string actionString;
             InventoryAction action;
             if (arguments.Length == 2)
@@ -123,7 +121,8 @@
             switch (Action)
             {
                 case InventoryAction.List:
-                    int inventorySize = Interpreter.Inventory.Count;
+                    var realInventory = Interpreter.Inventory.Values.Where((item) => !item.IsSwitch);
+                    int inventorySize = realInventory.Count();
                     if (inventorySize > 0)
                     {
                         if (inventorySize == 1)
@@ -134,13 +133,14 @@
                         {
                             Console.Write(Content.Script.FindMessage("i_4"), inventorySize);
                         }
-                        foreach (var inventoryItem in Interpreter.Inventory.Values)
+                        foreach (var inventoryItem in realInventory)
                         {
                             Console.Write(
                                     Content.Script.FindMessage("i_5"),
                                     inventoryItem.Name,
                                     inventoryItem.Description);
                         }
+                        Console.WriteLine();
                     }
                     else
                     {
