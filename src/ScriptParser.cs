@@ -303,9 +303,7 @@ namespace Statesman
                         _conditionalsElse[_depth] = true;
                     }
                     ConditionalCommand command =
-                            (ConditionalCommand)Interpreter
-                            .Commands[Id]
-                            .CreateInstance(parts);
+                            Command.All[Id].CreateInstance(parts) as ConditionalCommand;
                     // Set the name of the command groups contained within
                     // conditional commands to be the same with the group
                     // that contains them
@@ -349,7 +347,7 @@ namespace Statesman
                     {
                         string[] keywords = parts[0].ToLowerInvariant().Split(",");
                         string[] arguments = parts[1].Split(",");
-                        Command command = Interpreter.FindCommand(arguments);
+                        Command command = Command.Find(arguments);
                         if (command == null)
                         {
                             throw new GameException("Unknown command was referenced in line " + _lineNumber);
@@ -379,7 +377,7 @@ namespace Statesman
                     if (parts.Length == 1)
                     {
                         string[] arguments = parts[0].Split(",");
-                        Command command = Interpreter.FindCommand(arguments);
+                        Command command = Command.Find(arguments);
                         if (command == null)
                         {
                             throw new GameException("Unknown command was referenced in line " + _lineNumber);
