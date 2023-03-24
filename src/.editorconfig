@@ -1,0 +1,13 @@
+﻿[*.cs]
+
+# IDE0057: Use range operator
+csharp_style_prefer_range_operator = false
+
+# IDE0066: Convert switch statement to expression
+csharp_style_prefer_switch_expression = false
+
+# IDE0270: Use coalesce expression
+dotnet_style_coalesce_expression = false
+
+# IDE0074: Use compound assignment
+dotnet_style_prefer_compound_assignment = false
