@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class LoadCommand : Command
     {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class SceneCommand : Command
     {

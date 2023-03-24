@@ -1,5 +1,3 @@
-using System;
-
 namespace Statesman.Commands
 {
     public abstract class ConditionalCommand : Command

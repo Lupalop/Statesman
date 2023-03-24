@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class CommandGroup
     {
