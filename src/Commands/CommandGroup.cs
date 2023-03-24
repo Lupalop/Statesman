@@ -34,14 +34,6 @@
                     }
                     continue;
                 }
-                // Call overridden global command
-                if (command is GotoBaseCommand)
-                {
-                    if (Content.Script.CommandGroups.TryGetValue(Name, out CommandGroup group))
-                    {
-                        group.Execute();
-                    }
-                }
                 command.Execute();
                 i++;
             }

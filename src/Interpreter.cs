@@ -42,8 +42,7 @@ namespace Statesman
                 { PointsCommand.ID, new PointsCommand() },
                 { QuitCommand.ID, new QuitCommand() },
                 { SaveCommand.ID, new SaveCommand() },
-                { LoadCommand.ID, new LoadCommand() },
-                { GotoBaseCommand.ID, new GotoBaseCommand() }
+                { LoadCommand.ID, new LoadCommand() }
             };
             _scene = null;
         }
