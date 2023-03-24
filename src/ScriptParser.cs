@@ -58,23 +58,23 @@ namespace Statesman
                 _lineNumber = i + 1;
                 _line = _data[i].Trim();
 
-                if (IsComment())
+                if (ParseComment())
                 {
                     continue;
                 }
-                if (IsTerminator())
+                if (ParseTerminator())
                 {
                     continue;
                 }
-                if (IsPreference())
+                if (ParsePreference())
                 {
                     continue;
                 }
-                if (IsSection())
+                if (ParseSection())
                 {
                     continue;
                 }
-                if (IsInnerSection())
+                if (ParseInnerSection())
                 {
                     continue;
                 }
@@ -85,7 +85,7 @@ namespace Statesman
             return _script;
         }
 
-        private bool IsComment()
+        private bool ParseComment()
         {
             // Block comment start tag
             if (_line.StartsWith("/*"))
@@ -107,230 +107,239 @@ namespace Statesman
             return false;
         }
 
-        private bool IsTerminator()
+        private bool ParseTerminator()
         {
-            if (_line.StartsWith("end"))
+            if (!_line.StartsWith("end"))
             {
-                switch (_section)
-                {
-                    case Section.Root:
-                        throw new GameException("Stray end tag in line " + _lineNumber);
-                    case Section.Scene:
-                        _scene = null;
-                        break;
-                    case Section.Group:
-                        if (_depth > 0)
-                        {
-                            _conditionalsElse[_depth] = false;
-                            _conditionals[_depth] = null;
-                            _depth--;
-                            return true;
-                        }
-                        else
-                        {
-                            _group = null;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                if (_scene != null)
-                {
-                    _section = Section.Scene;
-                }
-                else
-                {
-                    _section = Section.Root;
-                }
-                return true;
+                return false;
             }
-            return false;
+
+            switch (_section)
+            {
+                case Section.Root:
+                    throw new GameException("Stray end tag in line " + _lineNumber);
+                case Section.Scene:
+                    _scene = null;
+                    break;
+                case Section.Group:
+                    if (_depth > 0)
+                    {
+                        _conditionalsElse[_depth] = false;
+                        _conditionals[_depth] = null;
+                        _depth--;
+                        return true;
+                    }
+                    else
+                    {
+                        _group = null;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            if (_scene != null)
+            {
+                _section = Section.Scene;
+            }
+            else
+            {
+                _section = Section.Root;
+            }
+
+            return true;
         }
 
-        private bool IsPreference()
+        private bool ParsePreference()
         {
             string[] parts = _line.Split(" ");
-            if (_section == Section.Root && parts.Length == 2)
+            if (_section != Section.Root || parts.Length != 2)
             {
-                switch (parts[0])
-                {
-                    case "maxpoints":
-                        int maxPoints = int.Parse(parts[1]);
-                        if (maxPoints < 0)
-                        {
-                            throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
-                        }
-                        _script.MaxPoints = maxPoints;
-                        break;
-                    case "switches":
-                        int switchSize = int.Parse(parts[1]);
-                        if (switchSize < 0)
-                        {
-                            throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
-                        }
-                        _script.SwitchSize = switchSize;
-                        break;
-                    default:
-                        return false;
-                }
-                return true;
+                return false;
             }
-            return false;
+
+            switch (parts[0])
+            {
+                case "maxpoints":
+                    int maxPoints = int.Parse(parts[1]);
+                    if (maxPoints < 0)
+                    {
+                        throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
+                    }
+                    _script.MaxPoints = maxPoints;
+                    break;
+                case "switches":
+                    int switchSize = int.Parse(parts[1]);
+                    if (switchSize < 0)
+                    {
+                        throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
+                    }
+                    _script.SwitchSize = switchSize;
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
-        private bool IsSection()
+        private bool ParseSection()
         {
             string[] parts = _line.Split(" ");
             if (_section == Section.Root || _section == Section.Scene)
             {
-                if (!Enum.TryParse(typeof(Section), parts[0], true, out object parsedSection))
-                {
+                return ParseRootOrSceneSection(parts);
+            }
+            else if (_section == Section.Group)
+            {
+                return ParseGroupSection(parts);
+            }
+            return false;
+        }
+
+        private bool ParseRootOrSceneSection(string[] parts)
+        {
+            if (!Enum.TryParse(typeof(Section), parts[0], true, out object parsedSection))
+            {
+                return false;
+            }
+            Section nextSection = (Section)parsedSection;
+            switch (nextSection)
+            {
+                case Section.Action:
+                case Section.String:
+                    break;
+                case Section.Item:
+                    if (_section != Section.Scene)
+                    {
+                        throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
+                    }
+                    break;
+                case Section.Group:
+                    if (parts.Length == 2)
+                    {
+                        _group = new CommandGroup(parts[1]);
+                        if (_section == Section.Root)
+                        {
+                            // Reserved group name (command ran on entry)
+                            if (_group.Name.Equals(Scene.CommandGroupEntry, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                throw new GameException("Use of reserved command group name, see line " + _lineNumber);
+                            }
+                            _script.CommandGroups[_group.Name] = _group;
+                        }
+                        else
+                        {
+                            // Group name already in use locally
+                            if (_scene.CommandGroups.ContainsKey(_group.Name))
+                            {
+                                throw new GameException("Command group name already used in current scene, see line " + _lineNumber);
+                            }
+                            _scene.CommandGroups[_group.Name] = _group;
+                        }
+                    }
+                    else
+                    {
+                        throw new GameException("Invalid group section tag, see line " + _lineNumber);
+                    }
+                    break;
+                case Section.Scene:
+                    // Nested scenes
+                    if (_section == Section.Scene || _scene != null)
+                    {
+                        throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
+                    }
+                    if (parts.Length == 2)
+                    {
+                        _scene = new Scene(parts[1]);
+                        // Scene name already in use
+                        if (_script.Scenes.ContainsKey(_scene.Name))
+                        {
+                            throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
+                        }
+                        _script.Scenes.Add(_scene.Name, _scene);
+                    }
+                    else
+                    {
+                        throw new GameException("Invalid scene section tag, see line " + _lineNumber);
+                    }
+                    break;
+                default:
                     return false;
-                }
-                Section nextSection = (Section)parsedSection;
-                switch (nextSection)
+            }
+            _section = nextSection;
+
+            return true;
+        }
+
+        private bool ParseGroupSection(string[] parts)
+        {
+            if (parts.Length == 1 && parts[0].Equals("else", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (_conditionals[_depth] == null || _conditionalsElse[_depth])
                 {
-                    case Section.Action:
-                    case Section.String:
-                        break;
-                    case Section.Item:
-                        if (_section != Section.Scene)
-                        {
-                            throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
-                        }
-                        break;
-                    case Section.Group:
-                        if (parts.Length == 2)
-                        {
-                            _group = new CommandGroup(parts[1]);
-                            if (_section == Section.Root)
-                            {
-                                // Reserved group name (command ran on entry)
-                                if (_group.Name.Equals(Scene.CommandGroupEntry, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    throw new GameException("Use of reserved command group name, see line " + _lineNumber);
-                                }
-                                _script.CommandGroups[_group.Name] = _group;
-                            }
-                            else
-                            {
-                                // Group name already in use locally
-                                if (_scene.CommandGroups.ContainsKey(_group.Name))
-                                {
-                                    throw new GameException("Command group name already used in current scene, see line " + _lineNumber);
-                                }
-                                _scene.CommandGroups[_group.Name] = _group;
-                            }
-                        }
-                        else
-                        {
-                            throw new GameException("Invalid group section tag, see line " + _lineNumber);
-                        }
-                        break;
-                    case Section.Scene:
-                        // Nested scenes
-                        if (_section == Section.Scene || _scene != null)
-                        {
-                            throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
-                        }
-                        if (parts.Length == 2)
-                        {
-                            _scene = new Scene(parts[1]);
-                            // Scene name already in use
-                            if (_script.Scenes.ContainsKey(_scene.Name))
-                            {
-                                throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
-                            }
-                            _script.Scenes.Add(_scene.Name, _scene);
-                        }
-                        else
-                        {
-                            throw new GameException("Invalid scene section tag, see line " + _lineNumber);
-                        }
-                        break;
-                    default:
-                        return false;
+                    throw new GameException("Stray else tag, see line " + _lineNumber);
                 }
-                _section = nextSection;
+                _conditionalsElse[_depth] = true;
                 return true;
             }
-
-            if (_section == Section.Group)
+            else if (parts.Length == 2)
             {
-                if (parts.Length == 1 && parts[0].Equals("else", StringComparison.InvariantCultureIgnoreCase))
+                string Id = null;
+                if (parts[0].Equals("if", StringComparison.InvariantCultureIgnoreCase) ||
+                    parts[0].Equals("elsif", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (_conditionals[_depth] == null || _conditionalsElse[_depth])
-                    {
-                        throw new GameException("Stray else tag, see line " + _lineNumber);
-                    }
-                    _conditionalsElse[_depth] = true;
-                    return true;
+                    Id = SwitchConditionalCommand.ID;
                 }
-                if (parts.Length == 2)
+                else if (parts[0].Equals("if_inv", StringComparison.InvariantCultureIgnoreCase) ||
+                           parts[0].Equals("elsif_inv", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    string Id = null;
-                    if (parts[0].Equals("if", StringComparison.InvariantCultureIgnoreCase) ||
-                        parts[0].Equals("elsif", StringComparison.InvariantCultureIgnoreCase))
+                    Id = InventoryConditionalCommand.ID;
+                }
+                if (Id != null)
+                {
+                    bool isElseIf = parts[0].StartsWith("els");
+                    if (isElseIf)
                     {
-                        Id = SwitchConditionalCommand.ID;
+                        _conditionalsElse[_depth] = true;
                     }
-                    else if (parts[0].Equals("if_inv", StringComparison.InvariantCultureIgnoreCase) ||
-                               parts[0].Equals("elsif_inv", StringComparison.InvariantCultureIgnoreCase))
+                    ConditionalCommand command =
+                            (ConditionalCommand)Interpreter
+                            .Commands[Id]
+                            .CreateInstance(parts);
+                    // Set the name of the command groups contained within
+                    // conditional commands to be the same with the group
+                    // that contains them
+                    command.Group.Name = _group.Name;
+                    command.ElseGroup.Name = _group.Name;
+                    if (_depth == 0 && _section == Section.Group)
                     {
-                        Id = InventoryConditionalCommand.ID;
+                        _group.Commands.Add(command);
                     }
-                    if (Id != null)
+                    else if (_conditionalsElse[_depth])
                     {
-                        bool isElseIf = parts[0].StartsWith("els");
-                        if (isElseIf)
-                        {
-                            _conditionalsElse[_depth] = true;
-                        }
-                        ConditionalCommand command =
-                                (ConditionalCommand)Interpreter
-                                .Commands[Id]
-                                .CreateInstance(parts);
-                        // Set the name of the command groups contained within
-                        // conditional commands to be the same with the group
-                        // that contains them
-                        command.                        // Set the name of the command groups contained within
-                        // conditional commands to be the same with the group
-                        // that contains them
-                        Group.                        // Set the name of the command groups contained within
-                        // conditional commands to be the same with the group
-                        // that contains them
-                        Name = _group.Name;
-                        command.ElseGroup.Name = _group.Name;
-                        if (_depth == 0 && _section == Section.Group)
-                        {
-                            _group.Commands.Add(command);
-                        }
-                        else if (_conditionalsElse[_depth])
-                        {
-                            _conditionals[_depth].ElseGroup.Commands.Add(command);
-                        }
-                        else
-                        {
-                            _conditionals[_depth].Group.Commands.Add(command);
-                        }
-                        if (isElseIf)
-                        {
-                            _conditionalsElse[_depth] = false;
-                        }
-                        else
-                        {
-                            _depth++;
-                        }
-                        _conditionals[_depth] = command;
-                        return true;
+                        _conditionals[_depth].ElseGroup.Commands.Add(command);
                     }
+                    else
+                    {
+                        _conditionals[_depth].Group.Commands.Add(command);
+                    }
+                    if (isElseIf)
+                    {
+                        _conditionalsElse[_depth] = false;
+                    }
+                    else
+                    {
+                        _depth++;
+                    }
+                    _conditionals[_depth] = command;
+                    return true;
                 }
             }
 
             return false;
         }
 
-        private bool IsInnerSection()
+        private bool ParseInnerSection()
         {
             string[] parts = _line.Split("|");
             switch (_section)
