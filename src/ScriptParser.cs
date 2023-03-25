@@ -290,7 +290,7 @@ namespace Statesman
                         _conditionalsElse[_depth] = true;
                     }
                     ConditionalCommand command =
-                            ConditionalCommand.CreateInstance(
+                            ConditionalCommand.FromText(
                                 ConditionalCommand.CommandConditional, parts) as ConditionalCommand;
                     // Set the name of the command groups contained within
                     // conditional commands to be the same with the group

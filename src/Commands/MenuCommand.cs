@@ -18,7 +18,7 @@
             _actionName = actionName;
         }
 
-        public new static Command CreateInstance(string actionName, string[] arguments)
+        public new static Command FromText(string actionName, string[] arguments)
         {
             if (actionName != CommandSave && actionName != CommandLoad && actionName != CommandQuit)
             {

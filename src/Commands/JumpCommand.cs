@@ -24,7 +24,7 @@
             _lineIfFalse = lineIfFalse;
         }
 
-        public new static Command CreateInstance(string commandName, string[] arguments)
+        public new static Command FromText(string commandName, string[] arguments)
         {
             if (arguments.Length == 1 && commandName == CommandReturn)
             {

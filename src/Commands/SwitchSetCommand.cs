@@ -13,7 +13,7 @@
             _value = value;
         }
 
-        public new static Command CreateInstance(string commandName, string[] arguments)
+        public new static Command FromText(string commandName, string[] arguments)
         {
             if (commandName == CommandSwitchSet && arguments.Length == 3)
             {

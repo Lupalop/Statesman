@@ -35,14 +35,14 @@
             Command command;
             if (All.TryGetValue(commandId, out Type commandType))
             {
-                command = (Command)commandType.GetMethod(nameof(CreateInstance))
+                command = (Command)commandType.GetMethod(nameof(FromText))
                     .Invoke(null, new object[] { commandId, arguments });
                 return command;
             }
             return null;
         }
 
-        public static Command CreateInstance(string commandName, string[] arguments)
+        public static Command FromText(string commandName, string[] arguments)
         {
             if (string.IsNullOrEmpty(commandName))
             {

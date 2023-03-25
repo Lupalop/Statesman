@@ -31,7 +31,7 @@ namespace Statesman.Commands
             _orMode = orMode;
         }
 
-        public new static Command CreateInstance(string commandName, string[] arguments)
+        public new static Command FromText(string commandName, string[] arguments)
         {
             if (commandName != CommandConditional)
             {
