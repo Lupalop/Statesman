@@ -58,7 +58,7 @@ namespace Statesman.Commands
                     {
                         if (!foundOrOperator && !foundAndOperator)
                         {
-                            throw new InvalidOperationException("Unknown operator found.");
+                            throw new GameException("Unknown operator found.");
                         }
 
                         if (!orMode.HasValue)
@@ -67,7 +67,7 @@ namespace Statesman.Commands
                         }
                         else if ((orMode.Value && foundAndOperator) || (!orMode.Value && foundOrOperator))
                         {
-                            throw new InvalidOperationException("Combining and/or conditional operators are not allowed.");
+                            throw new GameException("Combining and/or conditional operators are not allowed.");
                         }
                         isConditionNext = false;
                         isConditionPrevious = true;
@@ -76,7 +76,7 @@ namespace Statesman.Commands
 
                     if (foundOrOperator || foundAndOperator)
                     {
-                        throw new InvalidOperationException("Incorrect condition order.");
+                        throw new GameException("Incorrect condition order.");
                     }
 
                     // Not operator.
@@ -94,7 +94,7 @@ namespace Statesman.Commands
 
                 if (isConditionPrevious)
                 {
-                    throw new InvalidOperationException("Found stray operator inside condition.");
+                    throw new GameException("Found stray operator inside condition.");
                 }
 
                 // Assume Or mode if it's a single condition.
