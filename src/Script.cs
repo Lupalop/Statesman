@@ -37,11 +37,11 @@ namespace Statesman
             }
         }
 
-        public Dictionary<string, string> Messages { get; set; }
-        public Dictionary<string, string> SubstitutedMessages { get; set; }
-        public Dictionary<string, Scene> Scenes { get; set; }
-        public Dictionary<string, Command> Actions { get; set; }
-        public Dictionary<string, CommandGroup> CommandGroups { get; set; }
+        public Dictionary<string, string> Messages { get; }
+        public Dictionary<string, string> SubstitutedMessages { get; }
+        public Dictionary<string, Scene> Scenes { get; }
+        public Dictionary<string, Command> Actions { get; }
+        public Dictionary<string, CommandGroup> CommandGroups { get; }
 
         public Script()
         {
