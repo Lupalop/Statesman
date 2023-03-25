@@ -22,6 +22,7 @@
                 { SceneCommand.CommandScene, typeof(SceneCommand) },
                 { CallCommand.CommandCall, typeof(CallCommand) },
                 { CallCommand.CommandGoto, typeof(CallCommand) },
+                { CallCommand.CommandCallGlobal, typeof(CallCommand) },
                 { MenuCommand.CommandQuit, typeof(MenuCommand) },
                 { MenuCommand.CommandSave, typeof(MenuCommand) },
                 { MenuCommand.CommandLoad, typeof(MenuCommand) },
