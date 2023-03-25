@@ -5,22 +5,22 @@ namespace Statesman.Commands
     public class ConditionalCommand : Command
     {
         public const string CommandConditional = "cond";
-        private const char OrDelimiter = ';';
-        private const char AndDelimiter = ',';
+        private const string OrDelimiter = "||";
+        private const string AndDelimiter = "&&";
 
-        public string[] ItemNames { get; }
+        public List<string> ItemNames { get; }
+        public List<bool> TargetValues { get; private set; }
         public CommandGroup Group { get; private set; }
         public CommandGroup ElseGroup { get; private set; }
-        public bool[] TargetValues { get; private set; }
 
-        private bool _orMode;
+        private readonly bool _orMode;
         private bool? _shouldExecute;
 
         public ConditionalCommand(
             CommandGroup group,
             CommandGroup elseGroup,
-            string[] itemNames,
-            bool[] targetValues,
+            List<string> itemNames,
+            List<bool> targetValues,
             bool orMode)
         {
             Group = group;
@@ -37,25 +37,70 @@ namespace Statesman.Commands
             {
                 return null;
             }
-            if (arguments.Length == 2)
+            if (arguments.Length >= 2)
             {
-                string condition = arguments[1];
-                bool orMode = UseOrOperator(condition);
-                string[] parts = GetConditionParts(condition, orMode);
-                bool[] targetValues = new bool[parts.Length];
-                string[] itemNames = new string[parts.Length];
+                bool? orMode = null;
+                List<string> itemNames = new();
+                List<bool> targetValues = new();
 
-                for (int i = 0; i < parts.Length; i++)
+                // The first argument is the command name, so start evaluating
+                // the parts of the conditional with the second argument.
+                bool isConditionNext = false;
+                bool isConditionPrevious = false;
+                for (int i = 1; i < arguments.Length; i++)
                 {
-                    targetValues[i] = !parts[i].StartsWith("!");
-                    if (targetValues[i])
+                    string conditionPart = arguments[i].Trim();
+
+                    bool foundOrOperator = conditionPart.Equals(OrDelimiter);
+                    bool foundAndOperator = conditionPart.Equals(AndDelimiter);
+                    
+                    if (conditionPart.Length == 2 && isConditionNext)
                     {
-                        itemNames[i] = parts[i];
+                        if (!foundOrOperator && !foundAndOperator)
+                        {
+                            throw new InvalidOperationException("Unknown operator found.");
+                        }
+
+                        if (!orMode.HasValue)
+                        {
+                            orMode = foundOrOperator;
+                        }
+                        else if ((orMode.Value && foundAndOperator) || (!orMode.Value && foundOrOperator))
+                        {
+                            throw new InvalidOperationException("Combining and/or conditional operators are not allowed.");
+                        }
+                        isConditionNext = false;
+                        isConditionPrevious = true;
+                        continue;
                     }
-                    else
+
+                    if (foundOrOperator || foundAndOperator)
                     {
-                        itemNames[i] = parts[i].Substring(1);
+                        throw new InvalidOperationException("Incorrect condition order.");
                     }
+
+                    // Not operator.
+                    string itemName = conditionPart;
+                    bool targetValue = !conditionPart.StartsWith("!");
+                    if (!targetValue)
+                    {
+                        itemName = conditionPart.Substring(1);
+                    }
+                    itemNames.Add(itemName);
+                    targetValues.Add(targetValue);
+                    isConditionNext = true;
+                    isConditionPrevious = false;
+                }
+
+                if (isConditionPrevious)
+                {
+                    throw new InvalidOperationException("Found stray operator inside condition.");
+                }
+
+                // Assume Or mode if it's a single condition.
+                if (!orMode.HasValue)
+                {
+                    orMode = true;
                 }
 
                 return new ConditionalCommand(
@@ -63,14 +108,14 @@ namespace Statesman.Commands
                         new CommandGroup(""),
                         itemNames,
                         targetValues,
-                        orMode);
+                        orMode.Value);
             }
             return null;
         }
 
         public override void Execute()
         {
-            for (int i = 0; i < ItemNames.Length; i++)
+            for (int i = 0; i < ItemNames.Count; i++)
             {
                 bool currentState =
                     Interpreter.Inventory.ContainsKey(ItemNames[i]) == TargetValues[i];
@@ -111,31 +156,6 @@ namespace Statesman.Commands
                 _shouldExecute = false;
             }
             return false;
-        }
-
-        private static bool UseOrOperator(string condition)
-        {
-            bool orMode = condition.Contains(OrDelimiter);
-            bool andMode = condition.Contains(AndDelimiter);
-
-            if (orMode && andMode)
-            {
-                throw new InvalidOperationException("Combining and/or conditional operators are not allowed.");
-            }
-
-            return orMode;
-        }
-
-        private static string[] GetConditionParts(string condition, bool orMode)
-        {
-            char delimiter = AndDelimiter;
-
-            if (orMode)
-            {
-                delimiter = OrDelimiter;
-            }
-
-            return condition.Split(delimiter);
         }
     }
 }

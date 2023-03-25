@@ -277,7 +277,7 @@ namespace Statesman
                 _conditionalsElse[_depth] = true;
                 return true;
             }
-            else if (parts.Length == 2)
+            else if (parts.Length >= 2)
             {
                 if (parts[0].Equals("if", StringComparison.InvariantCultureIgnoreCase) ||
                     parts[0].Equals("elsif", StringComparison.InvariantCultureIgnoreCase) ||
