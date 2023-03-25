@@ -1,4 +1,5 @@
 ﻿using Statesman.Commands;
+using System.Text.RegularExpressions;
 
 namespace Statesman
 {
@@ -37,6 +38,7 @@ namespace Statesman
         }
 
         public Dictionary<string, string> Messages { get; set; }
+        public Dictionary<string, string> SubstitutedMessages { get; set; }
         public Dictionary<string, Scene> Scenes { get; set; }
         public Dictionary<string, Command> Actions { get; set; }
         public Dictionary<string, CommandGroup> CommandGroups { get; set; }
@@ -46,20 +48,68 @@ namespace Statesman
             _maxPoints = 0;
             _switchSize = DefaultSwitchSize;
             Messages = new Dictionary<string, string>();
+            SubstitutedMessages = new Dictionary<string, string>();
             Scenes = new Dictionary<string, Scene>();
             Actions = new Dictionary<string, Command>();
             CommandGroups = new Dictionary<string, CommandGroup>();
         }
 
-        public string FindMessage(string key)
+        public string FindMessage(string key, bool replaceMissing = true)
         {
-            string template = "[Missing message: `{0}`]";
-            string defaultValue = string.Format(template, key);
-            if (Messages.TryGetValue(key, out var messageValue))
+            if (SubstitutedMessages.TryGetValue(key, out var messageValue))
             {
                 return messageValue;
             }
-            return defaultValue;
+            else if (Messages.TryGetValue(key, out messageValue))
+            {
+                bool unescapeString = key.StartsWith("@");
+                if (unescapeString)
+                {
+                    messageValue = messageValue.Replace("\\e", "\u001b");
+                }
+                // Try to replace C-style format specifiers with C#-compatible ones.
+                SubstituteCFormatString(messageValue, out messageValue);
+                SubstitutedMessages.Add(key, messageValue);
+                return messageValue;
+            }
+            else if (replaceMissing)
+            {
+                string template = "[Missing message: `{0}`]";
+                string defaultValue = string.Format(template, key);
+                return defaultValue;
+            }
+            return key;
+        }
+
+        private static bool SubstituteCFormatString(string messageValue, out string newValue)
+        {
+            newValue = messageValue;
+            string pattern = @"%(\d+(\.\d+)?)?(?<Type>d|f|n|s)";
+            // The given string doesn't have any known format specifiers.
+            if (!Regex.IsMatch(messageValue, pattern))
+            {
+                return false;
+            }
+
+            int argumentIndex = 0;
+            newValue = Regex.Replace(messageValue, pattern, matches =>
+            {
+                // XXX: we're effectively discarding the subspecifiers here.
+                var type = matches.Groups["Type"].Value;
+                switch (type)
+                {
+                    case "d":
+                    case "f":
+                    case "s":
+                        return string.Concat("{", argumentIndex++, "}");
+                    case "n":
+                        return "\n";
+                    default:
+                        return matches.Value;
+                }
+            });
+
+            return true;
         }
     }
 }

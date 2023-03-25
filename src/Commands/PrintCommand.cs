@@ -93,16 +93,7 @@ namespace Statesman.Commands
             {
                 for (int i = 0; i < _messages.Length; i++)
                 {
-                    bool unescapeString = _messages[i].StartsWith("@");
-                    if (Content.Script.Messages.TryGetValue(_messages[i], out string messageValue))
-                    {
-                        _messages[i] = messageValue;
-                    }
-                    if (unescapeString)
-                    {
-                        _messages[i] = _messages[i].Replace("\\e", "\u001b");
-                    }
-                    _messages[i] = _messages[i].Replace("%n", "\n");
+                    _messages[i] = Content.Script.FindMessage(_messages[i], false);
                 }
                 _initialized = true;
             }
