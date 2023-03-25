@@ -5,6 +5,8 @@ namespace Statesman.Commands
     public class ConditionalCommand : Command
     {
         public const string CommandConditional = "cond";
+        private const char OrDelimiter = ';';
+        private const char AndDelimiter = ',';
 
         public string[] ItemNames { get; }
         public CommandGroup Group { get; private set; }
@@ -113,8 +115,8 @@ namespace Statesman.Commands
 
         private static bool UseOrOperator(string condition)
         {
-            bool orMode = condition.Contains(';');
-            bool andMode = condition.Contains(',');
+            bool orMode = condition.Contains(OrDelimiter);
+            bool andMode = condition.Contains(AndDelimiter);
 
             if (orMode && andMode)
             {
@@ -126,11 +128,11 @@ namespace Statesman.Commands
 
         private static string[] GetConditionParts(string condition, bool orMode)
         {
-            string delimiter = ",";
+            char delimiter = AndDelimiter;
 
             if (orMode)
             {
-                delimiter = ";";
+                delimiter = OrDelimiter;
             }
 
             return condition.Split(delimiter);
