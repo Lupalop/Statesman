@@ -101,11 +101,13 @@ namespace Statesman
                         string[] keywordParts = keyword.Split(" ");
                         if (keyword.StartsWith("*tp"))
                         {
-                            currentAction = SceneCommand.CreateInstance(keyword, keywordParts);
+                            currentAction = SceneCommand.CreateInstance(
+                                SceneCommand.CommandScene, keywordParts);
                         }
                         if (keyword.StartsWith("*set"))
                         {
-                            currentAction = SwitchSetCommand.CreateInstance(keyword, keywordParts);
+                            currentAction = SwitchSetCommand.CreateInstance(
+                                SwitchSetCommand.CommandSwitchSet, keywordParts);
                         }
                         if (keyword.Equals("*reload", StringComparison.InvariantCultureIgnoreCase))
                         {
