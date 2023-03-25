@@ -5,8 +5,6 @@ namespace Statesman
 {
     public class Script
     {
-        public static readonly int DefaultSwitchSize = 2000;
-
         private int _maxPoints;
         public int MaxPoints
         {
@@ -22,21 +20,6 @@ namespace Statesman
             }
         }
 
-        private int _switchSize;
-        public int SwitchSize
-        {
-            get => _switchSize;
-            set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentException(
-                        "The number of allocated switches must be greater than or equal to zero");
-                }
-                _switchSize = value;
-            }
-        }
-
         public Dictionary<string, string> Messages { get; }
         public Dictionary<string, string> SubstitutedMessages { get; }
         public Dictionary<string, Scene> Scenes { get; }
@@ -46,7 +29,6 @@ namespace Statesman
         public Script()
         {
             _maxPoints = 0;
-            _switchSize = DefaultSwitchSize;
             Messages = new Dictionary<string, string>();
             SubstitutedMessages = new Dictionary<string, string>();
             Scenes = new Dictionary<string, Scene>();

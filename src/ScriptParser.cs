@@ -168,12 +168,7 @@ namespace Statesman
                     _script.MaxPoints = maxPoints;
                     break;
                 case "switches":
-                    int switchSize = int.Parse(parts[1]);
-                    if (switchSize < 0)
-                    {
-                        throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
-                    }
-                    _script.SwitchSize = switchSize;
+                    // XXX: This is a legacy property and is ignored.
                     break;
                 default:
                     return false;
