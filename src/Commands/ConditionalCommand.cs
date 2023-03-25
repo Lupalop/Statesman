@@ -14,7 +14,7 @@ namespace Statesman.Commands
         public CommandGroup ElseGroup { get; private set; }
 
         private readonly bool _orMode;
-        private bool? _shouldExecute;
+        private bool? _executeTrueGroup;
 
         public ConditionalCommand(
             CommandGroup group,
@@ -27,7 +27,7 @@ namespace Statesman.Commands
             ElseGroup = elseGroup;
             ItemNames = itemNames;
             TargetValues = targetValues;
-            _shouldExecute = null;
+            _executeTrueGroup = null;
             _orMode = orMode;
         }
 
@@ -79,8 +79,8 @@ namespace Statesman.Commands
                         throw new GameException("Incorrect condition order.");
                     }
 
-                    // Not operator.
                     string itemName = conditionPart;
+                    // Check for the negation operator.
                     bool targetValue = !conditionPart.StartsWith("!");
                     if (!targetValue)
                     {
@@ -115,18 +115,19 @@ namespace Statesman.Commands
 
         public override void Execute()
         {
+            // Evaluate all conditions.
             for (int i = 0; i < ItemNames.Count; i++)
             {
-                bool currentState =
+                bool condition =
                     Interpreter.Inventory.ContainsKey(ItemNames[i]) == TargetValues[i];
-                bool stopLooping = UpdateState(currentState);
-                if (stopLooping)
+                if (CheckAndUpdateState(condition))
                 {
                     break;
                 }
             }
-
-            if (_shouldExecute.Value)
+            // Execute the commands inside the condition's scope depending
+            // on whether the condition is true or false.
+            if (_executeTrueGroup.Value)
             {
                 Group.Execute();
             }
@@ -134,26 +135,34 @@ namespace Statesman.Commands
             {
                 ElseGroup.Execute();
             }
-            _shouldExecute = null;
+            // Reset the state.
+            _executeTrueGroup = null;
         }
 
-        private bool UpdateState(bool newState)
+        private bool CheckAndUpdateState(bool condition)
         {
-            if (newState)
+            // The condition is true.
+            if (condition)
             {
+                // Or mode: requires only one condition to be true.
                 if (_orMode)
                 {
-                    _shouldExecute = true;
+                    _executeTrueGroup = true;
                     return true;
                 }
-                if (_shouldExecute == null)
+                // And mode: the first condition is true.
+                else if (_executeTrueGroup == null)
                 {
-                    _shouldExecute = true;
+                    _executeTrueGroup = true;
                 }
             }
             else
             {
-                _shouldExecute = false;
+                // The condition is false.
+                _executeTrueGroup = false;
+                // There's no point in checking the other conditions if we're
+                // not in or mode.
+                return !_orMode;
             }
             return false;
         }
