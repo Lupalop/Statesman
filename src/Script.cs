@@ -60,7 +60,10 @@ namespace Statesman
                 string defaultValue = string.Format(template, key);
                 return defaultValue;
             }
-            return key;
+            // Check if there's anything to substitute in the given key.
+            SubstituteCFormatString(key, out messageValue);
+            SubstitutedMessages.Add(key, messageValue);
+            return messageValue;
         }
 
         private static bool SubstituteCFormatString(string messageValue, out string newValue)
