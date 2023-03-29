@@ -7,7 +7,6 @@ import statesman.commands.*;
 public class Interpreter {
 
     private static Scanner _scanner;
-    private static HashMap<String, Command> _commands;
     private static Scene _scene;
     private static boolean[] _switches;
     private static HashMap<String, InventoryItem> _inventory;
@@ -15,39 +14,9 @@ public class Interpreter {
     private static boolean _isRunning = false;
 
     static {
-        _commands = new HashMap<String, Command>();
-        // XXX: manually input IDs of new commands here!
-        _commands.put(PrintCommand.ID, new PrintCommand());
-        _commands.put(PrintRandomCommand.ID, new PrintRandomCommand());
-        _commands.put(PrintCombineCommand.ID, new PrintCombineCommand());
-        _commands.put(SceneCommand.ID, new SceneCommand());
-        _commands.put(GotoCommand.ID, new GotoCommand());
-        _commands.put(JumpCommand.ID, new JumpCommand());
-        _commands.put(ReturnCommand.ID, new ReturnCommand());
-        _commands.put(SwitchSetCommand.ID, new SwitchSetCommand());
-        _commands.put(SwitchJumpCommand.ID, new SwitchJumpCommand());
-        _commands.put(SwitchConditionalCommand.ID, new SwitchConditionalCommand());
-        _commands.put(InventoryCommand.ID, new InventoryCommand());
-        _commands.put(InventoryJumpCommand.ID, new InventoryJumpCommand());
-        _commands.put(InventoryConditionalCommand.ID, new InventoryConditionalCommand());
-        _commands.put(PointsCommand.ID, new PointsCommand());
-        _commands.put(QuitCommand.ID, new QuitCommand());
-        _commands.put(SaveCommand.ID, new SaveCommand());
-        _commands.put(LoadCommand.ID, new LoadCommand());
-        _commands.put(GotoBaseCommand.ID, new GotoBaseCommand());
-
         _scene = null;
     }
 
-    public static Command findCommand(String[] arguments) {
-        String commandId = arguments[0].toLowerCase();
-        Command command = getCommands().getOrDefault(commandId, null);
-        if (command != null) {
-            return command.createInstance(arguments);
-        }
-        return null;
-    }
-    
     public static Command findAction(String keyword) {
         Command localAction = _scene.getActions().get(keyword);
         Command globalAction = Content.getScript().getActions().get(keyword);
@@ -113,10 +82,10 @@ public class Interpreter {
                 if (App.debugMode) {
                     String[] keywordParts = keyword.split(" ");
                     if (keyword.startsWith("*tp")) {
-                        currentAction = _commands.get(SceneCommand.ID).createInstance(keywordParts);
+                        currentAction = Command.getCommands().get(SceneCommand.ID).createInstance(keywordParts);
                     }
                     if (keyword.startsWith("*set")) {
-                        currentAction = _commands.get(SwitchSetCommand.ID).createInstance(keywordParts);
+                        currentAction = Command.getCommands().get(SwitchSetCommand.ID).createInstance(keywordParts);
                     }
                     if (keyword.equalsIgnoreCase("*reload")) {
                         String location = Content.getDataPath().toString();
@@ -153,10 +122,6 @@ public class Interpreter {
 
     public static void setScanner(Scanner scanner) {
         _scanner = scanner;
-    }
-
-    public static HashMap<String, Command> getCommands() {
-        return _commands;
     }
 
     public static Scene getScene() {

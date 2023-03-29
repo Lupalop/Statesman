@@ -274,7 +274,7 @@ public class ScriptParser {
                     _conditionalsElse[_depth] = true;
                 }
                 ConditionalCommand command =
-                        (ConditionalCommand)Interpreter
+                        (ConditionalCommand)Command
                         .getCommands()
                         .get(Id)
                         .createInstance(parts);
@@ -309,7 +309,7 @@ public class ScriptParser {
             if (parts.length == 2) {
                 String[] keywords = parts[0].toLowerCase().split(",");
                 String[] arguments = parts[1].split(",");
-                Command command = Interpreter.findCommand(arguments);
+                Command command = Command.findCommand(arguments);
                 if (command == null) {
                     throw new GameException("Unknown command was referenced in line " + _lineNumber);
                 }
@@ -330,7 +330,7 @@ public class ScriptParser {
             }
             if (parts.length == 1) {
                 String[] arguments = parts[0].split(",");
-                Command command = Interpreter.findCommand(arguments);
+                Command command = Command.findCommand(arguments);
                 if (command == null) {
                     throw new GameException("Unknown command was referenced in line " + _lineNumber);
                 }
