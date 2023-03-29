@@ -3,7 +3,7 @@ package statesman.commands;
 import statesman.Content;
 import statesman.Interpreter;
 
-public class PointsCommand implements Command {
+public class PointsCommand extends Command {
 
     public static final String ID = "points";
 

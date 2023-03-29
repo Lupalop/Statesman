@@ -6,7 +6,7 @@ import statesman.Content;
 import statesman.GameException;
 import statesman.Interpreter;
 
-public class LoadCommand implements Command {
+public class LoadCommand extends Command {
 
     public static final String ID = "load";
     

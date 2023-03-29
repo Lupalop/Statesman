@@ -1,6 +1,6 @@
 package statesman.commands;
 
-public abstract class ConditionalCommand implements Command {
+public abstract class ConditionalCommand extends Command {
 
     public static final String ID = "cond";
 

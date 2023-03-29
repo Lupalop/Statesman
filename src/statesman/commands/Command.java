@@ -1,6 +1,6 @@
 package statesman.commands;
 
-public interface Command {
+public abstract class Command {
 
     public abstract Command createInstance(String[] arguments);
 

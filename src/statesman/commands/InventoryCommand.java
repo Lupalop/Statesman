@@ -6,7 +6,7 @@ import statesman.Content;
 import statesman.Interpreter;
 import statesman.InventoryItem;
 
-public class InventoryCommand implements Command {
+public class InventoryCommand extends Command {
 
     public static final String ID = "inv";
     

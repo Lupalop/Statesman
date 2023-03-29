@@ -3,7 +3,7 @@ package statesman.commands;
 import statesman.Content;
 import statesman.Interpreter;
 
-public class GotoCommand implements Command {
+public class GotoCommand extends Command {
 
     public static final String ID = "goto";
 

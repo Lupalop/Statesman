@@ -2,7 +2,7 @@ package statesman.commands;
 
 import statesman.Content;
 
-public class PrintCommand implements Command {
+public class PrintCommand extends Command {
 
     public static final String ID = "print";
 

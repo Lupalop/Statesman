@@ -5,7 +5,7 @@ import java.io.IOException;
 import statesman.Content;
 import statesman.Interpreter;
 
-public class SaveCommand implements Command {
+public class SaveCommand extends Command {
 
     public static final String ID = "save";
     

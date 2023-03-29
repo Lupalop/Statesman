@@ -1,6 +1,6 @@
 package statesman.commands;
 
-public class QuitCommand implements Command {
+public class QuitCommand extends Command {
 
     public static final String ID = "quit";
     

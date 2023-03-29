@@ -1,6 +1,6 @@
 package statesman.commands;
 
-public class GotoBaseCommand implements Command {
+public class GotoBaseCommand extends Command {
 
     public static final String ID = "gotob";
 

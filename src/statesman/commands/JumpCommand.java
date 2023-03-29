@@ -1,6 +1,6 @@
 package statesman.commands;
 
-public class JumpCommand implements Command {
+public class JumpCommand extends Command {
 
     public static final String ID = "jmp";
 

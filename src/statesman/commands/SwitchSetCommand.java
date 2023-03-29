@@ -2,7 +2,7 @@ package statesman.commands;
 
 import statesman.Interpreter;
 
-public class SwitchSetCommand implements Command {
+public class SwitchSetCommand extends Command {
 
     public static final String ID = "set";
 

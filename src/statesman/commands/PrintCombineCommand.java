@@ -2,7 +2,7 @@ package statesman.commands;
 
 import statesman.Content;
 
-public class PrintCombineCommand implements Command {
+public class PrintCombineCommand extends Command {
 
     public static final String ID = "printc";
 
