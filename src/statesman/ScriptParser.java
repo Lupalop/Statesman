@@ -85,19 +85,19 @@ public class ScriptParser {
             _lineNumber = i + 1;
             _line = _data.get(i).trim();
 
-            if (isComment()) {
+            if (parseComment()) {
                 continue;
             }
-            if (isTerminator()) {
+            if (parseTerminator()) {
                 continue;
             }
-            if (isPreference()) {
+            if (parsePreference()) {
                 continue;
             }
-            if (isSection()) {
+            if (parseSection()) {
                 continue;
             }
-            if (isInnerSection()) {
+            if (parseInnerSection()) {
                 continue;
             }
 
@@ -107,7 +107,7 @@ public class ScriptParser {
         return _script;
     }
     
-    private boolean isComment() {
+    private boolean parseComment() {
         // Block comment start tag
         if (_line.startsWith("/*")) {
             _blockComment = true;
@@ -125,176 +125,184 @@ public class ScriptParser {
         return false;
     }
     
-    private boolean isTerminator() throws GameException {
-        if (_line.startsWith("end")) {
-            switch (_section) {
-            case ROOT:
-                throw new GameException("Stray end tag in line " + _lineNumber);
-            case SCENE:
-                _scene = null;
-                break;
-            case GROUP:
-                if (_depth > 0) {
-                    _conditionalsElse[_depth] = false;
-                    _conditionals[_depth] = null;
-                    _depth--;
-                    return true;
-                } else {
-                    _group = null;
-                }
-                break;
-            default:
-                break;
-            }
-            if (_scene != null) {
-                _section = Section.SCENE;
+    private boolean parseTerminator() throws GameException {
+        if (!_line.startsWith("end")) {
+        	return false;
+        }
+        switch (_section) {
+        case ROOT:
+            throw new GameException("Stray end tag in line " + _lineNumber);
+        case SCENE:
+            _scene = null;
+            break;
+        case GROUP:
+            if (_depth > 0) {
+                _conditionalsElse[_depth] = false;
+                _conditionals[_depth] = null;
+                _depth--;
+                return true;
             } else {
-                _section = Section.ROOT;
+                _group = null;
             }
-            return true;
+            break;
+        default:
+            break;
         }
-        return false;
+        if (_scene != null) {
+            _section = Section.SCENE;
+        } else {
+            _section = Section.ROOT;
+        }
+        return true;
     }
     
-    private boolean isPreference() throws GameException {
+    private boolean parsePreference() throws GameException {
         String[] parts = _line.split(" ");
-        if (_section == Section.ROOT && parts.length == 2) {
-            switch (parts[0]) {
-            case "maxpoints":
-                int maxPoints = Integer.parseInt(parts[1]);
-                if (maxPoints < 0) {
-                    throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
-                }
-                _script.setMaxPoints(maxPoints);
-                break;
-            case "switches":
-                int switchSize = Integer.parseInt(parts[1]);
-                if (switchSize < 0) {
-                    throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
-                }
-                _script.setSwitchSize(switchSize);
-                break;
-            default:
-                return false;
-            }
-            return true;
+        if (_section != Section.ROOT || parts.length != 2)
+        {
+            return false;
         }
-        return false;
+        
+        switch (parts[0]) {
+        case "maxpoints":
+            int maxPoints = Integer.parseInt(parts[1]);
+            if (maxPoints < 0) {
+                throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
+            }
+            _script.setMaxPoints(maxPoints);
+            break;
+        case "switches":
+            int switchSize = Integer.parseInt(parts[1]);
+            if (switchSize < 0) {
+                throw new GameException("The maximum number of switches must be greater than or equal to zero, see line " + _lineNumber);
+            }
+            _script.setSwitchSize(switchSize);
+            break;
+        default:
+            return false;
+        }
+        return true;
     }
     
-    private boolean isSection() throws GameException {
+    private boolean parseSection() throws GameException {
         String[] parts = _line.split(" ");
         if (_section == Section.ROOT || _section == Section.SCENE) {
-            Section nextSection = Section.valueOfTag(parts[0]);
-            if (nextSection == null) {
-                return false;
-            }
-            switch (nextSection) {
-            case ACTION:
-            case STRING:
-                break;
-            case ITEM:
-                if (_section != Section.SCENE) {
-                    throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
-                }
-                break;
-            case GROUP:
-                if (parts.length == 2) {
-                    _group = new CommandGroup(parts[1]);
-                    if (_section == Section.ROOT) {
-                        // Reserved group name (command ran on entry)
-                        if (_group.getName().equals(Scene.CG_ENTRY)) {
-                            throw new GameException("Use of reserved command group name, see line " + _lineNumber);
-                        }
-                        _script.getCommandGroups().put(_group.getName(), _group);
-                    } else {
-                        // Group name already in use locally
-                        if (_scene.getCommandGroups().containsKey(_group.getName())) {
-                            throw new GameException("Command group name already used in current scene, see line " + _lineNumber);
-                        }
-                        _scene.getCommandGroups().put(_group.getName(), _group);
-                    }
-                } else {
-                    throw new GameException("Invalid group section tag, see line " + _lineNumber);
-                }
-                break;
-            case SCENE:
-                // Nested scenes
-                if (_section == Section.SCENE || _scene != null) {
-                    throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
-                }
-                if (parts.length == 2) {
-                    _scene = new Scene(parts[1]);
-                    // Scene name already in use
-                    if (_script.getScenes().containsKey(_scene.getName())) {
-                        throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
-                    }
-                    _script.getScenes().put(_scene.getName(), _scene);
-                } else {
-                    throw new GameException("Invalid scene section tag, see line " + _lineNumber);
-                }
-                break;
-            default:
-                return false;
-            }
-            _section = nextSection;
-            return true;
+        	return parseRootOrSceneSection(parts);
+        } else if (_section == Section.GROUP) {
+    		return parseGroupSection(parts);
         }
-        
-        if (_section == Section.GROUP) {
-            if (parts.length == 1 && parts[0].equals("else")) {
-                if (_conditionals[_depth] == null || _conditionalsElse[_depth]) {
-                    throw new GameException("Stray else tag, see line " + _lineNumber);
-                }
-                _conditionalsElse[_depth] = true;
-                return true;
-            }
-            if (parts.length == 2) {
-                String Id = null;
-                if (parts[0].equals("if") ||
-                    parts[0].equals("elsif")) {
-                    Id = SwitchConditionalCommand.ID;
-                } else if (parts[0].equals("if_inv") ||
-                           parts[0].equals("elsif_inv")) {
-                    Id = InventoryConditionalCommand.ID;
-                }
-                if (Id != null) {
-                    boolean isElseIf = parts[0].startsWith("els");
-                    if (isElseIf) {
-                        _conditionalsElse[_depth] = true;
-                    }
-                    ConditionalCommand command =
-                            (ConditionalCommand)Interpreter
-                            .getCommands()
-                            .get(Id)
-                            .createInstance(parts);
-                    // Set the name of the command groups contained within
-                    // conditional commands to be the same with the group
-                    // that contains them
-                    command.getGroup().setName(_group.getName());
-                    command.getElseGroup().setName(_group.getName());
-                    if (_depth == 0 && _section == Section.GROUP) {
-                        _group.getCommands().add(command);
-                    } else if (_conditionalsElse[_depth]) {
-                        _conditionals[_depth].getElseGroup().getCommands().add(command);
-                    } else {
-                        _conditionals[_depth].getGroup().getCommands().add(command);
-                    }
-                    if (isElseIf) {
-                        _conditionalsElse[_depth] = false;
-                    } else {
-                        _depth++;
-                    }
-                    _conditionals[_depth] = command;
-                    return true;
-                }
-            }
-        }
-        
         return false;
     }
     
-    private boolean isInnerSection() throws GameException {
+    private boolean parseRootOrSceneSection(String[] parts) throws GameException {
+        Section nextSection = Section.valueOfTag(parts[0]);
+        if (nextSection == null) {
+            return false;
+        }
+        switch (nextSection) {
+        case ACTION:
+        case STRING:
+            break;
+        case ITEM:
+            if (_section != Section.SCENE) {
+                throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
+            }
+            break;
+        case GROUP:
+            if (parts.length == 2) {
+                _group = new CommandGroup(parts[1]);
+                if (_section == Section.ROOT) {
+                    // Reserved group name (command ran on entry)
+                    if (_group.getName().equals(Scene.CG_ENTRY)) {
+                        throw new GameException("Use of reserved command group name, see line " + _lineNumber);
+                    }
+                    _script.getCommandGroups().put(_group.getName(), _group);
+                } else {
+                    // Group name already in use locally
+                    if (_scene.getCommandGroups().containsKey(_group.getName())) {
+                        throw new GameException("Command group name already used in current scene, see line " + _lineNumber);
+                    }
+                    _scene.getCommandGroups().put(_group.getName(), _group);
+                }
+            } else {
+                throw new GameException("Invalid group section tag, see line " + _lineNumber);
+            }
+            break;
+        case SCENE:
+            // Nested scenes
+            if (_section == Section.SCENE || _scene != null) {
+                throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
+            }
+            if (parts.length == 2) {
+                _scene = new Scene(parts[1]);
+                // Scene name already in use
+                if (_script.getScenes().containsKey(_scene.getName())) {
+                    throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
+                }
+                _script.getScenes().put(_scene.getName(), _scene);
+            } else {
+                throw new GameException("Invalid scene section tag, see line " + _lineNumber);
+            }
+            break;
+        default:
+            return false;
+        }
+        _section = nextSection;
+        return true;
+    }
+    
+    private boolean parseGroupSection(String[] parts) throws GameException {
+        if (parts.length == 1 && parts[0].equals("else")) {
+            if (_conditionals[_depth] == null || _conditionalsElse[_depth]) {
+                throw new GameException("Stray else tag, see line " + _lineNumber);
+            }
+            _conditionalsElse[_depth] = true;
+            return true;
+        }
+        else if (parts.length == 2) {
+            String Id = null;
+            if (parts[0].equals("if") ||
+                parts[0].equals("elsif")) {
+                Id = SwitchConditionalCommand.ID;
+            } else if (parts[0].equals("if_inv") ||
+                       parts[0].equals("elsif_inv")) {
+                Id = InventoryConditionalCommand.ID;
+            }
+            if (Id != null) {
+                boolean isElseIf = parts[0].startsWith("els");
+                if (isElseIf) {
+                    _conditionalsElse[_depth] = true;
+                }
+                ConditionalCommand command =
+                        (ConditionalCommand)Interpreter
+                        .getCommands()
+                        .get(Id)
+                        .createInstance(parts);
+                // Set the name of the command groups contained within
+                // conditional commands to be the same with the group
+                // that contains them
+                command.getGroup().setName(_group.getName());
+                command.getElseGroup().setName(_group.getName());
+                if (_depth == 0 && _section == Section.GROUP) {
+                    _group.getCommands().add(command);
+                } else if (_conditionalsElse[_depth]) {
+                    _conditionals[_depth].getElseGroup().getCommands().add(command);
+                } else {
+                    _conditionals[_depth].getGroup().getCommands().add(command);
+                }
+                if (isElseIf) {
+                    _conditionalsElse[_depth] = false;
+                } else {
+                    _depth++;
+                }
+                _conditionals[_depth] = command;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean parseInnerSection() throws GameException {
         String[] parts = _line.split("\\|");
         switch (_section) {
         case ACTION:
