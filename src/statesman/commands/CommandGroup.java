@@ -2,8 +2,6 @@ package statesman.commands;
 
 import java.util.LinkedList;
 
-import statesman.Content;
-
 public class CommandGroup {
 
     private String _name;
@@ -43,13 +41,6 @@ public class CommandGroup {
                     break;
                 }
                 continue;
-            }
-            // Call overridden global command
-            if (command instanceof GotoBaseCommand) {
-                CommandGroup group = Content.getScript().getCommandGroups().get(_name);
-                if (group != null) {
-                    group.execute();
-                }
             }
             command.execute();
             i++;

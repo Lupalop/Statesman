@@ -26,7 +26,6 @@ public abstract class Command {
         _commands.put(QuitCommand.ID, new QuitCommand());
         _commands.put(SaveCommand.ID, new SaveCommand());
         _commands.put(LoadCommand.ID, new LoadCommand());
-        _commands.put(GotoBaseCommand.ID, new GotoBaseCommand());
     }
 
     public static HashMap<String, Command> getCommands() {
