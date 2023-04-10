@@ -3,6 +3,7 @@
 */
 
 maxpoints 200
+// deprecated
 switches 3000
 
 // Global messages
@@ -136,24 +137,24 @@ scene initial
             print,1
             set,99,true
         end
-        if !101,100
+        if !101 && 100
             print,2
         end
-        if !102,101
+        if !102 && 101
             print,3
         end
-        if !103,102
+        if !103 && 102
             print,4
             set,103,true
         end
-        if 100,101,102,103
+        if 100 && 101 && 102 && 103
             print,5
         end
     end
     
     group pick_rock
         if 99
-            if_inv !rock
+            if !i:rock
                 inv,add,rock
                 points,add,10
                 print,6
@@ -181,7 +182,7 @@ scene initial
     end
     
     group response_no
-        if 100,101
+        if 100 && 101
             if !102
                 print,12
                 points,add,10
@@ -208,7 +209,7 @@ scene initial
     end
     
     group inventory_test
-        if_inv rock
+        if i:rock
             print,Rock is in your inventory!
         else
             print,There's no rock!
@@ -216,7 +217,7 @@ scene initial
     end
 
     group inventory_test_inverted
-        if_inv !rock
+        if !i:rock
             print,There's no rock!
         else
             print,Rock is in your inventory!
@@ -233,71 +234,71 @@ scene initial
     
     group paper_pen
         print,Individual conditions:%n
-        if_inv paper
+        if i:paper
             print,we have paper
         end
-        if_inv !paper
+        if !i:paper
             print,no paper here
         end
-        if_inv pen
+        if i:pen
             print,we have a pen
         end
-        if_inv !pen
+        if !i:pen
             print,no pen here
         end
         print,%nAND/OR conditions:%n
-        if_inv paper,pen
+        if i:paper && i:pen
             print,paper AND pen
         end
-        if_inv paper;pen
+        if i:paper || i:pen
             print,paper OR pen
         end
-        if_inv pen,paper
+        if i:pen && i:paper
             print,pen AND paper
         end
-        if_inv pen;paper
+        if i:pen || i:paper
             print,pen OR paper
         end
         print,%nNOT AND conditions:%n
-        if_inv !paper,!pen
+        if !i:paper && !i:pen
             print,NOT paper AND NOT pen
         end
-        if_inv !pen,!paper
+        if !i:pen && !i:paper
             print,NOT pen AND NOT paper
         end
         print,%nNOT OR conditions:%n
-        if_inv !paper;!pen
+        if !i:paper || !i:pen
             print,NOT paper OR NOT pen
         end
-        if_inv !pen;!paper
+        if !i:pen || !i:paper
             print,NOT pen OR NOT paper
         end
         print,%nNOT AND HAS conditions:%n
-        if_inv !paper,pen
+        if !i:paper && i:pen
             print,NOT paper AND HAS pen
         end
-        if_inv !pen,paper
+        if !i:pen && i:paper
             print,NOT pen AND HAS paper
         end
         print,%nHAS AND NOT conditions:%n
-        if_inv paper,!pen
+        if i:paper && !i:pen
             print,HAS paper AND NOT pen
         end
-        if_inv pen,!paper
+        if i:pen && !i:paper
             print,HAS pen AND NOT paper
         end
         print,%nNOT OR HAS conditions:%n
-        if_inv !paper;pen
+        if !i:paper || i:pen
             print,NOT paper OR HAS pen
         end
-        if_inv !pen;paper
+        if !i:pen || i:paper
             print,NOT pen OR HAS paper
         end
         print,%nHAS OR NOT conditions:%n
-        if_inv paper;!pen
+        if i:paper || !i:pen
             print,HAS paper OR NOT pen
         end
-        if_inv pen;!paper
+        if i:pen || !i:paper
             print,HAS pen OR NOT paper
         end
     end
