@@ -266,7 +266,7 @@ public class ScriptParser {
             }
             _conditionalsElse[_depth] = true;
             return true;
-        } else if (parts.length == 2) {
+        } else if (parts.length >= 2) {
             String Id = null;
             if (parts[0].equals("if") || parts[0].equals("elsif")
                     || parts[0].equals("if_inv")

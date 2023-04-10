@@ -1,18 +1,23 @@
 package statesman.commands;
 
+import java.util.ArrayList;
+
+import statesman.GameException;
+
 public class ConditionalCommand extends Command {
 
     public static final String ID_CONDITIONAL = "cond";
-    public static final String DELIMITER_OR = ";";
-    public static final String DELIMITER_AND = ",";
+    public static final String DELIMITER_OR = "||";
+    public static final String DELIMITER_AND = "&&";
 
-    private String[] _targetNames;
     protected CommandGroup _group;
     protected CommandGroup _elseGroup;
-    protected boolean[] _targetValues;
 
-    protected boolean _orMode;
-    protected Boolean _shouldExecute;
+    private ArrayList<String> _targetNames;
+    private ArrayList<Boolean> _targetValues;
+
+    private boolean _orMode;
+    private Boolean _shouldExecute;
 
     private ConditionalCommand() {
         _group = null;
@@ -24,7 +29,7 @@ public class ConditionalCommand extends Command {
     }
 
     public ConditionalCommand(CommandGroup group, CommandGroup elseGroup,
-            String[] targetNames, boolean[] targetValues, boolean orMode) {
+            ArrayList<String> targetNames, ArrayList<Boolean> targetValues, boolean orMode) {
         this();
         _group = group;
         _elseGroup = elseGroup;
@@ -43,34 +48,89 @@ public class ConditionalCommand extends Command {
     }
 
     @Override
-    public Command fromText(String commandId, String[] arguments) {
-        if (arguments.length == 2) {
-            String condition = arguments[1];
-            boolean orMode = useOrOperator(condition);
-            String[] parts = getConditionParts(condition, orMode);
-            boolean[] targetValues = new boolean[parts.length];
-            String[] itemNames = new String[parts.length];
+    public Command fromText(String commandId, String[] arguments) throws GameException {
+        if (arguments.length >= 2) {
+            Boolean orMode = null;
+            ArrayList<Boolean> targetValues = new ArrayList<Boolean>();
+            ArrayList<String> targetNames = new ArrayList<String>();
 
-            for (int i = 0; i < parts.length; i++) {
-                targetValues[i] = !parts[i].startsWith("!");
-                if (targetValues[i]) {
-                    itemNames[i] = parts[i];
-                } else {
-                    itemNames[i] = parts[i].substring(1);
+            // The first argument is the command name, so start evaluating
+            // the parts of the conditional with the second argument.
+            boolean isConditionNext = false;
+            boolean isConditionPrevious = false;
+            for (int i = 1; i < arguments.length; i++) {
+                String operatorOrTargetName = arguments[i].trim();
+
+                boolean foundOrOperator =
+                        operatorOrTargetName.equalsIgnoreCase(DELIMITER_OR);
+                boolean foundAndOperator =
+                        operatorOrTargetName.equalsIgnoreCase(DELIMITER_AND);
+
+                if (operatorOrTargetName.length() == 2 && isConditionNext)
+                {
+                    if (!foundOrOperator && !foundAndOperator)
+                    {
+                        throw new GameException("Unknown operator found.");
+                    }
+
+                    if (orMode == null)
+                    {
+                        orMode = foundOrOperator;
+                    }
+                    else if ((orMode.booleanValue() && foundAndOperator)
+                            || (!orMode.booleanValue() && foundOrOperator))
+                    {
+                        throw new GameException(
+                                "Combining and/or conditional operators are not allowed.");
+                    }
+                    isConditionNext = false;
+                    isConditionPrevious = true;
+                    continue;
                 }
+
+                if (foundOrOperator || foundAndOperator)
+                {
+                    throw new GameException("Incorrect condition order.");
+                }
+
+                // Check for the negation operator.
+                boolean targetValue = !operatorOrTargetName.startsWith("!");
+                if (!targetValue)
+                {
+                    operatorOrTargetName = operatorOrTargetName.substring(1);
+                }
+                targetNames.add(operatorOrTargetName);
+                targetValues.add(targetValue);
+                isConditionNext = true;
+                isConditionPrevious = false;
             }
 
-            return new ConditionalCommand(new CommandGroup(""),
-                    new CommandGroup(""), itemNames, targetValues, orMode);
+            if (isConditionPrevious)
+            {
+                throw new GameException("Found stray operator inside condition.");
+            }
+
+            // Assume Or mode if it's a single condition.
+            if (orMode == null)
+            {
+                orMode = true;
+            }
+
+            return new ConditionalCommand(
+                    new CommandGroup(""),
+                    new CommandGroup(""),
+                    targetNames,
+                    targetValues,
+                    orMode);
         }
         return null;
     }
 
     @Override
     public void execute() {
-        for (int i = 0; i < _targetNames.length; i++) {
-            String targetName = _targetNames[i];
-            boolean targetValue = _targetValues[i];
+        for (int i = 0; i < _targetNames.size(); i++) {
+            String targetName = _targetNames.get(i);
+            boolean targetValue = _targetValues.get(i);
             boolean keyValue = JumpCommand.getConditionValue(targetName);
 
             boolean stopLooping = updateState(keyValue == targetValue);
@@ -87,7 +147,7 @@ public class ConditionalCommand extends Command {
         _shouldExecute = null;
     }
 
-    protected boolean updateState(boolean newState) {
+    private boolean updateState(boolean newState) {
         if (newState) {
             if (_orMode) {
                 _shouldExecute = true;
@@ -102,32 +162,6 @@ public class ConditionalCommand extends Command {
         return false;
     }
 
-    protected boolean useOrOperator(String condition) {
-        boolean orMode = condition.contains(DELIMITER_OR);
-        boolean andMode = condition.contains(DELIMITER_AND);
-
-        if (orMode && andMode) {
-            throw new UnsupportedOperationException(
-                    "Combining and/or conditional operators are not allowed.");
-        }
-
-        return orMode;
-    }
-
-    protected String[] getConditionParts(String condition, boolean orMode) {
-        String delimiter = DELIMITER_AND;
-
-        if (orMode) {
-            delimiter = DELIMITER_OR;
-        }
-
-        return condition.split(delimiter);
-    }
-
-    public String[] getItemNames() {
-        return _targetNames;
-    }
-
     public CommandGroup getGroup() {
         return _group;
     }
@@ -136,7 +170,11 @@ public class ConditionalCommand extends Command {
         return _elseGroup;
     }
 
-    public boolean[] getTargetValues() {
+    public ArrayList<String> getTargetNames() {
+        return _targetNames;
+    }
+
+    public ArrayList<Boolean> getTargetValues() {
         return _targetValues;
     }
 
