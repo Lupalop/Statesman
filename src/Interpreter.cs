@@ -15,6 +15,7 @@ namespace Statesman
             }
         }
 
+        public static Dictionary<string, bool> Switches { get; set; }
         public static Dictionary<string, InventoryItem> Inventory { get; set; }
         public static int Points { get; set; }
         public static bool IsRunning { get; private set; } = false;
@@ -63,7 +64,8 @@ namespace Statesman
                 return;
             }
 
-            Inventory = new Dictionary<string, InventoryItem>();
+            Switches = new();
+            Inventory = new();
 
             if (initialSceneName == null)
             {

@@ -7,19 +7,19 @@
         public const string CommandSwitchJump = "sjmp";
         public const string CommandReturn = "ret";
 
-        private readonly string _itemName;
+        private readonly string _targetName;
         private readonly bool _isUnconditional;
 
         protected int _lineIfTrue;
         protected int _lineIfFalse;
 
-        public JumpCommand(string itemName, int lineIfTrue, int lineIfFalse)
+        public JumpCommand(string targetName, int lineIfTrue, int lineIfFalse)
         {
-            if (itemName == null)
+            if (targetName == null)
             {
                 _isUnconditional = true;
             }
-            _itemName = itemName;
+            _targetName = targetName;
             _lineIfTrue = lineIfTrue;
             _lineIfFalse = lineIfFalse;
         }
@@ -40,7 +40,7 @@
             }
             else if (arguments.Length == 4 && (commandName == CommandInventoryJump || commandName == CommandSwitchJump))
             {
-                string itemName = arguments[1];
+                string targetName = arguments[1];
                 if (!GetLineNumberFromString(arguments[2], out int lineIfTrue))
                 {
                     return null;
@@ -49,7 +49,7 @@
                 {
                     return null;
                 }
-                return new JumpCommand(itemName, lineIfTrue, lineIfFalse);
+                return new JumpCommand(targetName, lineIfTrue, lineIfFalse);
             }
             return null;
         }
@@ -72,15 +72,23 @@
 
         public virtual int GetJumpIndex()
         {
-            if (_isUnconditional)
-            {
-                return _lineIfTrue;
-            }
-            else if (Interpreter.Inventory.ContainsKey(_itemName))
+            if (_isUnconditional || GetConditionValue(_targetName))
             {
                 return _lineIfTrue;
             }
             return _lineIfFalse;
+        }
+
+        public static bool GetConditionValue(string targetName)
+        {
+            if (targetName.StartsWith("i:", StringComparison.InvariantCultureIgnoreCase))
+            {
+                targetName = targetName.Substring(2);
+                return Interpreter.Inventory
+                    .TryGetValue(targetName, out InventoryItem targetItem) && targetItem != null;
+            }
+            return Interpreter.Switches
+                .TryGetValue(targetName, out bool targetSwitch) && targetSwitch;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Statesman.Commands
         private const string OrDelimiter = "||";
         private const string AndDelimiter = "&&";
 
-        public List<string> ItemNames { get; }
+        public List<string> TargetNames { get; }
         public List<bool> TargetValues { get; private set; }
         public Function Group { get; private set; }
         public Function ElseGroup { get; private set; }
@@ -19,13 +19,13 @@ namespace Statesman.Commands
         public ConditionalCommand(
             Function group,
             Function elseGroup,
-            List<string> itemNames,
+            List<string> targetNames,
             List<bool> targetValues,
             bool orMode)
         {
             Group = group;
             ElseGroup = elseGroup;
-            ItemNames = itemNames;
+            TargetNames = targetNames;
             TargetValues = targetValues;
             _executeTrueGroup = null;
             _orMode = orMode;
@@ -40,7 +40,7 @@ namespace Statesman.Commands
             if (arguments.Length >= 2)
             {
                 bool? orMode = null;
-                List<string> itemNames = new();
+                List<string> targetNames = new();
                 List<bool> targetValues = new();
 
                 // The first argument is the command name, so start evaluating
@@ -49,12 +49,12 @@ namespace Statesman.Commands
                 bool isConditionPrevious = false;
                 for (int i = 1; i < arguments.Length; i++)
                 {
-                    string conditionPart = arguments[i].Trim();
+                    string operatorOrTargetName = arguments[i].Trim();
 
-                    bool foundOrOperator = conditionPart.Equals(OrDelimiter);
-                    bool foundAndOperator = conditionPart.Equals(AndDelimiter);
+                    bool foundOrOperator = operatorOrTargetName.Equals(OrDelimiter);
+                    bool foundAndOperator = operatorOrTargetName.Equals(AndDelimiter);
                     
-                    if (conditionPart.Length == 2 && isConditionNext)
+                    if (operatorOrTargetName.Length == 2 && isConditionNext)
                     {
                         if (!foundOrOperator && !foundAndOperator)
                         {
@@ -79,14 +79,13 @@ namespace Statesman.Commands
                         throw new GameException("Incorrect condition order.");
                     }
 
-                    string itemName = conditionPart;
                     // Check for the negation operator.
-                    bool targetValue = !conditionPart.StartsWith("!");
+                    bool targetValue = !operatorOrTargetName.StartsWith("!");
                     if (!targetValue)
                     {
-                        itemName = conditionPart.Substring(1);
+                        operatorOrTargetName = operatorOrTargetName.Substring(1);
                     }
-                    itemNames.Add(itemName);
+                    targetNames.Add(operatorOrTargetName);
                     targetValues.Add(targetValue);
                     isConditionNext = true;
                     isConditionPrevious = false;
@@ -106,7 +105,7 @@ namespace Statesman.Commands
                 return new ConditionalCommand(
                         new Function(""),
                         new Function(""),
-                        itemNames,
+                        targetNames,
                         targetValues,
                         orMode.Value);
             }
@@ -116,11 +115,11 @@ namespace Statesman.Commands
         public override void Execute()
         {
             // Evaluate all conditions.
-            for (int i = 0; i < ItemNames.Count; i++)
+            for (int i = 0; i < TargetNames.Count; i++)
             {
-                bool condition =
-                    Interpreter.Inventory.ContainsKey(ItemNames[i]) == TargetValues[i];
-                if (CheckAndUpdateState(condition))
+                bool currentValue = JumpCommand.GetConditionValue(TargetNames[i]);
+                bool condition = currentValue == TargetValues[i];
+                if (UpdateState(condition))
                 {
                     break;
                 }
@@ -139,7 +138,7 @@ namespace Statesman.Commands
             _executeTrueGroup = null;
         }
 
-        private bool CheckAndUpdateState(bool condition)
+        private bool UpdateState(bool condition)
         {
             // The condition is true.
             if (condition)

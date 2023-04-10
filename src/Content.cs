@@ -102,21 +102,40 @@
             // current scene, points, inventory, switches
             writer.WriteLine("scene {0}", Interpreter.Scene.Name);
             writer.WriteLine("points {0}", Interpreter.Points);
+            var switches = Interpreter.Switches;
+            if (switches.Count > 0)
+            {
+                writer.Write("switches ");
+                int count = 0;
+                foreach (var keyValuePair in switches)
+                {
+                    count++;
+                    if (keyValuePair.Value)
+                    {
+                        writer.Write(keyValuePair.Key);
+                        if (count != switches.Count)
+                        {
+                            writer.Write(",");
+                        }
+                    }
+                    if (count == switches.Count)
+                    {
+                        writer.WriteLine();
+                    }
+                }
+            }
             var inventory = Interpreter.Inventory;
             if (inventory.Count > 0)
             {
                 writer.Write("inventory ");
-                // TODO: change this to use a regular for loop.
-                var lastItem = inventory.Last().Value;
+                int count = 0;
                 foreach (var item in inventory.Values)
                 {
-                    if (item.OwnerScene != null)
-                    {
-                        writer.Write(item.OwnerScene.Name);
-                        writer.Write(";");
-                    }
+                    count++;
+                    writer.Write(item.OwnerScene.Name);
+                    writer.Write(";");
                     writer.Write(item.Name);
-                    if (item != lastItem)
+                    if (count < inventory.Count)
                     {
                         writer.Write(",");
                     }
@@ -135,6 +154,7 @@
 
             bool sceneFound = false;
             bool pointsFound = false;
+            bool switchesFound = false;
             bool inventoryFound = false;
 
             for (int i = 0; i < data.Length; i++)
@@ -165,6 +185,22 @@
                         Interpreter.Points = int.Parse(lineParts[1]);
                         pointsFound = true;
                         break;
+                    case "switches":
+                        if (switchesFound)
+                        {
+                            throw new GameException("Invalid save file: multiple declarations of `switches`");
+                        }
+                        string[] switches = lineParts[1].Split(",");
+                        for (int j = 0; j < switches.Length; j++)
+                        {
+                            if (!string.IsNullOrWhiteSpace(switches[j]))
+                            {
+                                Interpreter.Switches[switches[j]] = true;
+                            }
+                            // Silently ignore if the switch is invalid.
+                        }
+                        switchesFound = true;
+                        break;
                     case "inventory":
                         if (inventoryFound)
                         {
@@ -174,25 +210,17 @@
                         for (int j = 0; j < items.Length; j++)
                         {
                             string[] itemParts = items[j].Split(";");
-                            // We have a switch disguised as an inventory item.
-                            if (itemParts.Length == 1)
-                            {
-                                string switchName = itemParts[0];
-                                Interpreter.Inventory[switchName] = new InventoryItem(switchName);
-                            }
-                            else if (itemParts.Length == 2 &&
-                                     Script.Scenes.TryGetValue(itemParts[0], out Scene targetScene))
+                            // Try to get the inventory item if the scene exists.
+                            if (Script.Scenes.TryGetValue(itemParts[0], out Scene targetScene))
                             {
                                 string itemName = itemParts[1];
-                                // If the scene exists, try to get the inventory item.
                                 InventoryItem item = targetScene.Items[itemName];
                                 if (item != null)
                                 {
                                     Interpreter.Inventory[itemName] = item;
                                 }
                             }
-
-                            // Silently ignore if either the inventory item or scene does not exist 
+                            // Silently ignore if either the inventory item or scene does not exist .
                         }
                         inventoryFound = true;
                         break;

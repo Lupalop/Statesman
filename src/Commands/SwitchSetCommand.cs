@@ -26,22 +26,7 @@
 
         public override void Execute()
         {
-            if (Interpreter.Inventory.TryGetValue(_switchId, out InventoryItem item))
-            {
-                if (item != null && !item.IsSwitch)
-                {
-                    throw new InvalidDataException("Attempted to modify an inventory item using a switch command.");
-                }
-            }
-
-            if (_value)
-            {
-                Interpreter.Inventory[_switchId] = new InventoryItem(_switchId);
-            }
-            else
-            {
-                Interpreter.Inventory.Remove(_switchId);
-            }
+            Interpreter.Switches[_switchId] = _value;
         }
     }
 }
