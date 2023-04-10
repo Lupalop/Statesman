@@ -169,13 +169,7 @@ public class ScriptParser {
             _script.setMaxPoints(maxPoints);
             break;
         case "switches":
-            int switchSize = Integer.parseInt(parts[1]);
-            if (switchSize < 0) {
-                throw new GameException(
-                        "The maximum number of switches must be greater than or equal to zero, see line "
-                                + _lineNumber);
-            }
-            _script.setSwitchSize(switchSize);
+            // XXX: This is a legacy property and is ignored.
             break;
         default:
             return false;

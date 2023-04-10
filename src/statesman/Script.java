@@ -7,10 +7,7 @@ import statesman.commands.CommandGroup;
 
 public class Script {
 
-    public static final int DEFAULT_SWITCH_SIZE = 2000;
-
     private int _maxPoints;
-    private int _switchSize;
     private HashMap<String, String> _messages;
     private HashMap<String, Scene> _scenes;
     private HashMap<String, Command> _actions;
@@ -18,7 +15,6 @@ public class Script {
 
     public Script() {
         _maxPoints = 0;
-        _switchSize = DEFAULT_SWITCH_SIZE;
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();
@@ -35,18 +31,6 @@ public class Script {
                     "The maximum number of points must be greater than or equal to zero");
         }
         _maxPoints = maxPoints;
-    }
-
-    public int getSwitchSize() {
-        return _switchSize;
-    }
-
-    public void setSwitchSize(int switchSize) {
-        if (switchSize < 0) {
-            throw new IllegalArgumentException(
-                    "The number of allocated switches must be greater than or equal to zero");
-        }
-        _switchSize = switchSize;
     }
 
     public HashMap<String, String> getMessages() {
