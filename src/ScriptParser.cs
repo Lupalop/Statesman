@@ -9,7 +9,7 @@ namespace Statesman
         private enum Section
         {
             Action,
-            Group,
+            Function,
             Item,
             String,
             Root,
@@ -25,7 +25,7 @@ namespace Statesman
         // Parser fields
         private Section _section;
         private Scene _scene;
-        private CommandGroup _group;
+        private Function _function;
         private bool _blockComment;
 
         private readonly ConditionalCommand[] _conditionals;
@@ -42,7 +42,7 @@ namespace Statesman
             _section = Section.Root;
             _depth = 0;
             _scene = null;
-            _group = null;
+            _function = null;
             _blockComment = false;
 
             _conditionals = new ConditionalCommand[MaxDepth];
@@ -121,7 +121,7 @@ namespace Statesman
                 case Section.Scene:
                     _scene = null;
                     break;
-                case Section.Group:
+                case Section.Function:
                     if (_depth > 0)
                     {
                         _conditionalsElse[_depth] = false;
@@ -131,7 +131,7 @@ namespace Statesman
                     }
                     else
                     {
-                        _group = null;
+                        _function = null;
                     }
                     break;
                 default:
@@ -184,9 +184,9 @@ namespace Statesman
             {
                 return ParseRootOrSceneSection(parts);
             }
-            else if (_section == Section.Group)
+            else if (_section == Section.Function)
             {
-                return ParseGroupSection(parts);
+                return ParseFunctionSection(parts);
             }
             return false;
         }
@@ -209,32 +209,32 @@ namespace Statesman
                         throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
                     }
                     break;
-                case Section.Group:
+                case Section.Function:
                     if (parts.Length == 2)
                     {
-                        _group = new CommandGroup(parts[1]);
+                        _function = new Function(parts[1]);
                         if (_section == Section.Root)
                         {
-                            // Reserved group name (command ran on entry)
-                            if (_group.Name.Equals(Scene.CommandGroupEntry, StringComparison.InvariantCultureIgnoreCase))
+                            // Reserved function name (command ran on entry)
+                            if (_function.Name.Equals(Scene.FunctionEntry, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                throw new GameException("Use of reserved command group name, see line " + _lineNumber);
+                                throw new GameException("Use of reserved command function name, see line " + _lineNumber);
                             }
-                            _script.CommandGroups[_group.Name] = _group;
+                            _script.Functions[_function.Name] = _function;
                         }
                         else
                         {
-                            // Group name already in use locally
-                            if (_scene.CommandGroups.ContainsKey(_group.Name))
+                            // Function name already in use locally
+                            if (_scene.Functions.ContainsKey(_function.Name))
                             {
-                                throw new GameException("Command group name already used in current scene, see line " + _lineNumber);
+                                throw new GameException("Command function name already used in current scene, see line " + _lineNumber);
                             }
-                            _scene.CommandGroups[_group.Name] = _group;
+                            _scene.Functions[_function.Name] = _function;
                         }
                     }
                     else
                     {
-                        throw new GameException("Invalid group section tag, see line " + _lineNumber);
+                        throw new GameException("Invalid function section tag, see line " + _lineNumber);
                     }
                     break;
                 case Section.Scene:
@@ -266,7 +266,7 @@ namespace Statesman
             return true;
         }
 
-        private bool ParseGroupSection(string[] parts)
+        private bool ParseFunctionSection(string[] parts)
         {
             if (parts.Length == 1 && parts[0].Equals("else", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -292,14 +292,14 @@ namespace Statesman
                     ConditionalCommand command =
                             ConditionalCommand.FromText(
                                 ConditionalCommand.CommandConditional, parts) as ConditionalCommand;
-                    // Set the name of the command groups contained within
-                    // conditional commands to be the same with the group
-                    // that contains them
-                    command.Group.Name = _group.Name;
-                    command.ElseGroup.Name = _group.Name;
-                    if (_depth == 0 && _section == Section.Group)
+                    // Set the name of the anonymous functions contained within
+                    // conditional functions to be the same with the function
+                    // that contains them.
+                    command.Group.Name = _function.Name;
+                    command.ElseGroup.Name = _function.Name;
+                    if (_depth == 0 && _section == Section.Function)
                     {
-                        _group.Commands.Add(command);
+                        _function.Commands.Add(command);
                     }
                     else if (_conditionalsElse[_depth])
                     {
@@ -357,10 +357,10 @@ namespace Statesman
                         throw new GameException("Invalid action, see line " + _lineNumber);
                     }
                     break;
-                case Section.Group:
-                    if (_group == null)
+                case Section.Function:
+                    if (_function == null)
                     {
-                        throw new GameException("Invalid command group, see line " + _lineNumber);
+                        throw new GameException("Invalid function, see line " + _lineNumber);
                     }
                     if (parts.Length == 1)
                     {
@@ -383,7 +383,7 @@ namespace Statesman
                         }
                         else
                         {
-                            _group.Commands.Add(command);
+                            _function.Commands.Add(command);
                         }
                     }
                     else

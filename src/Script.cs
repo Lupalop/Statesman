@@ -24,7 +24,7 @@ namespace Statesman
         public Dictionary<string, string> SubstitutedMessages { get; }
         public Dictionary<string, Scene> Scenes { get; }
         public Dictionary<string, Command> Actions { get; }
-        public Dictionary<string, CommandGroup> CommandGroups { get; }
+        public Dictionary<string, Function> Functions { get; }
 
         public Script()
         {
@@ -33,7 +33,7 @@ namespace Statesman
             SubstitutedMessages = new Dictionary<string, string>();
             Scenes = new Dictionary<string, Scene>();
             Actions = new Dictionary<string, Command>();
-            CommandGroups = new Dictionary<string, CommandGroup>();
+            Functions = new Dictionary<string, Function>();
         }
 
         public string FindMessage(string key, bool replaceMissing = true)

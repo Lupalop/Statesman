@@ -10,24 +10,24 @@
         public const string CommandSuper = "super";
 
         public CallType CallerType { get; private set; }
-        private readonly string _groupName;
+        private readonly string _functionName;
 
-        public CallCommand(CallType callType, string commandGroupName)
+        public CallCommand(CallType callType, string functionName)
         {
             if (callType == CallType.None ||
                 (callType != CallType.Super &&
-                 string.IsNullOrWhiteSpace(commandGroupName)))
+                 string.IsNullOrWhiteSpace(functionName)))
             {
-                throw new ArgumentException("Command group name cannot be empty.");
+                throw new ArgumentException("Function name cannot be empty.");
             }
-            _groupName = commandGroupName;
+            _functionName = functionName;
             CallerType = callType;
         }
 
         public new static Command FromText(string commandName, string[] arguments)
         {
             CallType callType = CallType.None;
-            string groupName = "";
+            string functionName = "";
 
             if (arguments.Length == 1 &&
                 commandName.Equals(CommandSuper, StringComparison.InvariantCultureIgnoreCase))
@@ -45,7 +45,7 @@
                 {
                     callType = CallType.Global;
                 }
-                groupName = arguments[1];
+                functionName = arguments[1];
             }
 
             if (callType == CallType.None)
@@ -53,7 +53,7 @@
                 return null;
             }
 
-            return new CallCommand(callType, groupName);
+            return new CallCommand(callType, functionName);
         }
 
         public override void Execute()
@@ -63,19 +63,19 @@
                 return;
             }
 
-            Content.Script.CommandGroups.TryGetValue(_groupName, out CommandGroup group);
+            Content.Script.Functions.TryGetValue(_functionName, out Function function);
 
-            // Local scene groups override the global group
+            // Local functions override global functions if we're a normal call.
             if (Interpreter.Scene != null && CallerType == CallType.Normal)
             {
-                if (Interpreter.Scene.CommandGroups.TryGetValue(_groupName, out CommandGroup localGroup))
+                if (Interpreter.Scene.Functions.TryGetValue(_functionName, out Function localFunction))
                 {
-                    localGroup?.Execute();
+                    localFunction?.Execute();
                     return;
                 }
             }
 
-            group?.Execute();
+            function?.Execute();
         }
     }
 }

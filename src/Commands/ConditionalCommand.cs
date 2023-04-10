@@ -10,15 +10,15 @@ namespace Statesman.Commands
 
         public List<string> ItemNames { get; }
         public List<bool> TargetValues { get; private set; }
-        public CommandGroup Group { get; private set; }
-        public CommandGroup ElseGroup { get; private set; }
+        public Function Group { get; private set; }
+        public Function ElseGroup { get; private set; }
 
         private readonly bool _orMode;
         private bool? _executeTrueGroup;
 
         public ConditionalCommand(
-            CommandGroup group,
-            CommandGroup elseGroup,
+            Function group,
+            Function elseGroup,
             List<string> itemNames,
             List<bool> targetValues,
             bool orMode)
@@ -104,8 +104,8 @@ namespace Statesman.Commands
                 }
 
                 return new ConditionalCommand(
-                        new CommandGroup(""),
-                        new CommandGroup(""),
+                        new Function(""),
+                        new Function(""),
                         itemNames,
                         targetValues,
                         orMode.Value);

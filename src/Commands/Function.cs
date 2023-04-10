@@ -1,17 +1,17 @@
 ﻿namespace Statesman.Commands
 {
-    public class CommandGroup
+    public class Function
     {
         public string Name { get; set; }
         public List<Command> Commands { get; }
 
-        public CommandGroup(string name, List<Command> commands)
+        public Function(string name, List<Command> commands)
         {
             Name = name;
             Commands = commands;
         }
 
-        public CommandGroup(string name)
+        public Function(string name)
             : this(name, new List<Command>())
         {
         }
