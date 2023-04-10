@@ -23,6 +23,7 @@
                 { CallCommand.CommandCall, typeof(CallCommand) },
                 { CallCommand.CommandGoto, typeof(CallCommand) },
                 { CallCommand.CommandCallGlobal, typeof(CallCommand) },
+                { CallCommand.CommandSuper, typeof(CallCommand) },
                 { MenuCommand.CommandQuit, typeof(MenuCommand) },
                 { MenuCommand.CommandSave, typeof(MenuCommand) },
                 { MenuCommand.CommandLoad, typeof(MenuCommand) },

@@ -33,6 +33,17 @@
                     }
                     continue;
                 }
+                // Call base function.
+                if (command is CallCommand callCommand)
+                {
+                    CallCommand.CallType callType = callCommand.CallerType;
+                    if (callType == CallCommand.CallType.Super &&
+                        Content.Script.Functions.TryGetValue(
+                            Name, out Function baseFunction))
+                    {
+                        baseFunction.Execute();
+                    }
+                }
                 command.Execute();
                 i++;
             }
