@@ -3,7 +3,7 @@ package statesman;
 import java.util.HashMap;
 
 import statesman.commands.Command;
-import statesman.commands.CommandGroup;
+import statesman.commands.Function;
 
 public class Script {
 
@@ -11,14 +11,14 @@ public class Script {
     private HashMap<String, String> _messages;
     private HashMap<String, Scene> _scenes;
     private HashMap<String, Command> _actions;
-    private HashMap<String, CommandGroup> _commandGroups;
+    private HashMap<String, Function> _functions;
 
     public Script() {
         _maxPoints = 0;
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();
-        _commandGroups = new HashMap<String, CommandGroup>();
+        _functions = new HashMap<String, Function>();
     }
 
     public int getMaxPoints() {
@@ -45,8 +45,8 @@ public class Script {
         return _actions;
     }
 
-    public HashMap<String, CommandGroup> getCommandGroups() {
-        return _commandGroups;
+    public HashMap<String, Function> getFunctions() {
+        return _functions;
     }
 
     public String findMessage(String key, boolean replaceMissing) {

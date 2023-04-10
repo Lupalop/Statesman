@@ -50,7 +50,7 @@ end
 action
     fallback|printr,f_1,f_2,f_3,f_4
     junk|print,junk
-    junktest|goto,junk
+    junktest|call,junk
     talk|printr,t_1,t_2
     walk|printr,w_1,w_2
     quit|quit
@@ -63,8 +63,8 @@ action
     points|points,list
 end
 
-// Global command groups
-group junk
+// Global functions
+function junk
     sjmp,0,1,3
     print,otherjunk
     ret
@@ -93,13 +93,13 @@ scene initial
     end
     
     // Intro
-    group $
+    function $
         print,0
     end
     
     // Actions
     action
-        look,view,see|goto,view
+        look,view,see|call,view
         #look,view,see|print,0
         take rock|print,2
         wave back|print,3
@@ -109,18 +109,18 @@ scene initial
         combine|printc,1,2,3,4
         walk north, walk n|scene,north
         
-        // Global command group test
-        junked|goto,junk
+        // Global function test
+        junked|call,junk
         
 		// Sample convo
-        talk|goto,conversation
-        pick rock|goto,pick_rock
-        wave|goto,wave
-        no|goto,response_no
+        talk|call,conversation
+        pick rock|call,pick_rock
+        wave|call,wave
+        no|call,response_no
     end
 
-    // Command group: view
-    group view
+    // Function: view
+    function view
         // conditional jump, switch #, line if true, line if false
         sjmp,1,1,3
         print,0
@@ -132,7 +132,7 @@ scene initial
     /*
     // Sample conversation
     */
-    group conversation
+    function conversation
         if !100
             print,1
             set,99,true
@@ -152,7 +152,7 @@ scene initial
         end
     end
     
-    group pick_rock
+    function pick_rock
         if 99
             if !i:rock
                 inv,add,rock
@@ -167,7 +167,7 @@ scene initial
         end
     end
     
-    group wave
+    function wave
         if 100
             if !101
                 print,9
@@ -181,7 +181,7 @@ scene initial
         end
     end
     
-    group response_no
+    function response_no
         if 100 && 101
             if !102
                 print,12
@@ -196,8 +196,8 @@ scene initial
     end
     
     action
-        rocka|goto,inventory_test
-        rockb|goto,inventory_test_inverted
+        rocka|call,inventory_test
+        rockb|call,inventory_test_inverted
         rockadd|inv,add,rock
         rockrm|inv,rm,rock
     end
@@ -208,7 +208,7 @@ scene initial
         pen|This is a pen
     end
     
-    group inventory_test
+    function inventory_test
         if i:rock
             print,Rock is in your inventory!
         else
@@ -216,7 +216,7 @@ scene initial
         end
     end
 
-    group inventory_test_inverted
+    function inventory_test_inverted
         if !i:rock
             print,There's no rock!
         else
@@ -225,14 +225,14 @@ scene initial
     end
 
     action
-        pp|goto,paper_pen
+        pp|call,paper_pen
         penadd|inv,add,pen
         penrm|inv,rm,pen
         paperadd|inv,add,paper
         paperrm|inv,rm,paper
     end
     
-    group paper_pen
+    function paper_pen
         print,Individual conditions:%n
         if i:paper
             print,we have paper
@@ -312,12 +312,12 @@ scene north
     end
 
     action
-        look,view,see|goto,view
+        look,view,see|call,view
         walk south,walk s|scene,initial
     end
 
-    // Command group: view
-    group view
+    // Function: view
+    function view
         // conditional jump, switch #, line if true, line if false
         sjmp,2,1,3
         print,nothing2
@@ -326,8 +326,8 @@ scene north
         print,nothing
     end
 
-    // Overriden global command group test: junk
-    group junk
+    // Overriden global function test: junk
+    function junk
         print,this is an inline message
         print,this message is inline
         print,this message is not in the source

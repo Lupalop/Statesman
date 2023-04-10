@@ -15,22 +15,22 @@ public class CallCommand extends Command {
     public static final String ID_SUPER = "super";
 
     private CallType _callType;
-    private String _groupName;
+    private String _functionName;
 
     private CallCommand() {
-        _groupName = "";
+        _functionName = "";
         _callType = null;
     }
 
-    public CallCommand(CallType callType, String groupName) {
+    public CallCommand(CallType callType, String functionName) {
         if (callType == null) {
             throw new IllegalArgumentException();
         }
         if (callType != CallType.SUPER
-                && (groupName == null || groupName.isBlank())) {
+                && (functionName == null || functionName.isBlank())) {
             throw new IllegalArgumentException();
         }
-        _groupName = groupName;
+        _functionName = functionName;
         _callType = callType;
     }
 
@@ -50,7 +50,7 @@ public class CallCommand extends Command {
     @Override
     public Command fromText(String commandId, String[] arguments) {
         CallType callType = null;
-        String groupName = "";
+        String functionName = "";
 
         if (arguments.length == 1 && commandId.equalsIgnoreCase(ID_SUPER)) {
             callType = CallType.SUPER;
@@ -61,41 +61,40 @@ public class CallCommand extends Command {
             } else if (commandId.equalsIgnoreCase(ID_CALL_GLOB)) {
                 callType = CallType.GLOBAL;
             }
-            groupName = arguments[1];
+            functionName = arguments[1];
         }
         
         if (callType == null) {
             return null;
         }
 
-        return new CallCommand(callType, groupName);
+        return new CallCommand(callType, functionName);
     }
 
     @Override
     public void execute() {
-        // Return early because we're handled by the command group.
+        // Return early because we're handled by the containing function.
         if (_callType == CallType.SUPER) {
             return;
         }
-        
-        CommandGroup group = Content.getScript().getCommandGroups()
-                .get(_groupName);
 
-        // Local scene groups override the global group if we're
-        // a normal call.
+        Function globalFunction = Content.getScript().getFunctions()
+                .get(_functionName);
+
+        // Local functions override global functions if we're a normal call.
         if (Interpreter.getScene() != null && _callType == CallType.NORMAL) {
-            CommandGroup localGroup = Interpreter
+            Function localFunction = Interpreter
                     .getScene()
-                    .getCommandGroups()
-                    .get(_groupName);
-            if (localGroup != null) {
-                localGroup.execute();
+                    .getFunctions()
+                    .get(_functionName);
+            if (localFunction != null) {
+                localFunction.execute();
                 return;
             }
         }
 
-        if (group != null) {
-            group.execute();
+        if (globalFunction != null) {
+            globalFunction.execute();
         }
     }
 

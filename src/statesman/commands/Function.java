@@ -5,17 +5,17 @@ import java.util.LinkedList;
 import statesman.Content;
 import statesman.commands.CallCommand.CallType;
 
-public class CommandGroup {
+public class Function {
 
     private String _name;
     private LinkedList<Command> _commands;
 
-    public CommandGroup(String name, LinkedList<Command> commands) {
+    public Function(String name, LinkedList<Command> commands) {
         _name = name;
         _commands = commands;
     }
 
-    public CommandGroup(String name) {
+    public Function(String name) {
         this(name, new LinkedList<Command>());
     }
 
@@ -44,16 +44,16 @@ public class CommandGroup {
                 }
                 continue;
             }
-            // Call base command group.
+            // Call base function.
             if (command instanceof CallCommand) {
                 CallType callType = ((CallCommand) command).getCallType();
                 if (callType == CallType.SUPER) {
-                    CommandGroup group = Content
+                    Function baseFunction = Content
                             .getScript()
-                            .getCommandGroups()
+                            .getFunctions()
                             .get(_name);
-                    if (group != null) {
-                        group.execute();
+                    if (baseFunction != null) {
+                        baseFunction.execute();
                     }
                 }
             }

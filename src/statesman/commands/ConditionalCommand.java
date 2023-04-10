@@ -10,8 +10,8 @@ public class ConditionalCommand extends Command {
     public static final String DELIMITER_OR = "||";
     public static final String DELIMITER_AND = "&&";
 
-    protected CommandGroup _group;
-    protected CommandGroup _elseGroup;
+    protected Function _group;
+    protected Function _elseGroup;
 
     private ArrayList<String> _targetNames;
     private ArrayList<Boolean> _targetValues;
@@ -28,7 +28,7 @@ public class ConditionalCommand extends Command {
         _executeTrueGroup = null;
     }
 
-    public ConditionalCommand(CommandGroup group, CommandGroup elseGroup,
+    public ConditionalCommand(Function group, Function elseGroup,
             ArrayList<String> targetNames, ArrayList<Boolean> targetValues, boolean orMode) {
         this();
         _group = group;
@@ -117,8 +117,8 @@ public class ConditionalCommand extends Command {
             }
 
             return new ConditionalCommand(
-                    new CommandGroup(""),
-                    new CommandGroup(""),
+                    new Function(""),
+                    new Function(""),
                     targetNames,
                     targetValues,
                     orMode);
@@ -171,11 +171,11 @@ public class ConditionalCommand extends Command {
         return false;
     }
 
-    public CommandGroup getGroup() {
+    public Function getTrueGroup() {
         return _group;
     }
 
-    public CommandGroup getElseGroup() {
+    public Function getFalseGroup() {
         return _elseGroup;
     }
 

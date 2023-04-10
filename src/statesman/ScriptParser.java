@@ -11,7 +11,7 @@ public class ScriptParser {
 
     private enum Section {
 
-        ACTION("action"), GROUP("group"), ITEM("item"), STRING("string"),
+        ACTION("action"), FUNCTION("function"), ITEM("item"), STRING("string"),
         ROOT("root"), SCENE("scene");
 
         private final String _tag;
@@ -46,7 +46,7 @@ public class ScriptParser {
     // Parser fields
     private Section _section;
     private Scene _scene;
-    private CommandGroup _group;
+    private Function _function;
     private boolean _blockComment;
 
     private ConditionalCommand[] _conditionals;
@@ -62,7 +62,7 @@ public class ScriptParser {
         _section = Section.ROOT;
         _depth = 0;
         _scene = null;
-        _group = null;
+        _function = null;
         _blockComment = false;
 
         _conditionals = new ConditionalCommand[MAX_DEPTH];
@@ -131,14 +131,14 @@ public class ScriptParser {
         case SCENE:
             _scene = null;
             break;
-        case GROUP:
+        case FUNCTION:
             if (_depth > 0) {
                 _conditionalsElse[_depth] = false;
                 _conditionals[_depth] = null;
                 _depth--;
                 return true;
             } else {
-                _group = null;
+                _function = null;
             }
             break;
         default:
@@ -181,8 +181,8 @@ public class ScriptParser {
         String[] parts = _line.split(" ");
         if (_section == Section.ROOT || _section == Section.SCENE) {
             return parseRootOrSceneSection(parts);
-        } else if (_section == Section.GROUP) {
-            return parseGroupSection(parts);
+        } else if (_section == Section.FUNCTION) {
+            return parseFunctionSection(parts);
         }
         return false;
     }
@@ -204,30 +204,30 @@ public class ScriptParser {
                                 + _lineNumber);
             }
             break;
-        case GROUP:
+        case FUNCTION:
             if (parts.length == 2) {
-                _group = new CommandGroup(parts[1]);
+                _function = new Function(parts[1]);
                 if (_section == Section.ROOT) {
-                    // Reserved group name (command ran on entry)
-                    if (_group.getName().equals(Scene.CG_ENTRY)) {
+                    // Reserved function name (command ran on entry)
+                    if (_function.getName().equals(Scene.FN_ENTRY)) {
                         throw new GameException(
-                                "Use of reserved command group name, see line "
+                                "Use of reserved function name, see line "
                                         + _lineNumber);
                     }
-                    _script.getCommandGroups().put(_group.getName(), _group);
+                    _script.getFunctions().put(_function.getName(), _function);
                 } else {
-                    // Group name already in use locally
-                    if (_scene.getCommandGroups()
-                            .containsKey(_group.getName())) {
+                    // Function name already in use locally
+                    if (_scene.getFunctions()
+                            .containsKey(_function.getName())) {
                         throw new GameException(
-                                "Command group name already used in current scene, see line "
+                                "Function name already used in current scene, see line "
                                         + _lineNumber);
                     }
-                    _scene.getCommandGroups().put(_group.getName(), _group);
+                    _scene.getFunctions().put(_function.getName(), _function);
                 }
             } else {
                 throw new GameException(
-                        "Invalid group section tag, see line " + _lineNumber);
+                        "Invalid function section tag, see line " + _lineNumber);
             }
             break;
         case SCENE:
@@ -258,7 +258,7 @@ public class ScriptParser {
         return true;
     }
 
-    private boolean parseGroupSection(String[] parts) throws GameException {
+    private boolean parseFunctionSection(String[] parts) throws GameException {
         if (parts.length == 1 && parts[0].equals("else")) {
             if (_conditionals[_depth] == null || _conditionalsElse[_depth]) {
                 throw new GameException(
@@ -280,18 +280,18 @@ public class ScriptParser {
                 }
                 ConditionalCommand command = (ConditionalCommand) ConditionalCommand
                         .getDefault().fromText(null, parts);
-                // Set the name of the command groups contained within
-                // conditional commands to be the same with the group
-                // that contains them
-                command.getGroup().setName(_group.getName());
-                command.getElseGroup().setName(_group.getName());
-                if (_depth == 0 && _section == Section.GROUP) {
-                    _group.getCommands().add(command);
+                // Set the name of the anonymous functions contained within
+                // conditional commands to be the same with the function
+                // that contains them.
+                command.getTrueGroup().setName(_function.getName());
+                command.getFalseGroup().setName(_function.getName());
+                if (_depth == 0 && _section == Section.FUNCTION) {
+                    _function.getCommands().add(command);
                 } else if (_conditionalsElse[_depth]) {
-                    _conditionals[_depth].getElseGroup().getCommands()
+                    _conditionals[_depth].getFalseGroup().getCommands()
                             .add(command);
                 } else {
-                    _conditionals[_depth].getGroup().getCommands().add(command);
+                    _conditionals[_depth].getTrueGroup().getCommands().add(command);
                 }
                 if (isElseIf) {
                     _conditionalsElse[_depth] = false;
@@ -330,10 +330,10 @@ public class ScriptParser {
                         "Invalid action, see line " + _lineNumber);
             }
             break;
-        case GROUP:
-            if (_group == null) {
+        case FUNCTION:
+            if (_function == null) {
                 throw new GameException(
-                        "Invalid command group, see line " + _lineNumber);
+                        "Invalid function, see line " + _lineNumber);
             }
             if (parts.length == 1) {
                 String[] arguments = parts[0].split(",");
@@ -345,14 +345,14 @@ public class ScriptParser {
                 }
                 if (_depth > 0) {
                     if (_conditionalsElse[_depth]) {
-                        _conditionals[_depth].getElseGroup().getCommands()
+                        _conditionals[_depth].getFalseGroup().getCommands()
                                 .add(command);
                     } else {
-                        _conditionals[_depth].getGroup().getCommands()
+                        _conditionals[_depth].getTrueGroup().getCommands()
                                 .add(command);
                     }
                 } else {
-                    _group.getCommands().add(command);
+                    _function.getCommands().add(command);
                 }
             } else {
                 throw new GameException(
