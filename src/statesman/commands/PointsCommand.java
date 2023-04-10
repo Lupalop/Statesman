@@ -103,7 +103,7 @@ public class PointsCommand extends Command {
             Interpreter.setPoints(0);
             break;
         case LIST:
-            System.out.printf(Content.getScript().getMessage("p_1"),
+            System.out.printf(Content.getScript().findMessage("p_1"),
                     Interpreter.getPoints(),
                     Content.getScript().getMaxPoints());
             break;

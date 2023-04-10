@@ -96,7 +96,7 @@ public class InventoryCommand extends Command {
                 break;
             }
             if (Interpreter.getInventory().containsKey(item.getName())) {
-                System.out.println(Content.getScript().getMessage("i_1"));
+                System.out.println(Content.getScript().findMessage("i_1"));
                 break;
             }
             Interpreter.getInventory().put(item.getName(), item);
@@ -109,27 +109,27 @@ public class InventoryCommand extends Command {
                 Interpreter.getInventory().remove(_itemName);
                 break;
             }
-            System.out.println(Content.getScript().getMessage("i_2"));
+            System.out.println(Content.getScript().findMessage("i_2"));
             break;
         case LIST:
             int inventorySize = Interpreter.getInventory().size();
             if (inventorySize > 0) {
                 if (inventorySize == 1) {
-                    System.out.println(Content.getScript().getMessage("i_3"));
+                    System.out.println(Content.getScript().findMessage("i_3"));
                 } else {
-                    System.out.printf(Content.getScript().getMessage("i_4"),
+                    System.out.printf(Content.getScript().findMessage("i_4"),
                             inventorySize);
                 }
                 Iterator<InventoryItem> iterator = Interpreter.getInventory()
                         .values().iterator();
                 while (iterator.hasNext()) {
                     InventoryItem currentItem = iterator.next();
-                    System.out.printf(Content.getScript().getMessage("i_5"),
+                    System.out.printf(Content.getScript().findMessage("i_5"),
                             currentItem.getName(),
                             currentItem.getDescription());
                 }
             } else {
-                System.out.println(Content.getScript().getMessage("i_6"));
+                System.out.println(Content.getScript().findMessage("i_6"));
             }
             break;
         case CLEAR:

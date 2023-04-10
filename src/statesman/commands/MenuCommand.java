@@ -63,14 +63,14 @@ public class MenuCommand extends Command {
             return;
         }
 
-        System.out.println(Content.getScript().getMessage("sl_1"));
+        System.out.println(Content.getScript().findMessage("sl_1"));
         String name = Interpreter.getScanner().nextLine().trim().toLowerCase();
         if (name.isBlank()) {
-            System.out.println(Content.getScript().getMessage("sl_2"));
+            System.out.println(Content.getScript().findMessage("sl_2"));
             return;
         }
         if (name.length() > 255) {
-            System.out.println(Content.getScript().getMessage("sl_3"));
+            System.out.println(Content.getScript().findMessage("sl_3"));
             return;
         }
 
@@ -80,24 +80,24 @@ public class MenuCommand extends Command {
                 Content.saveState(name);
                 actionSuccess = true;
             } catch (IOException e) {
-                System.out.println(Content.getScript().getMessage("sl_6"));
+                System.out.println(Content.getScript().findMessage("sl_6"));
             }
 
             if (actionSuccess) {
-                System.out.println(Content.getScript().getMessage("sl_7"));
+                System.out.println(Content.getScript().findMessage("sl_7"));
             }
         } else if (_actionType == MenuActionType.LOAD) {
             try {
                 Content.loadState(name);
                 actionSuccess = true;
             } catch (IOException e) {
-                System.out.println(Content.getScript().getMessage("sl_4"));
+                System.out.println(Content.getScript().findMessage("sl_4"));
             } catch (GameException e) {
                 System.out.println(e.getMessage());
             }
 
             if (actionSuccess) {
-                System.out.println(Content.getScript().getMessage("sl_5"));
+                System.out.println(Content.getScript().findMessage("sl_5"));
             }
         }
     }

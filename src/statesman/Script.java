@@ -81,10 +81,26 @@ public class Script {
         _commandGroups = commandGroups;
     }
 
-    public String getMessage(String key) {
-        String template = "[Missing message: `%s`]";
-        String defaultValue = String.format(template, key);
-        return getMessages().getOrDefault(key, defaultValue);
+    public String findMessage(String key, boolean replaceMissing) {
+        String messageValue = getMessages().get(key);
+        if (messageValue != null) {
+            if (messageValue.startsWith("@")) {
+                messageValue = messageValue.replace("\\e", "\033");
+            }
+            getMessages().put(key, messageValue);
+        } else if (replaceMissing) {
+            String template = "[Missing message: `%s`]";
+            messageValue = String.format(template, key);
+        }
+        
+        if (messageValue == null) {
+            return key;
+        }
+        return messageValue; 
     }
 
+    public String findMessage(String key) {
+        return findMessage(key, true);
+    }
+    
 }
