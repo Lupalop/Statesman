@@ -8,7 +8,7 @@ public class Interpreter {
 
     private static Scanner _scanner;
     private static Scene _scene;
-    private static boolean[] _switches;
+    private static HashMap<String, Boolean> _switches;
     private static HashMap<String, InventoryItem> _inventory;
     private static int _points;
     private static boolean _isRunning = false;
@@ -21,8 +21,9 @@ public class Interpreter {
         Command localAction = _scene.getActions().get(keyword);
         Command globalAction = Content.getScript().getActions().get(keyword);
         Command localFallbackAction = _scene.getActions().get("fallback");
-        Command fallbackAction = Content.getScript().getActions().get("fallback");
-        
+        Command fallbackAction = Content.getScript().getActions()
+                .get("fallback");
+
         if (localAction != null) {
             return localAction;
         } else if (globalAction != null) {
@@ -34,7 +35,7 @@ public class Interpreter {
         } else if (App.debugMode) {
             System.out.println("Fallback message is missing");
         }
-        
+
         return null;
     }
 
@@ -43,36 +44,36 @@ public class Interpreter {
             System.out.println("The interpreter is already running.");
             return;
         }
-        
+
         if (Content.getScript() == null) {
             System.out.println("The game script is missing.");
             return;
         }
 
         _inventory = new HashMap<String, InventoryItem>();
-        _switches = new boolean[Content.getScript().getSwitchSize()];
-        Arrays.fill(_switches, false);
+        _switches = new HashMap<String, Boolean>();
 
         if (initialSceneName == null) {
             initialSceneName = "initial";
         }
-        Scene initialScene = Content.getScript().getScenes().get(initialSceneName);
+        Scene initialScene = Content.getScript().getScenes()
+                .get(initialSceneName);
         if (initialScene == null) {
             System.out.println("Initial scene is missing.");
             return;
         }
         setScene(initialScene);
-        
+
         _isRunning = true;
 
         while (_isRunning) {
             System.out.print("> ");
             String keyword = getScanner().nextLine().trim().toLowerCase();
-            
+
             if (keyword.isBlank()) {
                 continue;
             }
-            
+
             System.out.println();
 
             Command currentAction = findAction(keyword);
@@ -82,10 +83,12 @@ public class Interpreter {
                 if (App.debugMode) {
                     String[] keywordParts = keyword.split(" ");
                     if (keyword.startsWith("*tp")) {
-                        currentAction = Command.getCommands().get(SceneCommand.ID).createInstance(keywordParts);
+                        currentAction = SceneCommand.getDefault().fromText(null,
+                                keywordParts);
                     }
                     if (keyword.startsWith("*set")) {
-                        currentAction = Command.getCommands().get(SwitchSetCommand.ID).createInstance(keywordParts);
+                        currentAction = SwitchSetCommand.getDefault()
+                                .fromText(null, keywordParts);
                     }
                     if (keyword.equalsIgnoreCase("*reload")) {
                         String location = Content.getDataPath().toString();
@@ -107,11 +110,11 @@ public class Interpreter {
             }
         }
     }
-    
+
     public static void run() {
         run(null);
     }
-    
+
     public static void stop() {
         _isRunning = false;
     }
@@ -133,7 +136,7 @@ public class Interpreter {
         _scene.runEntry();
     }
 
-    public static boolean[] getSwitches() {
+    public static HashMap<String, Boolean> getSwitches() {
         return _switches;
     }
 
@@ -152,7 +155,7 @@ public class Interpreter {
     public static void setPoints(int points) {
         _points = points;
     }
-    
+
     public static boolean isRunning() {
         return _isRunning;
     }

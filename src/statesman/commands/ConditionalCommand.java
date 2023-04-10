@@ -1,30 +1,82 @@
 package statesman.commands;
 
-public abstract class ConditionalCommand extends Command {
+public class ConditionalCommand extends Command {
 
-    public static final String ID = "cond";
+    public static final String ID_CONDITIONAL = "cond";
 
+    private String[] _targetNames;
     protected CommandGroup _group;
     protected CommandGroup _elseGroup;
-    protected boolean _orMode;
     protected boolean[] _targetValues;
+
+    protected boolean _orMode;
     protected Boolean _shouldExecute;
 
-    public ConditionalCommand() {
+    private ConditionalCommand() {
         _group = null;
         _elseGroup = null;
         _orMode = false;
+        _targetNames = null;
         _targetValues = null;
         _shouldExecute = null;
     }
 
+    public ConditionalCommand(CommandGroup group, CommandGroup elseGroup,
+            String[] targetNames, boolean[] targetValues, boolean orMode) {
+        this();
+        _group = group;
+        _elseGroup = elseGroup;
+        _targetNames = targetNames;
+        _targetValues = targetValues;
+        _orMode = orMode;
+    }
+
+    private static Command _defaultInstance;
+
+    public static Command getDefault() {
+        if (_defaultInstance == null) {
+            _defaultInstance = new ConditionalCommand();
+        }
+        return _defaultInstance;
+    }
+
     @Override
-    public Command createInstance(String[] arguments) {
+    public Command fromText(String commandId, String[] arguments) {
+        if (arguments.length == 2) {
+            String condition = arguments[1];
+            boolean orMode = useOrOperator(condition);
+            String[] parts = getConditionParts(condition, orMode);
+            boolean[] targetValues = new boolean[parts.length];
+            String[] itemNames = new String[parts.length];
+
+            for (int i = 0; i < parts.length; i++) {
+                targetValues[i] = !parts[i].startsWith("!");
+                if (targetValues[i]) {
+                    itemNames[i] = parts[i];
+                } else {
+                    itemNames[i] = parts[i].substring(1);
+                }
+            }
+
+            return new ConditionalCommand(new CommandGroup(""),
+                    new CommandGroup(""), itemNames, targetValues, orMode);
+        }
         return null;
     }
 
     @Override
     public void execute() {
+        for (int i = 0; i < _targetNames.length; i++) {
+            String targetName = _targetNames[i];
+            boolean targetValue = _targetValues[i];
+            boolean keyValue = JumpCommand.getConditionValue(targetName);
+
+            boolean stopLooping = updateState(keyValue == targetValue);
+            if (stopLooping) {
+                break;
+            }
+        }
+
         if (_shouldExecute) {
             _group.execute();
         } else {
@@ -32,7 +84,7 @@ public abstract class ConditionalCommand extends Command {
         }
         _shouldExecute = null;
     }
-    
+
     protected boolean updateState(boolean newState) {
         if (newState) {
             if (_orMode) {
@@ -47,26 +99,31 @@ public abstract class ConditionalCommand extends Command {
         }
         return false;
     }
-    
+
     protected boolean useOrOperator(String condition) {
         boolean orMode = condition.contains(";");
         boolean andMode = condition.contains(",");
 
         if (orMode && andMode) {
-            throw new UnsupportedOperationException("Combining and/or conditional operators are not allowed.");
+            throw new UnsupportedOperationException(
+                    "Combining and/or conditional operators are not allowed.");
         }
 
         return orMode;
     }
-    
+
     protected String[] getConditionParts(String condition, boolean orMode) {
         String delimiter = ",";
-        
+
         if (orMode) {
             delimiter = ";";
         }
-        
+
         return condition.split(delimiter);
+    }
+
+    public String[] getItemNames() {
+        return _targetNames;
     }
 
     public CommandGroup getGroup() {
@@ -76,7 +133,7 @@ public abstract class ConditionalCommand extends Command {
     public CommandGroup getElseGroup() {
         return _elseGroup;
     }
-    
+
     public boolean[] getTargetValues() {
         return _targetValues;
     }

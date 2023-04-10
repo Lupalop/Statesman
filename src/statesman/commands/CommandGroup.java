@@ -19,7 +19,7 @@ public class CommandGroup {
     public String getName() {
         return _name;
     }
-    
+
     public void setName(String name) {
         _name = name;
     }
@@ -33,9 +33,8 @@ public class CommandGroup {
         while (i < _commands.size()) {
             Command command = _commands.get(i);
             // Handle jumps
-            if (command instanceof JumpCommand ||
-                command instanceof ReturnCommand) {
-                i = ((JumpCommand)command).getJumpIndex();
+            if (command instanceof JumpCommand) {
+                i = ((JumpCommand) command).getJumpIndex();
                 // Stop execution if the index is invalid
                 if (i < 0 || i > _commands.size()) {
                     break;

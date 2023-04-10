@@ -21,17 +21,17 @@ public class Content {
         if (Files.notExists(_dataPath)) {
             throw new GameException("The data directory does not exist");
         }
-        // Read all game scripts from the given directory 
+        // Read all game scripts from the given directory
         String filter = "*.gs";
-        DirectoryStream<Path> stream =
-                Files.newDirectoryStream(_dataPath, filter);
+        DirectoryStream<Path> stream = Files.newDirectoryStream(_dataPath,
+                filter);
         Iterator<Path> iterator = stream.iterator();
         // Merged game script collection
         int scriptCount = 0;
         List<String> scriptLines = new LinkedList<String>();
         while (iterator.hasNext()) {
             Path currentPath = iterator.next();
-            List<String> currentData = Files.readAllLines(currentPath); 
+            List<String> currentData = Files.readAllLines(currentPath);
             scriptLines.addAll(currentData);
             scriptCount++;
         }
@@ -63,7 +63,7 @@ public class Content {
         }
         return _script;
     }
-    
+
     public static void setScript(Script script) {
         _manualScript = true;
         _dataPath = null;
@@ -81,7 +81,7 @@ public class Content {
         _scriptParsed = false;
         _script = null;
     }
-    
+
     public static void saveState(String name) throws IOException {
         String filename = name + ".sav";
         File output = new File(filename);
@@ -89,18 +89,27 @@ public class Content {
         // current scene, points, inventory, switches
         writer.printf("scene %s%n", Interpreter.getScene().getName());
         writer.printf("points %s%n", Interpreter.getPoints());
-        writer.print("switches ");
-        for (int i = 0; i < Interpreter.getSwitches().length; i++) {
-            writer.print(Interpreter.getSwitches()[i]);
-            if (i < Interpreter.getSwitches().length - 1) {
-                writer.print(",");
-            } else {
-                writer.println();
+        if (Interpreter.getSwitches().size() > 0) {
+            writer.print("switches ");
+            Iterator<String> switchIterator = Interpreter.getSwitches().keySet()
+                    .iterator();
+            while (switchIterator.hasNext()) {
+                String key = switchIterator.next();
+                boolean value = Interpreter.getSwitches().get(key);
+                writer.print(key);
+                writer.print(";");
+                writer.print(value);
+                if (switchIterator.hasNext()) {
+                    writer.print(",");
+                } else {
+                    writer.println();
+                }
             }
         }
         if (Interpreter.getInventory().size() > 0) {
             writer.print("inventory ");
-            Iterator<InventoryItem> inventoryIterator = Interpreter.getInventory().values().iterator();
+            Iterator<InventoryItem> inventoryIterator = Interpreter
+                    .getInventory().values().iterator();
             while (inventoryIterator.hasNext()) {
                 InventoryItem currentItem = inventoryIterator.next();
                 writer.print(currentItem.getOwnerScene().getName());
@@ -116,25 +125,27 @@ public class Content {
         writer.flush();
         writer.close();
     }
-    
-    public static void loadState(String name) throws IOException, GameException {
+
+    public static void loadState(String name)
+            throws IOException, GameException {
         String filename = name + ".sav";
         Path savePath = Path.of(filename);
         List<String> data = Files.readAllLines(savePath);
-        
+
         boolean sceneFound = false;
         boolean pointsFound = false;
         boolean switchesFound = false;
         boolean inventoryFound = false;
-        
+
         for (int i = 0; i < data.size(); i++) {
             String line = data.get(i);
             String[] lineParts = line.split(" ");
-            
+
             switch (lineParts[0]) {
             case "scene":
                 if (sceneFound) {
-                    throw new GameException("Invalid save file: multiple declarations of `scene`");
+                    throw new GameException(
+                            "Invalid save file: multiple declarations of `scene`");
                 }
                 // Try to get the named scene if it exists
                 Scene currentScene = getScript().getScenes().get(lineParts[1]);
@@ -145,40 +156,49 @@ public class Content {
                 break;
             case "points":
                 if (pointsFound) {
-                    throw new GameException("Invalid save file: multiple declarations of `points`");
+                    throw new GameException(
+                            "Invalid save file: multiple declarations of `points`");
                 }
                 Interpreter.setPoints(Integer.valueOf(lineParts[1]));
                 pointsFound = true;
                 break;
             case "switches":
                 if (switchesFound) {
-                    throw new GameException("Invalid save file: multiple declarations of `switches`");
+                    throw new GameException(
+                            "Invalid save file: multiple declarations of `switches`");
                 }
-                String[] boolParts = lineParts[1].split(",");
-                for (int j = 0; j < Interpreter.getSwitches().length; j++) {
-                    Interpreter.getSwitches()[j] = Boolean.valueOf(boolParts[j]);
+                String[] switches = lineParts[1].split(",");
+                for (int j = 0; j < switches.length; j++) {
+                    String[] switchParts = switches[j].split(";");
+                    String key = switchParts[0];
+                    boolean value = Boolean.valueOf(switchParts[1]);
+                    Interpreter.getSwitches().put(key, value);
                 }
                 switchesFound = true;
                 break;
             case "inventory":
                 if (inventoryFound) {
-                    throw new GameException("Invalid save file: multiple declarations of `inventory`");
+                    throw new GameException(
+                            "Invalid save file: multiple declarations of `inventory`");
                 }
                 String[] items = lineParts[1].split(",");
                 for (int j = 0; j < items.length; j++) {
                     String[] itemParts = items[j].split(";");
                     // get scene name (first part)
-                    Scene targetScene = getScript().getScenes().get(itemParts[0]);
+                    Scene targetScene = getScript().getScenes()
+                            .get(itemParts[0]);
                     // get item name (second part)
                     String itemName = itemParts[1];
                     // If scene exists, try to get the inventory item
                     if (targetScene != null) {
-                        InventoryItem item = targetScene.getItems().get(itemName);
+                        InventoryItem item = targetScene.getItems()
+                                .get(itemName);
                         if (item != null) {
                             Interpreter.getInventory().put(itemName, item);
                         }
                     }
-                    // Silently ignore if either the inventory item or scene does not exist 
+                    // Silently ignore if either the inventory item or scene
+                    // does not exist
                 }
                 inventoryFound = true;
                 break;
@@ -186,7 +206,7 @@ public class Content {
                 break;
             }
         }
-        
+
         if (!sceneFound) {
             throw new GameException("Invalid save file: missing target scene");
         }

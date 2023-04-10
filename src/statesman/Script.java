@@ -8,21 +8,21 @@ import statesman.commands.CommandGroup;
 public class Script {
 
     public static final int DEFAULT_SWITCH_SIZE = 2000;
-    
+
     private int _maxPoints;
     private int _switchSize;
     private HashMap<String, String> _messages;
     private HashMap<String, Scene> _scenes;
     private HashMap<String, Command> _actions;
     private HashMap<String, CommandGroup> _commandGroups;
-    
+
     public Script() {
         _maxPoints = 0;
         _switchSize = DEFAULT_SWITCH_SIZE;
         _messages = new HashMap<String, String>();
         _scenes = new HashMap<String, Scene>();
         _actions = new HashMap<String, Command>();
-        _commandGroups = new HashMap<String, CommandGroup>(); 
+        _commandGroups = new HashMap<String, CommandGroup>();
     }
 
     public int getMaxPoints() {
@@ -31,7 +31,8 @@ public class Script {
 
     public void setMaxPoints(int maxPoints) {
         if (maxPoints < 0) {
-            throw new IllegalArgumentException("The maximum number of points must be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                    "The maximum number of points must be greater than or equal to zero");
         }
         _maxPoints = maxPoints;
     }
@@ -42,7 +43,8 @@ public class Script {
 
     public void setSwitchSize(int switchSize) {
         if (switchSize < 0) {
-            throw new IllegalArgumentException("The number of allocated switches must be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                    "The number of allocated switches must be greater than or equal to zero");
         }
         _switchSize = switchSize;
     }
@@ -78,7 +80,7 @@ public class Script {
     public void setCommandGroups(HashMap<String, CommandGroup> commandGroups) {
         _commandGroups = commandGroups;
     }
-    
+
     public String getMessage(String key) {
         String template = "[Missing message: `%s`]";
         String defaultValue = String.format(template, key);

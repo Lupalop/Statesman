@@ -5,72 +5,86 @@ import statesman.Interpreter;
 
 public class PointsCommand extends Command {
 
-    public static final String ID = "points";
+    public enum PointsActionType {
+        ADD, SUBTRACT, SET, CLEAR, LIST
+    }
 
-    private PointsAction _action;
+    public static final String ID_POINTS = "points";
+    public static final String ID_POINTS_ADD = "add";
+    public static final String ID_POINTS_SUB = "sub";
+    public static final String ID_POINTS_SET = "set";
+    public static final String ID_POINTS_CLEAR = "clear";
+    public static final String ID_POINTS_LIST = "list";
+
+    private PointsActionType _action;
     private int _value;
 
-    public enum PointsAction { ADD, SUBTRACT, SET, CLEAR, LIST };
-    
-    public PointsCommand() {
+    private PointsCommand() {
         _action = null;
         _value = 0;
     }
-    
-    public PointsCommand(PointsAction action, int value) {
+
+    public PointsCommand(PointsActionType action, int value) {
         if (value < 0) {
-            throw new IllegalArgumentException("Target points value cannot be less than zero");
+            throw new IllegalArgumentException(
+                    "Target points value cannot be less than zero");
         }
         if (action == null) {
-            throw new IllegalArgumentException("Invalid value was passed to the action parameter");
+            throw new IllegalArgumentException(
+                    "Invalid value was passed to the action parameter");
         }
         _action = action;
         _value = value;
     }
-    
-    public PointsCommand(PointsAction action) {
+
+    public PointsCommand(PointsActionType action) {
         this(action, 0);
     }
 
-    @Override
-    public Command createInstance(String[] arguments) {
-        String actionString = null;
-        if (arguments.length == 2) {
-            actionString = arguments[1].trim().toLowerCase();
-            PointsAction action = null;
-            switch (actionString) {
-            case "list":
-                action = PointsAction.LIST;
-                break;
-            case "clear":
-                action = PointsAction.CLEAR;
-                break;
-            default:
-                action = null;
-                break;
-            }
-            return new PointsCommand(action, 0);
-        } else if (arguments.length == 3) {
-            actionString = arguments[1].trim().toLowerCase();
-            PointsAction action = null;
-            switch (actionString) {
-            case "add":
-                action = PointsAction.ADD;
-                break;
-            case "sub":
-                action = PointsAction.SUBTRACT;
-                break;
-            case "set":
-                action = PointsAction.SET;
-                break;
-            default:
-                action = null;
-                break;
-            }
-            int value = Integer.parseInt(arguments[2]);
-            return new PointsCommand(action, value);
+    private static Command _defaultInstance;
+
+    public static Command getDefault() {
+        if (_defaultInstance == null) {
+            _defaultInstance = new PointsCommand();
         }
-        return null;
+        return _defaultInstance;
+    }
+
+    @Override
+    public Command fromText(String commandId, String[] arguments) {
+        if (arguments.length < 2) {
+            return null;
+        }
+
+        String action = arguments[1].trim();
+        PointsActionType actionType = null;
+        int actionValue = 0;
+        if (arguments.length == 2) {
+            if (action.equalsIgnoreCase(ID_POINTS_LIST)) {
+                actionType = PointsActionType.LIST;
+            } else if (action.equalsIgnoreCase(ID_POINTS_CLEAR)) {
+                actionType = PointsActionType.CLEAR;
+            }
+        } else if (arguments.length == 3) {
+            if (action.equalsIgnoreCase(ID_POINTS_ADD)) {
+                actionType = PointsActionType.ADD;
+            } else if (action.equalsIgnoreCase(ID_POINTS_SUB)) {
+                actionType = PointsActionType.SUBTRACT;
+            } else if (action.equalsIgnoreCase(ID_POINTS_SET)) {
+                actionType = PointsActionType.SET;
+            }
+            try {
+                actionValue = Integer.parseInt(arguments[2]);
+            } catch (NumberFormatException ex) {
+                // Second argument was not a number.
+                return null;
+            }
+        }
+
+        if (actionType == null) {
+            return null;
+        }
+        return new PointsCommand(actionType, actionValue);
     }
 
     @Override
@@ -89,8 +103,7 @@ public class PointsCommand extends Command {
             Interpreter.setPoints(0);
             break;
         case LIST:
-            System.out.printf(
-                    Content.getScript().getMessage("p_1"),
+            System.out.printf(Content.getScript().getMessage("p_1"),
                     Interpreter.getPoints(),
                     Content.getScript().getMaxPoints());
             break;

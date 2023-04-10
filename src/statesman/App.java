@@ -9,16 +9,17 @@ public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Interpreter.setScanner(scanner);
-        
+
         String location = "./scripts";
         if (args.length == 1) {
             location = args[0];
         }
-        
+
         initialize(location);
     }
-    
-    public static void initialize(String scriptLocation, String overrideInitialScene) {
+
+    public static void initialize(String scriptLocation,
+            String overrideInitialScene) {
         if (Interpreter.isRunning()) {
             Interpreter.stop();
         }
@@ -30,10 +31,11 @@ public class App {
                 Interpreter.run(overrideInitialScene);
             }
         } else {
-            System.out.println("An error occurred while loading the game scripts.");
+            System.out.println(
+                    "An error occurred while loading the game scripts.");
         }
     }
-    
+
     public static void initialize(String scriptLocation) {
         initialize(scriptLocation, null);
     }

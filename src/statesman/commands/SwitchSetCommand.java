@@ -4,28 +4,34 @@ import statesman.Interpreter;
 
 public class SwitchSetCommand extends Command {
 
-    public static final String ID = "set";
+    public static final String ID_SET = "set";
 
-    private int _switchId;
+    private String _switchId;
     private boolean _value;
 
-    public SwitchSetCommand() {
-        _switchId = 0;
+    private static Command _defaultInstance;
+
+    public static Command getDefault() {
+        if (_defaultInstance == null) {
+            _defaultInstance = new SwitchSetCommand();
+        }
+        return _defaultInstance;
+    }
+
+    private SwitchSetCommand() {
+        _switchId = "";
         _value = false;
     }
 
-    public SwitchSetCommand(int switchId, boolean value) {
-        if (switchId < 0) {
-            throw new IllegalArgumentException();
-        }
+    public SwitchSetCommand(String switchId, boolean value) {
         _switchId = switchId;
         _value = value;
     }
 
     @Override
-    public Command createInstance(String[] arguments) {
+    public Command fromText(String commandId, String[] arguments) {
         if (arguments.length == 3) {
-            int switchId = Integer.parseInt(arguments[1]);
+            String switchId = arguments[1];
             boolean value = Boolean.parseBoolean(arguments[2]);
             return new SwitchSetCommand(switchId, value);
         }
@@ -34,7 +40,7 @@ public class SwitchSetCommand extends Command {
 
     @Override
     public void execute() {
-        Interpreter.getSwitches()[_switchId] = _value;
+        Interpreter.getSwitches().put(_switchId, _value);
     }
 
 }

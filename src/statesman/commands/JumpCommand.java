@@ -1,27 +1,77 @@
 package statesman.commands;
 
+import statesman.Interpreter;
+
 public class JumpCommand extends Command {
 
-    public static final String ID = "jmp";
+    public static final String ID_JMP = "jmp";
+    public static final String ID_IJMP = "ijmp";
+    public static final String ID_SJMP = "sjmp";
+    public static final String ID_RET = "ret";
+
+    private static final int LINE_INVALID = -1;
+
+    private String _targetName;
+    private boolean _isUnconditional;
 
     protected int _lineIfTrue;
     protected int _lineIfFalse;
 
-    public JumpCommand() {
+    private JumpCommand() {
         _lineIfTrue = 0;
         _lineIfFalse = 0;
+        _targetName = "";
     }
 
-    public JumpCommand(int line) {
-        super();
-        _lineIfTrue = line;
+    public JumpCommand(int lineIfTrue, int lineIfFalse, String targetName) {
+        if (targetName == null) {
+            _isUnconditional = true;
+        }
+        _lineIfTrue = lineIfTrue;
+        _lineIfFalse = lineIfFalse;
+        _targetName = targetName;
+    }
+
+    private static Command _defaultInstance;
+
+    public static Command getDefault() {
+        if (_defaultInstance == null) {
+            _defaultInstance = new JumpCommand();
+        }
+        return _defaultInstance;
     }
 
     @Override
-    public Command createInstance(String[] arguments) {
-        if (arguments.length == 2) {
-            int line = Integer.parseInt(arguments[1]);
-            return new JumpCommand(line);
+    public Command fromText(String commandId, String[] arguments) {
+        switch (arguments.length) {
+        case 1:
+            if (!commandId.equalsIgnoreCase(ID_RET)) {
+                break;
+            }
+            return new JumpCommand(Integer.MAX_VALUE, LINE_INVALID, null);
+        case 2:
+            if (!commandId.equalsIgnoreCase(ID_JMP)) {
+                break;
+            }
+            int line = getLineNumberFromString(arguments[1]);
+            if (line == LINE_INVALID) {
+                break;
+            }
+            return new JumpCommand(line, LINE_INVALID, null);
+        case 4:
+            if (!commandId.equalsIgnoreCase(ID_IJMP)
+                    && !commandId.equalsIgnoreCase(ID_SJMP)) {
+                break;
+            }
+            String targetName = arguments[1].trim();
+            int lineIfTrue = getLineNumberFromString(arguments[2]);
+            int lineIfFalse = getLineNumberFromString(arguments[3]);
+            if (lineIfTrue == LINE_INVALID || lineIfFalse == LINE_INVALID) {
+                break;
+            }
+            return new JumpCommand(lineIfTrue, lineIfFalse, targetName);
+        default:
+            break;
         }
         return null;
     }
@@ -31,17 +81,34 @@ public class JumpCommand extends Command {
     }
 
     protected int getLineNumberFromString(String lineNumber) {
-        int index = 0;
         if (lineNumber.equalsIgnoreCase("ret")) {
-            index = Integer.MAX_VALUE;
-        } else {
-            index = Integer.parseInt(lineNumber);
+            return Integer.MAX_VALUE;
         }
-        return index;
+
+        try {
+            return Integer.parseInt(lineNumber);
+        } catch (NumberFormatException ex) {
+            return LINE_INVALID;
+        }
     }
-    
+
     public int getJumpIndex() {
+        if (_isUnconditional || getConditionValue(_targetName)) {
+            return _lineIfTrue;
+        }
         return _lineIfTrue;
+    }
+
+    public static boolean getConditionValue(String targetName) {
+        if (targetName.startsWith("i:")) {
+            targetName = targetName.substring(2);
+            return Interpreter.getInventory().containsKey(targetName)
+                    ? Interpreter.getInventory().get(targetName) != null
+                    : false;
+        }
+        return Interpreter.getSwitches().containsKey(targetName)
+                ? Interpreter.getSwitches().get(targetName)
+                : false;
     }
 
 }

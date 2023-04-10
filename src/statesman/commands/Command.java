@@ -4,44 +4,43 @@ import java.util.HashMap;
 
 public abstract class Command {
 
-	private static HashMap<String, Command> _commands;
-
-    static {
-        _commands = new HashMap<String, Command>();
-        // XXX: manually input IDs of new commands here!
-        _commands.put(PrintCommand.ID, new PrintCommand());
-        _commands.put(PrintRandomCommand.ID, new PrintRandomCommand());
-        _commands.put(PrintCombineCommand.ID, new PrintCombineCommand());
-        _commands.put(SceneCommand.ID, new SceneCommand());
-        _commands.put(GotoCommand.ID, new GotoCommand());
-        _commands.put(JumpCommand.ID, new JumpCommand());
-        _commands.put(ReturnCommand.ID, new ReturnCommand());
-        _commands.put(SwitchSetCommand.ID, new SwitchSetCommand());
-        _commands.put(SwitchJumpCommand.ID, new SwitchJumpCommand());
-        _commands.put(SwitchConditionalCommand.ID, new SwitchConditionalCommand());
-        _commands.put(InventoryCommand.ID, new InventoryCommand());
-        _commands.put(InventoryJumpCommand.ID, new InventoryJumpCommand());
-        _commands.put(InventoryConditionalCommand.ID, new InventoryConditionalCommand());
-        _commands.put(PointsCommand.ID, new PointsCommand());
-        _commands.put(QuitCommand.ID, new QuitCommand());
-        _commands.put(SaveCommand.ID, new SaveCommand());
-        _commands.put(LoadCommand.ID, new LoadCommand());
-    }
+    private static HashMap<String, Command> _commands;
 
     public static HashMap<String, Command> getCommands() {
+        if (_commands == null) {
+            _commands = new HashMap<String, Command>();
+            _commands.put(PrintCommand.ID_PRINT, PrintCommand.getDefault());
+            _commands.put(PrintCommand.ID_PRINTC, PrintCommand.getDefault());
+            _commands.put(PrintCommand.ID_PRINTR, PrintCommand.getDefault());
+            _commands.put(SceneCommand.ID_SCENE, SceneCommand.getDefault());
+            _commands.put(CallCommand.ID_CALL, CallCommand.getDefault());
+            _commands.put(CallCommand.ID_GOTO, CallCommand.getDefault());
+            _commands.put(JumpCommand.ID_JMP, JumpCommand.getDefault());
+            _commands.put(JumpCommand.ID_IJMP, JumpCommand.getDefault());
+            _commands.put(JumpCommand.ID_SJMP, JumpCommand.getDefault());
+            _commands.put(JumpCommand.ID_RET, JumpCommand.getDefault());
+            _commands.put(SwitchSetCommand.ID_SET,
+                    SwitchSetCommand.getDefault());
+            _commands.put(InventoryCommand.ID_INV,
+                    InventoryCommand.getDefault());
+            _commands.put(PointsCommand.ID_POINTS, PointsCommand.getDefault());
+            _commands.put(MenuCommand.ID_SAVE, MenuCommand.getDefault());
+            _commands.put(MenuCommand.ID_LOAD, MenuCommand.getDefault());
+            _commands.put(MenuCommand.ID_QUIT, MenuCommand.getDefault());
+        }
         return _commands;
     }
 
-    public static Command findCommand(String[] arguments) {
+    public static Command find(String[] arguments) {
         String commandId = arguments[0].toLowerCase();
-        Command command = getCommands().getOrDefault(commandId, null);
-        if (command != null) {
-            return command.createInstance(arguments);
+        Command command = getCommands().get(commandId);
+        if (command == null) {
+            return null;
         }
-        return null;
+        return command.fromText(commandId, arguments);
     }
 
-    public abstract Command createInstance(String[] arguments);
+    public abstract Command fromText(String id, String[] arguments);
 
     public abstract void execute();
 

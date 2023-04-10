@@ -5,14 +5,23 @@ import statesman.Interpreter;
 
 public class SceneCommand extends Command {
 
-    public static final String ID = "scene";
+    public static final String ID_SCENE = "scene";
 
     private String _targetScene;
     private boolean _hasKey;
 
-    public SceneCommand() {
+    private SceneCommand() {
         _targetScene = "";
         _hasKey = false;
+    }
+
+    private static Command _defaultInstance;
+
+    public static Command getDefault() {
+        if (_defaultInstance == null) {
+            _defaultInstance = new SceneCommand();
+        }
+        return _defaultInstance;
     }
 
     public SceneCommand(String targetScene) {
@@ -24,7 +33,7 @@ public class SceneCommand extends Command {
     }
 
     @Override
-    public Command createInstance(String[] arguments) {
+    public Command fromText(String commandId, String[] arguments) {
         if (arguments.length == 2) {
             return new SceneCommand(arguments[1]);
         }
@@ -33,8 +42,10 @@ public class SceneCommand extends Command {
 
     @Override
     public void execute() {
-        if (_hasKey || Content.getScript().getScenes().containsKey(_targetScene)) {
-            Interpreter.setScene(Content.getScript().getScenes().get(_targetScene));
+        if (_hasKey
+                || Content.getScript().getScenes().containsKey(_targetScene)) {
+            Interpreter.setScene(
+                    Content.getScript().getScenes().get(_targetScene));
             _hasKey = true;
         }
     }

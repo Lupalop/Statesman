@@ -20,8 +20,8 @@ public class GameException extends Exception {
         super(message, cause);
     }
 
-    public GameException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+    public GameException(String message, Throwable cause,
+            boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

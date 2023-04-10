@@ -7,15 +7,13 @@ import statesman.commands.*;
 public class Scene {
 
     public static final String CG_ENTRY = "$";
-    
+
     private String _name;
     private HashMap<String, Command> _actions;
     private HashMap<String, CommandGroup> _commandGroups;
     private HashMap<String, InventoryItem> _items;
 
-    public Scene(
-            String name,
-            HashMap<String, Command> actions,
+    public Scene(String name, HashMap<String, Command> actions,
             HashMap<String, CommandGroup> commandGroups,
             HashMap<String, InventoryItem> items) {
         if (name == null || name.isBlank()) {
@@ -28,11 +26,9 @@ public class Scene {
     }
 
     public Scene(String name) {
-        this(
-          name,
-          new HashMap<String, Command>(),
-          new HashMap<String, CommandGroup>(),
-          new HashMap<String, InventoryItem>());
+        this(name, new HashMap<String, Command>(),
+                new HashMap<String, CommandGroup>(),
+                new HashMap<String, InventoryItem>());
     }
 
     public String getName() {
