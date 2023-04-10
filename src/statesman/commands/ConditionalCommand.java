@@ -3,6 +3,8 @@ package statesman.commands;
 public class ConditionalCommand extends Command {
 
     public static final String ID_CONDITIONAL = "cond";
+    public static final String DELIMITER_OR = ";";
+    public static final String DELIMITER_AND = ",";
 
     private String[] _targetNames;
     protected CommandGroup _group;
@@ -101,8 +103,8 @@ public class ConditionalCommand extends Command {
     }
 
     protected boolean useOrOperator(String condition) {
-        boolean orMode = condition.contains(";");
-        boolean andMode = condition.contains(",");
+        boolean orMode = condition.contains(DELIMITER_OR);
+        boolean andMode = condition.contains(DELIMITER_AND);
 
         if (orMode && andMode) {
             throw new UnsupportedOperationException(
@@ -113,10 +115,10 @@ public class ConditionalCommand extends Command {
     }
 
     protected String[] getConditionParts(String condition, boolean orMode) {
-        String delimiter = ",";
+        String delimiter = DELIMITER_AND;
 
         if (orMode) {
-            delimiter = ";";
+            delimiter = DELIMITER_OR;
         }
 
         return condition.split(delimiter);
