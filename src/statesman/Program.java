@@ -2,7 +2,7 @@ package statesman;
 
 import java.util.*;
 
-public class App {
+public class Program {
 
     public static final boolean debugMode = true;
 

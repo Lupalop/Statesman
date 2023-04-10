@@ -32,7 +32,7 @@ public class Interpreter {
             return localFallbackAction;
         } else if (fallbackAction != null) {
             return fallbackAction;
-        } else if (App.debugMode) {
+        } else if (Program.debugMode) {
             System.out.println("Fallback message is missing");
         }
 
@@ -80,7 +80,7 @@ public class Interpreter {
 
             // Debug mode keywords
             try {
-                if (App.debugMode) {
+                if (Program.debugMode) {
                     String[] keywordParts = keyword.split(" ");
                     if (keyword.startsWith("*tp")) {
                         currentAction = SceneCommand.getDefault().fromText(null,
@@ -93,11 +93,11 @@ public class Interpreter {
                     if (keyword.equalsIgnoreCase("*reload")) {
                         String location = Content.getDataPath().toString();
                         String oldScene = getScene().getName();
-                        App.initialize(location, oldScene);
+                        Program.initialize(location, oldScene);
                     }
                     if (keyword.equalsIgnoreCase("*restart")) {
                         String location = Content.getDataPath().toString();
-                        App.initialize(location);
+                        Program.initialize(location);
                     }
                 }
             } catch (Exception e) {

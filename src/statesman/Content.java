@@ -49,7 +49,7 @@ public class Content {
         try {
             loadData();
         } catch (Exception e) {
-            if (App.debugMode) {
+            if (Program.debugMode) {
                 e.printStackTrace();
             }
             return false;
