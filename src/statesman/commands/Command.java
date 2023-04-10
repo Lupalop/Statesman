@@ -2,6 +2,8 @@ package statesman.commands;
 
 import java.util.HashMap;
 
+import statesman.GameException;
+
 public abstract class Command {
 
     private static HashMap<String, Command> _commands;
@@ -31,7 +33,7 @@ public abstract class Command {
         return _commands;
     }
 
-    public static Command find(String[] arguments) {
+    public static Command find(String[] arguments) throws GameException {
         String commandId = arguments[0].toLowerCase();
         Command command = getCommands().get(commandId);
         if (command == null) {
@@ -40,7 +42,7 @@ public abstract class Command {
         return command.fromText(commandId, arguments);
     }
 
-    public abstract Command fromText(String id, String[] arguments);
+    public abstract Command fromText(String id, String[] arguments) throws GameException;
 
     public abstract void execute();
 
