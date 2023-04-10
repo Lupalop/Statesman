@@ -2,99 +2,107 @@
 {
     public class PointsCommand : Command
     {
+        public enum PointsActionType
+        {
+            Add,
+            Subtract,
+            Set,
+            Clear,
+            List
+        }
+
         public const string CommandPoints = "points";
 
-        private readonly PointsAction _action;
+        public const string kPointsAdd = "add";
+        public const string kPointsSubtract = "sub";
+        public const string kPointsSet = "set";
+        public const string kPointsClear = "clear";
+        public const string kPointsList = "list";
+
+        private readonly PointsActionType _actionType;
         private readonly int _value;
 
-        public enum PointsAction { Add, Subtract, Set, Clear, List, None };
-
-        public PointsCommand(PointsAction action, int value)
+        public PointsCommand(PointsActionType action, int value)
         {
             if (value < 0)
             {
                 throw new ArgumentException("Target points value cannot be less than zero");
             }
-            if (action == PointsAction.None)
-            {
-                throw new ArgumentException("Invalid value was passed to the action parameter");
-            }
-            _action = action;
+            _actionType = action;
             _value = value;
         }
 
-        public PointsCommand(PointsAction action)
+        public PointsCommand(PointsActionType action)
                 : this(action, 0)
         {
         }
 
         public new static Command FromText(string commandName, string[] arguments)
         {
-            if (commandName != CommandPoints)
+            if (commandName != CommandPoints || arguments.Length < 2)
             {
                 return null;
             }
-            string actionString;
+
+            string actionString = arguments[1].Trim().ToLowerInvariant();
+            PointsActionType? actionType = null;
+            int actionValue = 0;
             if (arguments.Length == 2)
             {
-                actionString = arguments[1].Trim().ToLowerInvariant();
-                PointsAction action;
-                switch (actionString)
+                if (actionString.Equals(kPointsList))
                 {
-                    case "list":
-                        action = PointsAction.List;
-                        break;
-                    case "clear":
-                        action = PointsAction.Clear;
-                        break;
-                    default:
-                        action = PointsAction.None;
-                        break;
+                    actionType = PointsActionType.List;
                 }
-                return new PointsCommand(action, 0);
+                else if (actionString.Equals(kPointsClear))
+                {
+                    actionType = PointsActionType.Clear;
+                }
             }
             else if (arguments.Length == 3)
             {
-                actionString = arguments[1].Trim().ToLowerInvariant();
-                PointsAction action;
-                switch (actionString)
+                if (actionString.Equals(kPointsAdd))
                 {
-                    case "add":
-                        action = PointsAction.Add;
-                        break;
-                    case "sub":
-                        action = PointsAction.Subtract;
-                        break;
-                    case "set":
-                        action = PointsAction.Set;
-                        break;
-                    default:
-                        action = PointsAction.None;
-                        break;
+                    actionType = PointsActionType.Add;
                 }
-                int value = int.Parse(arguments[2]);
-                return new PointsCommand(action, value);
+                else if (actionString.Equals(kPointsSubtract))
+                {
+                    actionType = PointsActionType.Subtract;
+                }
+                else if (actionString.Equals(kPointsSet))
+                {
+                    actionType = PointsActionType.Set;
+                }
+                
+                if (!int.TryParse(arguments[2], out actionValue))
+                {
+                    return null;
+                }
             }
-            return null;
+
+            if (!actionType.HasValue)
+            {
+                return null;
+            }
+            return new PointsCommand(actionType.Value, actionValue);
         }
 
         public override void Execute()
         {
-            switch (_action)
+            switch (_actionType)
             {
-                case PointsAction.Add:
+                case PointsActionType.Add:
                     Interpreter.Points += _value;
                     break;
-                case PointsAction.Subtract:
+                case PointsActionType.Subtract:
                     Interpreter.Points -= _value;
                     break;
-                case PointsAction.Set:
+                case PointsActionType.Set:
                     Interpreter.Points = _value;
                     break;
-                case PointsAction.Clear:
+                case PointsActionType.Clear:
                     Interpreter.Points = 0;
                     break;
-                case PointsAction.List:
+                case PointsActionType.List:
                     Console.Write(
                             Content.Script.FindMessage("p_1"),
                             Interpreter.Points,

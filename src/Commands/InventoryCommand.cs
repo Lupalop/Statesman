@@ -2,7 +2,19 @@
 {
     public class InventoryCommand : Command
     {
+        public enum InventoryActionType {
+            Add,
+            Remove,
+            Clear,
+            List
+        }
+
         public const string CommandInventory = "inv";
+
+        public const string kInventoryAdd = "add";
+        public const string kInventoryRemove = "rm";
+        public const string kInventoryClear = "clear";
+        public const string kInventoryList = "list";
 
         public string ItemName { get; }
         private InventoryItem Item
@@ -16,111 +28,89 @@
                 return Interpreter.Scene.Items[ItemName];
             }
         }
-        public InventoryAction Action { get; set; }
+        public InventoryActionType ActionType { get; set; }
 
-        public enum InventoryAction { Add, Remove, Clear, List, None };
-
-        private InventoryCommand(InventoryAction action, string itemName, bool nameRequired)
+        private InventoryCommand(InventoryActionType action, string itemName)
         {
+            bool nameRequired = action == InventoryActionType.Add
+                    || action == InventoryActionType.Remove;
             if (nameRequired && string.IsNullOrWhiteSpace(itemName))
             {
                 throw new ArgumentException("Inventory item name cannot be blank");
             }
-            if (action == InventoryAction.None)
-            {
-                throw new ArgumentException("Invalid value was passed to the action parameter");
-            }
             ItemName = itemName;
-            Action = action;
-        }
-
-        public InventoryCommand(InventoryAction action, string itemName)
-            : this(action, itemName, true)
-        {
-        }
-
-        public InventoryCommand(InventoryAction action)
-            : this(action, null, false)
-        {
+            ActionType = action;
         }
 
         public new static Command FromText(string commandName, string[] arguments)
         {
-            if (commandName != CommandInventory)
+            if (commandName != CommandInventory || arguments.Length < 2)
             {
                 return null;
             }
-            string actionString;
-            InventoryAction action;
+
+            string actionString = arguments[1].Trim().ToLowerInvariant();
+            InventoryActionType? actionType = null;
+            string actionValue = "";
             if (arguments.Length == 2)
             {
-                actionString = arguments[1].Trim().ToLowerInvariant();
-                switch (actionString)
+                if (actionString.Equals(kInventoryList))
                 {
-                    case "list":
-                        action = InventoryAction.List;
-                        break;
-                    case "clear":
-                        action = InventoryAction.Clear;
-                        break;
-                    default:
-                        action = InventoryAction.None;
-                        break;
+                    actionType = InventoryActionType.List;
                 }
-                return new InventoryCommand(action);
+                else if (actionString.Equals(kInventoryClear))
+                {
+                    actionType = InventoryActionType.Clear;
+                }
             }
             else if (arguments.Length == 3)
             {
-                actionString = arguments[1].Trim().ToLowerInvariant();
-                switch (actionString)
+                if (actionString.Equals(kInventoryAdd))
                 {
-                    case "add":
-                        action = InventoryAction.Add;
-                        break;
-                    case "rm":
-                        action = InventoryAction.Remove;
-                        break;
-                    default:
-                        action = InventoryAction.None;
-                        break;
+                    actionType = InventoryActionType.Add;
                 }
-                string itemName = arguments[2].Trim();
-                return new InventoryCommand(action, itemName);
+                else if (actionString.Equals(kInventoryRemove))
+                {
+                    actionType = InventoryActionType.Remove;
+                }
+                actionValue = arguments[2].Trim();
+            }
+
+            if (actionType.HasValue)
+            {
+                return new InventoryCommand(actionType.Value, actionValue);
             }
             return null;
         }
 
         public override void Execute()
         {
-            InventoryItem item = Item;
-            if (item != null)
+            switch (ActionType)
             {
-                switch (Action)
-                {
-                    case InventoryAction.Add:
-                        if (Interpreter.Inventory.ContainsKey(item.Name))
-                        {
-                            Console.WriteLine(Content.Script.FindMessage("i_1"));
-                            break;
-                        }
-                        Interpreter.Inventory.Add(item.Name, item);
+                case InventoryActionType.Add:
+                    if (Item == null)
+                    {
+                        return;
+                    }
+                    if (Interpreter.Inventory.ContainsKey(Item.Name))
+                    {
+                        Console.WriteLine(Content.Script.FindMessage("i_1"));
                         break;
-                    case InventoryAction.Remove:
-                        if (Interpreter.Inventory.Remove(ItemName))
-                        {
-                            break;
-                        }
-                        Console.WriteLine(Content.Script.FindMessage("i_2"));
+                    }
+                    Interpreter.Inventory.Add(Item.Name, Item);
+                    break;
+                case InventoryActionType.Remove:
+                    if (Item == null)
+                    {
+                        return;
+                    }
+                    if (Interpreter.Inventory.Remove(ItemName))
+                    {
                         break;
-                    default:
-                        break;
-                }
-                return;
-            }
-
-            switch (Action)
-            {
-                case InventoryAction.List:
+                    }
+                    Console.WriteLine(Content.Script.FindMessage("i_2"));
+                    break;
+                case InventoryActionType.List:
                     var realInventory = Interpreter.Inventory.Values.Where((item) => !item.IsSwitch);
                     int inventorySize = realInventory.Count();
                     if (inventorySize > 0)
@@ -147,7 +137,7 @@
                         Console.WriteLine(Content.Script.FindMessage("i_6"));
                     }
                     break;
-                case InventoryAction.Clear:
+                case InventoryActionType.Clear:
                     Interpreter.Inventory.Clear();
                     break;
                 default:

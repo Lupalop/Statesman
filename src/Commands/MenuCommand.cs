@@ -1,39 +1,57 @@
-﻿namespace Statesman.Commands
+﻿using System.ComponentModel.Design;
+
+namespace Statesman.Commands
 {
     public class MenuCommand : Command
     {
+        public enum MenuActionType
+        {
+            None,
+            Save,
+            Load,
+            Quit
+        }
+
         public const string CommandSave = "save";
         public const string CommandLoad = "load";
         public const string CommandQuit = "quit";
 
-        private readonly string _actionName;
+        private readonly MenuActionType _actionType;
 
-        public MenuCommand(string actionName)
+        public MenuCommand(MenuActionType action)
         {
-            if (string.IsNullOrWhiteSpace(actionName))
-            {
-                throw new ArgumentNullException(nameof(actionName));
-            }
-
-            _actionName = actionName;
+            _actionType = action;
         }
 
-        public new static Command FromText(string actionName, string[] arguments)
+        public new static Command FromText(string commandName, string[] arguments)
         {
-            if (actionName != CommandSave && actionName != CommandLoad && actionName != CommandQuit)
-            {
-                return null;
-            }
             if (arguments.Length == 1)
             {
-                return new MenuCommand(actionName);
+                MenuActionType? actionType = null;
+                if (commandName.Equals(CommandSave, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    actionType = MenuActionType.Save;
+                }
+                else if (commandName.Equals(CommandLoad, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    actionType = MenuActionType.Load;
+                }
+                else if (commandName.Equals(CommandQuit, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    actionType = MenuActionType.Quit;
+                }
+
+                if (actionType.HasValue)
+                {
+                    return new MenuCommand(actionType.Value);
+                }
             }
             return null;
         }
 
         public override void Execute()
         {
-            if (_actionName == CommandQuit)
+            if (_actionType == MenuActionType.Quit)
             {
                 Environment.Exit(0);
                 return;
@@ -52,7 +70,7 @@
                 return;
             }
 
-            if (_actionName == CommandSave)
+            if (_actionType == MenuActionType.Save)
             {
                 bool gameSaved = false;
                 try
@@ -70,7 +88,7 @@
                     Console.WriteLine(Content.Script.FindMessage("sl_7"));
                 }
             }
-            else if (_actionName == CommandLoad)
+            else if (_actionType == MenuActionType.Load)
             {
                 bool gameLoaded = false;
                 try

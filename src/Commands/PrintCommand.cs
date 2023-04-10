@@ -26,7 +26,6 @@ namespace Statesman.Commands
         {
             _initialized = false;
             _messages = null;
-            _printType = PrintType.Single;
             _messages = messages;
             _printType = printType;
             if (printType == PrintType.Random)
