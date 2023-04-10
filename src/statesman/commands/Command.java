@@ -17,6 +17,8 @@ public abstract class Command {
             _commands.put(SceneCommand.ID_SCENE, SceneCommand.getDefault());
             _commands.put(CallCommand.ID_CALL, CallCommand.getDefault());
             _commands.put(CallCommand.ID_GOTO, CallCommand.getDefault());
+            _commands.put(CallCommand.ID_CALL_GLOB, CallCommand.getDefault());
+            _commands.put(CallCommand.ID_SUPER, CallCommand.getDefault());
             _commands.put(JumpCommand.ID_JMP, JumpCommand.getDefault());
             _commands.put(JumpCommand.ID_IJMP, JumpCommand.getDefault());
             _commands.put(JumpCommand.ID_SJMP, JumpCommand.getDefault());

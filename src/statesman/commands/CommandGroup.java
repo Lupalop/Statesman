@@ -2,6 +2,9 @@ package statesman.commands;
 
 import java.util.LinkedList;
 
+import statesman.Content;
+import statesman.commands.CallCommand.CallType;
+
 public class CommandGroup {
 
     private String _name;
@@ -40,6 +43,19 @@ public class CommandGroup {
                     break;
                 }
                 continue;
+            }
+            // Call base command group.
+            if (command instanceof CallCommand) {
+                CallType callType = ((CallCommand) command).getCallType();
+                if (callType == CallType.SUPER) {
+                    CommandGroup group = Content
+                            .getScript()
+                            .getCommandGroups()
+                            .get(_name);
+                    if (group != null) {
+                        group.execute();
+                    }
+                }
             }
             command.execute();
             i++;
