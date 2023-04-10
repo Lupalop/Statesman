@@ -17,7 +17,7 @@ public class ConditionalCommand extends Command {
     private ArrayList<Boolean> _targetValues;
 
     private boolean _orMode;
-    private Boolean _shouldExecute;
+    private Boolean _executeTrueGroup;
 
     private ConditionalCommand() {
         _group = null;
@@ -25,7 +25,7 @@ public class ConditionalCommand extends Command {
         _orMode = false;
         _targetNames = null;
         _targetValues = null;
-        _shouldExecute = null;
+        _executeTrueGroup = null;
     }
 
     public ConditionalCommand(CommandGroup group, CommandGroup elseGroup,
@@ -128,36 +128,45 @@ public class ConditionalCommand extends Command {
 
     @Override
     public void execute() {
+        // Evaluate all conditions.
         for (int i = 0; i < _targetNames.size(); i++) {
             String targetName = _targetNames.get(i);
             boolean targetValue = _targetValues.get(i);
-            boolean keyValue = JumpCommand.getConditionValue(targetName);
-
-            boolean stopLooping = updateState(keyValue == targetValue);
-            if (stopLooping) {
+            boolean currentValue = JumpCommand.getConditionValue(targetName);
+            boolean condition = (currentValue == targetValue);
+            if (updateState(condition)) {
                 break;
             }
         }
-
-        if (_shouldExecute) {
+        // Execute the commands inside the condition's scope depending
+        // on whether the condition is true or false.
+        if (_executeTrueGroup) {
             _group.execute();
         } else {
             _elseGroup.execute();
         }
-        _shouldExecute = null;
+        // Reset the state.
+        _executeTrueGroup = null;
     }
 
-    private boolean updateState(boolean newState) {
-        if (newState) {
+    private boolean updateState(boolean condition) {
+        // The condition is true.
+        if (condition) {
+            // Or mode: requires only one condition to be true.
             if (_orMode) {
-                _shouldExecute = true;
+                _executeTrueGroup = true;
                 return true;
             }
-            if (_shouldExecute == null) {
-                _shouldExecute = true;
+            // And mode: the first condition is true.
+            if (_executeTrueGroup == null) {
+                _executeTrueGroup = true;
             }
         } else {
-            _shouldExecute = false;
+            // The condition is false.
+            _executeTrueGroup = false;
+            // There's no point in checking the other conditions if we're
+            // not in or mode.
+            return !_orMode;
         }
         return false;
     }
