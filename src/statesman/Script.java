@@ -53,32 +53,16 @@ public class Script {
         return _messages;
     }
 
-    public void setMessages(HashMap<String, String> messages) {
-        _messages = messages;
-    }
-
     public HashMap<String, Scene> getScenes() {
         return _scenes;
-    }
-
-    public void setScenes(HashMap<String, Scene> scenes) {
-        _scenes = scenes;
     }
 
     public HashMap<String, Command> getActions() {
         return _actions;
     }
 
-    public void setActions(HashMap<String, Command> actions) {
-        _actions = actions;
-    }
-
     public HashMap<String, CommandGroup> getCommandGroups() {
         return _commandGroups;
-    }
-
-    public void setCommandGroups(HashMap<String, CommandGroup> commandGroups) {
-        _commandGroups = commandGroups;
     }
 
     public String findMessage(String key, boolean replaceMissing) {
