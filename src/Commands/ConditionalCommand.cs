@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Statesman.Commands
 {
     public class ConditionalCommand : Command
@@ -53,7 +51,7 @@ namespace Statesman.Commands
 
                     bool foundOrOperator = operatorOrTargetName.Equals(OrDelimiter);
                     bool foundAndOperator = operatorOrTargetName.Equals(AndDelimiter);
-                    
+
                     if (operatorOrTargetName.Length == 2 && isConditionNext)
                     {
                         if (!foundOrOperator && !foundAndOperator)

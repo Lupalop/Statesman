@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class MenuCommand : Command
     {

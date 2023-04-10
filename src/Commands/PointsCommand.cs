@@ -72,7 +72,7 @@
                 {
                     actionType = PointsActionType.Set;
                 }
-                
+
                 if (!int.TryParse(arguments[2], out actionValue))
                 {
                     return null;

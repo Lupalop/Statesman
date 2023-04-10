@@ -2,7 +2,8 @@
 {
     public class InventoryCommand : Command
     {
-        public enum InventoryActionType {
+        public enum InventoryActionType
+        {
             Add,
             Remove,
             Clear,

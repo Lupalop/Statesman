@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Statesman.Commands
+﻿namespace Statesman.Commands
 {
     public class PrintCommand : Command
     {
@@ -66,7 +63,7 @@ namespace Statesman.Commands
         public override void Execute()
         {
             InitializeStrings();
-            
+
             if (_printType == PrintType.Concatenate)
             {
                 for (int currentIndex = 0;

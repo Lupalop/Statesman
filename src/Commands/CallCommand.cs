@@ -2,7 +2,13 @@
 {
     public class CallCommand : Command
     {
-        public enum CallType { None, Normal, Super, Global }
+        public enum CallType
+        {
+            None,
+            Normal,
+            Super,
+            Global
+        }
 
         public const string CommandGoto = "goto";
         public const string CommandCall = "call";
