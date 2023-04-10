@@ -49,8 +49,8 @@ public class PrintCommand extends Command {
         initializeStrings();
 
         if (_printType == PrintType.CONCATENATE) {
-            for (int i = 0; i < _messages.length; i++) {
-                System.out.printf(_messages[i]);
+            for (String _message : _messages) {
+                System.out.printf(_message);
             }
             return;
         }
@@ -95,8 +95,7 @@ public class PrintCommand extends Command {
         }
 
         for (int i = 0; i < _messages.length; i++) {
-            _messages[i] = Content.getScript().findMessage(
-                    _messages[i], false);
+            _messages[i] = Content.getScript().findMessage(_messages[i], false);
         }
         _initialized = true;
     }

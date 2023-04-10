@@ -1,8 +1,16 @@
 package statesman;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Content {
 
@@ -25,12 +33,10 @@ public class Content {
         String filter = "*.gs";
         DirectoryStream<Path> stream = Files.newDirectoryStream(_dataPath,
                 filter);
-        Iterator<Path> iterator = stream.iterator();
         // Merged game script collection
         int scriptCount = 0;
-        List<String> scriptLines = new LinkedList<String>();
-        while (iterator.hasNext()) {
-            Path currentPath = iterator.next();
+        List<String> scriptLines = new LinkedList<>();
+        for (Path currentPath : stream) {
             List<String> currentData = Files.readAllLines(currentPath);
             scriptLines.addAll(currentData);
             scriptCount++;
@@ -137,8 +143,7 @@ public class Content {
         boolean switchesFound = false;
         boolean inventoryFound = false;
 
-        for (int i = 0; i < data.size(); i++) {
-            String line = data.get(i);
+        for (String line : data) {
             String[] lineParts = line.split(" ");
 
             switch (lineParts[0]) {
@@ -168,8 +173,8 @@ public class Content {
                             "Invalid save file: multiple declarations of `switches`");
                 }
                 String[] switches = lineParts[1].split(",");
-                for (int j = 0; j < switches.length; j++) {
-                    String[] switchParts = switches[j].split(";");
+                for (String element : switches) {
+                    String[] switchParts = element.split(";");
                     String key = switchParts[0];
                     boolean value = Boolean.valueOf(switchParts[1]);
                     Interpreter.getSwitches().put(key, value);
@@ -182,8 +187,8 @@ public class Content {
                             "Invalid save file: multiple declarations of `inventory`");
                 }
                 String[] items = lineParts[1].split(",");
-                for (int j = 0; j < items.length; j++) {
-                    String[] itemParts = items[j].split(";");
+                for (String item2 : items) {
+                    String[] itemParts = item2.split(";");
                     // get scene name (first part)
                     Scene targetScene = getScript().getScenes()
                             .get(itemParts[0]);

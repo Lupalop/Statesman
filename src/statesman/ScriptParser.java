@@ -3,7 +3,9 @@ package statesman;
 import java.util.HashMap;
 import java.util.List;
 
-import statesman.commands.*;
+import statesman.commands.Command;
+import statesman.commands.ConditionalCommand;
+import statesman.commands.Function;
 
 public class ScriptParser {
 
@@ -11,8 +13,12 @@ public class ScriptParser {
 
     private enum Section {
 
-        ACTION("action"), FUNCTION("function"), ITEM("item"), STRING("string"),
-        ROOT("root"), SCENE("scene");
+        ACTION("action"),
+        FUNCTION("function"),
+        ITEM("item"),
+        STRING("string"),
+        ROOT("root"),
+        SCENE("scene");
 
         private final String _tag;
         private static final HashMap<String, Section> BY_TAG = new HashMap<>();
@@ -35,7 +41,7 @@ public class ScriptParser {
             return BY_TAG.get(tag);
         }
 
-    };
+    }
 
     // Data fields
     private List<String> _data;
@@ -227,7 +233,8 @@ public class ScriptParser {
                 }
             } else {
                 throw new GameException(
-                        "Invalid function section tag, see line " + _lineNumber);
+                        "Invalid function section tag, see line "
+                                + _lineNumber);
             }
             break;
         case SCENE:
@@ -291,7 +298,8 @@ public class ScriptParser {
                     _conditionals[_depth].getFalseGroup().getCommands()
                             .add(command);
                 } else {
-                    _conditionals[_depth].getTrueGroup().getCommands().add(command);
+                    _conditionals[_depth].getTrueGroup().getCommands()
+                            .add(command);
                 }
                 if (isElseIf) {
                     _conditionalsElse[_depth] = false;
@@ -318,11 +326,11 @@ public class ScriptParser {
                             "Unknown command was referenced in line "
                                     + _lineNumber);
                 }
-                for (int i = 0; i < keywords.length; i++) {
+                for (String keyword : keywords) {
                     if (_scene == null) {
-                        _script.getActions().put(keywords[i], command);
+                        _script.getActions().put(keyword, command);
                     } else {
-                        _scene.getActions().put(keywords[i], command);
+                        _scene.getActions().put(keyword, command);
                     }
                 }
             } else {

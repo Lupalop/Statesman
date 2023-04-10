@@ -15,10 +15,10 @@ public class Script {
 
     public Script() {
         _maxPoints = 0;
-        _messages = new HashMap<String, String>();
-        _scenes = new HashMap<String, Scene>();
-        _actions = new HashMap<String, Command>();
-        _functions = new HashMap<String, Function>();
+        _messages = new HashMap<>();
+        _scenes = new HashMap<>();
+        _actions = new HashMap<>();
+        _functions = new HashMap<>();
     }
 
     public int getMaxPoints() {
@@ -60,15 +60,15 @@ public class Script {
             String template = "[Missing message: `%s`]";
             messageValue = String.format(template, key);
         }
-        
+
         if (messageValue == null) {
             return key;
         }
-        return messageValue; 
+        return messageValue;
     }
 
     public String findMessage(String key) {
         return findMessage(key, true);
     }
-    
+
 }

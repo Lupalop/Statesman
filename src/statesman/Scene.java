@@ -1,8 +1,9 @@
 package statesman;
 
-import java.util.*;
+import java.util.HashMap;
 
-import statesman.commands.*;
+import statesman.commands.Command;
+import statesman.commands.Function;
 
 public class Scene {
 

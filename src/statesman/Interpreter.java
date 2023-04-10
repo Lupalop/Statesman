@@ -1,8 +1,11 @@
 package statesman;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Scanner;
 
-import statesman.commands.*;
+import statesman.commands.Command;
+import statesman.commands.SceneCommand;
+import statesman.commands.SwitchSetCommand;
 
 public class Interpreter {
 
@@ -50,8 +53,8 @@ public class Interpreter {
             return;
         }
 
-        _inventory = new HashMap<String, InventoryItem>();
-        _switches = new HashMap<String, Boolean>();
+        _inventory = new HashMap<>();
+        _switches = new HashMap<>();
 
         if (initialSceneName == null) {
             initialSceneName = "initial";

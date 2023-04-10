@@ -8,7 +8,7 @@ public class CallCommand extends Command {
     public enum CallType {
         NORMAL, SUPER, GLOBAL
     }
-    
+
     public static final String ID_GOTO = "goto";
     public static final String ID_CALL = "call";
     public static final String ID_CALL_GLOB = "callglob";
@@ -23,11 +23,8 @@ public class CallCommand extends Command {
     }
 
     public CallCommand(CallType callType, String functionName) {
-        if (callType == null) {
-            throw new IllegalArgumentException();
-        }
-        if (callType != CallType.SUPER
-                && (functionName == null || functionName.isBlank())) {
+        if ((callType == null) || (callType != CallType.SUPER
+                && (functionName == null || functionName.isBlank()))) {
             throw new IllegalArgumentException();
         }
         _functionName = functionName;
@@ -63,7 +60,7 @@ public class CallCommand extends Command {
             }
             functionName = arguments[1];
         }
-        
+
         if (callType == null) {
             return null;
         }

@@ -1,6 +1,6 @@
 package statesman;
 
-import java.util.*;
+import java.util.Scanner;
 
 public class Program {
 

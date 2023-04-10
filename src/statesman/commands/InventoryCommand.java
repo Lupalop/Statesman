@@ -1,7 +1,5 @@
 package statesman.commands;
 
-import java.util.Iterator;
-
 import statesman.Content;
 import statesman.Interpreter;
 import statesman.InventoryItem;
@@ -120,10 +118,8 @@ public class InventoryCommand extends Command {
                     System.out.printf(Content.getScript().findMessage("i_4"),
                             inventorySize);
                 }
-                Iterator<InventoryItem> iterator = Interpreter.getInventory()
-                        .values().iterator();
-                while (iterator.hasNext()) {
-                    InventoryItem currentItem = iterator.next();
+                for (InventoryItem currentItem : Interpreter.getInventory()
+                        .values()) {
                     System.out.printf(Content.getScript().findMessage("i_5"),
                             currentItem.getName(),
                             currentItem.getDescription());

@@ -10,7 +10,7 @@ public abstract class Command {
 
     public static HashMap<String, Command> getCommands() {
         if (_commands == null) {
-            _commands = new HashMap<String, Command>();
+            _commands = new HashMap<>();
             _commands.put(PrintCommand.ID_PRINT, PrintCommand.getDefault());
             _commands.put(PrintCommand.ID_PRINTC, PrintCommand.getDefault());
             _commands.put(PrintCommand.ID_PRINTR, PrintCommand.getDefault());
@@ -44,7 +44,8 @@ public abstract class Command {
         return command.fromText(commandId, arguments);
     }
 
-    public abstract Command fromText(String id, String[] arguments) throws GameException;
+    public abstract Command fromText(String id, String[] arguments)
+            throws GameException;
 
     public abstract void execute();
 

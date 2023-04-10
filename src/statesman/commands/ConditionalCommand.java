@@ -29,7 +29,8 @@ public class ConditionalCommand extends Command {
     }
 
     public ConditionalCommand(Function group, Function elseGroup,
-            ArrayList<String> targetNames, ArrayList<Boolean> targetValues, boolean orMode) {
+            ArrayList<String> targetNames, ArrayList<Boolean> targetValues,
+            boolean orMode) {
         this();
         _group = group;
         _elseGroup = elseGroup;
@@ -48,11 +49,12 @@ public class ConditionalCommand extends Command {
     }
 
     @Override
-    public Command fromText(String commandId, String[] arguments) throws GameException {
+    public Command fromText(String commandId, String[] arguments)
+            throws GameException {
         if (arguments.length >= 2) {
             Boolean orMode = null;
-            ArrayList<Boolean> targetValues = new ArrayList<Boolean>();
-            ArrayList<String> targetNames = new ArrayList<String>();
+            ArrayList<Boolean> targetValues = new ArrayList<>();
+            ArrayList<String> targetNames = new ArrayList<>();
 
             // The first argument is the command name, so start evaluating
             // the parts of the conditional with the second argument.
@@ -61,25 +63,20 @@ public class ConditionalCommand extends Command {
             for (int i = 1; i < arguments.length; i++) {
                 String operatorOrTargetName = arguments[i].trim();
 
-                boolean foundOrOperator =
-                        operatorOrTargetName.equalsIgnoreCase(DELIMITER_OR);
-                boolean foundAndOperator =
-                        operatorOrTargetName.equalsIgnoreCase(DELIMITER_AND);
+                boolean foundOrOperator = operatorOrTargetName
+                        .equalsIgnoreCase(DELIMITER_OR);
+                boolean foundAndOperator = operatorOrTargetName
+                        .equalsIgnoreCase(DELIMITER_AND);
 
-                if (operatorOrTargetName.length() == 2 && isConditionNext)
-                {
-                    if (!foundOrOperator && !foundAndOperator)
-                    {
+                if (operatorOrTargetName.length() == 2 && isConditionNext) {
+                    if (!foundOrOperator && !foundAndOperator) {
                         throw new GameException("Unknown operator found.");
                     }
 
-                    if (orMode == null)
-                    {
+                    if (orMode == null) {
                         orMode = foundOrOperator;
-                    }
-                    else if ((orMode.booleanValue() && foundAndOperator)
-                            || (!orMode.booleanValue() && foundOrOperator))
-                    {
+                    } else if ((orMode.booleanValue() && foundAndOperator)
+                            || (!orMode.booleanValue() && foundOrOperator)) {
                         throw new GameException(
                                 "Combining and/or conditional operators are not allowed.");
                     }
@@ -88,15 +85,13 @@ public class ConditionalCommand extends Command {
                     continue;
                 }
 
-                if (foundOrOperator || foundAndOperator)
-                {
+                if (foundOrOperator || foundAndOperator) {
                     throw new GameException("Incorrect condition order.");
                 }
 
                 // Check for the negation operator.
                 boolean targetValue = !operatorOrTargetName.startsWith("!");
-                if (!targetValue)
-                {
+                if (!targetValue) {
                     operatorOrTargetName = operatorOrTargetName.substring(1);
                 }
                 targetNames.add(operatorOrTargetName);
@@ -105,23 +100,18 @@ public class ConditionalCommand extends Command {
                 isConditionPrevious = false;
             }
 
-            if (isConditionPrevious)
-            {
-                throw new GameException("Found stray operator inside condition.");
+            if (isConditionPrevious) {
+                throw new GameException(
+                        "Found stray operator inside condition.");
             }
 
             // Assume Or mode if it's a single condition.
-            if (orMode == null)
-            {
+            if (orMode == null) {
                 orMode = true;
             }
 
-            return new ConditionalCommand(
-                    new Function(""),
-                    new Function(""),
-                    targetNames,
-                    targetValues,
-                    orMode);
+            return new ConditionalCommand(new Function(""), new Function(""),
+                    targetNames, targetValues, orMode);
         }
         return null;
     }
