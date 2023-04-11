@@ -1,7 +1,11 @@
-﻿namespace Statesman.Commands
+﻿using System.Reflection;
+
+namespace Statesman.Commands
 {
     public abstract class Command
     {
+        public const string kGeneratorMethodName = "FromText";
+
         public static Dictionary<string, Type> All { get; private set; }
 
         static Command()
@@ -34,28 +38,18 @@
         public static Command Find(string[] arguments)
         {
             string commandId = arguments[0].ToLowerInvariant();
-            Command command;
             if (All.TryGetValue(commandId, out Type commandType))
             {
-                command = (Command)commandType.GetMethod(nameof(FromText))
+                MethodInfo generatorMethod =
+                    commandType.GetMethod(kGeneratorMethodName);
+                if (generatorMethod == null)
+                {
+                    throw new InvalidOperationException("Missing generator method.");
+                }
+                Command command = (Command)generatorMethod
                     .Invoke(null, new object[] { commandId, arguments });
                 return command;
             }
-            return null;
-        }
-
-        public static Command FromText(string commandId, string[] arguments)
-        {
-            if (string.IsNullOrEmpty(commandId))
-            {
-                throw new ArgumentException($"'{nameof(commandId)}' cannot be null or empty.", nameof(commandId));
-            }
-
-            if (arguments is null)
-            {
-                throw new ArgumentNullException(nameof(arguments));
-            }
-
             return null;
         }
 

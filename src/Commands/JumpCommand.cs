@@ -24,7 +24,7 @@
             _lineIfFalse = lineIfFalse;
         }
 
-        public new static Command FromText(string commandId, string[] arguments)
+        public static Command FromText(string commandId, string[] arguments)
         {
             if (arguments.Length == 1 && commandId == kIdReturn)
             {

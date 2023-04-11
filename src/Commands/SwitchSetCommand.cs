@@ -13,7 +13,7 @@
             _value = value;
         }
 
-        public new static Command FromText(string commandId, string[] arguments)
+        public static Command FromText(string commandId, string[] arguments)
         {
             if (commandId == kIdSwitchSet && arguments.Length == 3)
             {

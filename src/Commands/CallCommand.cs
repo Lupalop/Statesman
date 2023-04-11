@@ -30,7 +30,7 @@
             CallerType = callType;
         }
 
-        public new static Command FromText(string commandId, string[] arguments)
+        public static Command FromText(string commandId, string[] arguments)
         {
             CallType callType = CallType.None;
             string functionName = "";

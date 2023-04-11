@@ -37,7 +37,7 @@
         {
         }
 
-        public new static Command FromText(string commandId, string[] arguments)
+        public static Command FromText(string commandId, string[] arguments)
         {
             if (commandId != kIdPoints || arguments.Length < 2)
             {
