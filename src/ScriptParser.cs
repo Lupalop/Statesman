@@ -18,6 +18,7 @@ namespace Statesman
 
         // Data fields
         private readonly Script _script;
+        private readonly string _scriptName;
         private readonly StreamReader _reader;
         private string _line;
         private int _lineNumber;
@@ -32,12 +33,13 @@ namespace Statesman
         private readonly bool[] _conditionalsElse;
         private int _depth;
 
-        public ScriptParser(StreamReader reader, Script script)
+        public ScriptParser(StreamReader reader, string scriptName, Script script)
         {
+            _script = script;
+            _scriptName = scriptName;
             _reader = reader;
             _line = "";
             _lineNumber = 0;
-            _script = script;
 
             _section = Section.Root;
             _depth = 0;
@@ -78,7 +80,7 @@ namespace Statesman
                     continue;
                 }
 
-                throw new GameException("Invalid string in line " + _lineNumber);
+                ThrowParserException("Invalid string");
             }
         }
 
@@ -114,7 +116,8 @@ namespace Statesman
             switch (_section)
             {
                 case Section.Root:
-                    throw new GameException("Stray end tag in line " + _lineNumber);
+                    ThrowParserException("Stray end tag");
+                    break;
                 case Section.Scene:
                     _scene = null;
                     break;
@@ -160,7 +163,8 @@ namespace Statesman
                     int maxPoints = int.Parse(parts[1]);
                     if (maxPoints < 0)
                     {
-                        throw new GameException("The maximum number of points must be greater than or equal to zero, see line " + _lineNumber);
+                        ThrowParserException(
+                            "The maximum number of points must be greater than or equal to zero");
                     }
                     _script.MaxPoints = maxPoints;
                     break;
@@ -203,7 +207,7 @@ namespace Statesman
                 case Section.Item:
                     if (_section != Section.Scene)
                     {
-                        throw new GameException("The items section MUST be inside a scene section, see line " + _lineNumber);
+                        ThrowParserException("The items section MUST be inside a scene section");
                     }
                     break;
                 case Section.Function:
@@ -215,7 +219,7 @@ namespace Statesman
                             // Reserved function name (command ran on entry)
                             if (_function.Name.Equals(Scene.FunctionEntry, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                throw new GameException("Use of reserved command function name, see line " + _lineNumber);
+                                ThrowParserException("Use of reserved function name");
                             }
                             _script.Functions[_function.Name] = _function;
                         }
@@ -224,21 +228,21 @@ namespace Statesman
                             // Function name already in use locally
                             if (_scene.Functions.ContainsKey(_function.Name))
                             {
-                                throw new GameException("Command function name already used in current scene, see line " + _lineNumber);
+                                ThrowParserException("Function name is already in use in the current scene");
                             }
                             _scene.Functions[_function.Name] = _function;
                         }
                     }
                     else
                     {
-                        throw new GameException("Invalid function section tag, see line " + _lineNumber);
+                        ThrowParserException("Invalid function section tag");
                     }
                     break;
                 case Section.Scene:
                     // Nested scenes
                     if (_section == Section.Scene || _scene != null)
                     {
-                        throw new GameException("Nested scenes are not allowed, see line " + _lineNumber);
+                        ThrowParserException("Nested scenes are not allowed");
                     }
                     if (parts.Length == 2)
                     {
@@ -246,13 +250,13 @@ namespace Statesman
                         // Scene name already in use
                         if (_script.Scenes.ContainsKey(_scene.Name))
                         {
-                            throw new GameException("Specified scene name is already in use, see line " + _lineNumber);
+                            ThrowParserException("Scene name is already in use");
                         }
                         _script.Scenes.Add(_scene.Name, _scene);
                     }
                     else
                     {
-                        throw new GameException("Invalid scene section tag, see line " + _lineNumber);
+                        ThrowParserException("Invalid scene section tag");
                     }
                     break;
                 default:
@@ -269,7 +273,7 @@ namespace Statesman
             {
                 if (_conditionals[_depth] == null || _conditionalsElse[_depth])
                 {
-                    throw new GameException("Stray else tag, see line " + _lineNumber);
+                    ThrowParserException("Stray else tag");
                 }
                 _conditionalsElse[_depth] = true;
                 return true;
@@ -335,7 +339,7 @@ namespace Statesman
                         Command command = Command.Find(arguments);
                         if (command == null)
                         {
-                            throw new GameException("Unknown command was referenced in line " + _lineNumber);
+                            ThrowParserException("Unknown command");
                         }
                         for (int i = 0; i < keywords.Length; i++)
                         {
@@ -351,13 +355,13 @@ namespace Statesman
                     }
                     else
                     {
-                        throw new GameException("Invalid action, see line " + _lineNumber);
+                        ThrowParserException("Invalid action");
                     }
                     break;
                 case Section.Function:
                     if (_function == null)
                     {
-                        throw new GameException("Invalid function, see line " + _lineNumber);
+                        ThrowParserException("Invalid function");
                     }
                     if (parts.Length == 1)
                     {
@@ -365,7 +369,7 @@ namespace Statesman
                         Command command = Command.Find(arguments);
                         if (command == null)
                         {
-                            throw new GameException("Unknown command was referenced in line " + _lineNumber);
+                            ThrowParserException("Undefined command");
                         }
                         if (_depth > 0)
                         {
@@ -385,7 +389,7 @@ namespace Statesman
                     }
                     else
                     {
-                        throw new GameException("Invalid command, see line " + _lineNumber);
+                        ThrowParserException("Invalid command");
                     }
                     break;
                 case Section.Item:
@@ -396,19 +400,19 @@ namespace Statesman
                         // Missing keys
                         if (string.IsNullOrWhiteSpace(keyword))
                         {
-                            throw new GameException("Missing inventory item key in line " + _lineNumber);
+                            ThrowParserException("Missing inventory item key");
                         }
                         // Key already in use 
                         if (_scene.Items.ContainsKey(keyword))
                         {
-                            throw new GameException("Duplicate key was specified by the inventory item in line " + _lineNumber);
+                            ThrowParserException("Duplicate key specified by the inventory item");
                         }
                         InventoryItem item = new(keyword, description, _scene);
                         _scene.Items.Add(keyword, item);
                     }
                     else
                     {
-                        throw new GameException("Invalid inventory item, see line " + _lineNumber);
+                        ThrowParserException("Invalid inventory item");
                     }
                     break;
                 case Section.String:
@@ -419,24 +423,31 @@ namespace Statesman
                         // Missing keys
                         if (string.IsNullOrWhiteSpace(key))
                         {
-                            throw new GameException("Missing message key, see line " + _lineNumber);
+                            ThrowParserException("Missing message key");
                         }
                         // Key already in use 
                         if (_script.Messages.ContainsKey(key))
                         {
-                            throw new GameException("Duplicate key was specified by the message in line " + _lineNumber);
+                            ThrowParserException("Duplicate key was specified by the message");
                         }
                         _script.Messages.Add(key, value);
                     }
                     else
                     {
-                        throw new GameException("Invalid message, see line " + _lineNumber);
+                        ThrowParserException("Invalid message");
                     }
                     break;
                 default:
                     return false;
             }
             return true;
+        }
+
+        private void ThrowParserException(string innerMessage)
+        {
+            string message = "{0}.\nLine: {1}\nFile: {2}";
+            throw new GameException(
+                string.Format(message, innerMessage, _lineNumber, _scriptName));
         }
     }
 }

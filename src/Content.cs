@@ -28,7 +28,7 @@
             foreach (string path in scriptPaths)
             {
                 using StreamReader reader = new(path);
-                ScriptParser parser = new(reader, _script);
+                ScriptParser parser = new(reader, path, _script);
                 parser.Read();
             }
             if (scriptPaths.Length == 0) {
