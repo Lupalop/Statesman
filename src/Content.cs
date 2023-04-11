@@ -2,47 +2,39 @@
 {
     internal class Content
     {
+        private const string kScriptFilter = "*.gs";
+
         private static string _dataPath = null;
         private static bool _manualScript = false;
         private static bool _scriptParsed = false;
         private static Script _script = null;
-        private static ScriptParser _parser = null;
 
         public static void LoadData()
         {
-            // Refuse to parse data if the script was set manually
+            // Don't load any data if our game script was set manually.
             if (_manualScript)
             {
                 return;
             }
-            // Check for existence of the data path
+            // Check for existence of data path first before doing anything.
             if (!Directory.Exists(_dataPath))
             {
-                throw new GameException("The data directory does not exist");
+                throw new GameException("The data directory does not exist.");
             }
-            // Read all game scripts from the given directory 
-            string filter = "*.gs";
-            IEnumerable<string> filePaths = Directory.EnumerateFiles(_dataPath, filter);
-            // Merged game script collection
-            int scriptCount = 0;
-            List<string> scriptLines = new();
-            foreach (var scriptPath in filePaths)
+            // Retrieve all game scripts from the data directory.
+            string[] scriptPaths = Directory.GetFiles(_dataPath, kScriptFilter);
+            // Initialize and run the script parser.
+            _script = new Script();
+            foreach (string path in scriptPaths)
             {
-                string[] scriptData = File.ReadAllLines(scriptPath);
-                scriptLines.AddRange(scriptData);
-                scriptCount++;
+                using StreamReader reader = new(path);
+                ScriptParser parser = new(reader, _script);
+                parser.Read();
             }
-            // Initialize and run the script parser
-            if (scriptCount > 0)
-            {
-                _parser = new ScriptParser(scriptLines);
-                _script = _parser.Read();
-                _scriptParsed = true;
+            if (scriptPaths.Length == 0) {
+                throw new GameException("No game scripts found.");
             }
-            else
-            {
-                throw new GameException("No game scripts found");
-            }
+            _scriptParsed = true;
         }
 
         public static bool TryLoadData()

@@ -17,10 +17,10 @@ namespace Statesman
         };
 
         // Data fields
-        private readonly List<string> _data;
+        private readonly Script _script;
+        private readonly StreamReader _reader;
         private string _line;
         private int _lineNumber;
-        private Script _script;
 
         // Parser fields
         private Section _section;
@@ -32,12 +32,12 @@ namespace Statesman
         private readonly bool[] _conditionalsElse;
         private int _depth;
 
-        public ScriptParser(List<string> data)
+        public ScriptParser(StreamReader reader, Script script)
         {
-            _data = data;
+            _reader = reader;
             _line = "";
             _lineNumber = 0;
-            _script = null;
+            _script = script;
 
             _section = Section.Root;
             _depth = 0;
@@ -49,14 +49,13 @@ namespace Statesman
             _conditionalsElse = new bool[MaxDepth];
         }
 
-        public Script Read()
+        public void Read()
         {
-            _script = new Script();
-
-            for (int i = 0; i < _data.Count; i++)
+            _lineNumber = 0;
+            while (!_reader.EndOfStream)
             {
-                _lineNumber = i + 1;
-                _line = _data[i].Trim();
+                _lineNumber++;
+                _line = _reader.ReadLine().Trim();
 
                 if (ParseComment())
                 {
@@ -81,8 +80,6 @@ namespace Statesman
 
                 throw new GameException("Invalid string in line " + _lineNumber);
             }
-
-            return _script;
         }
 
         private bool ParseComment()
