@@ -10,9 +10,9 @@
             Quit
         }
 
-        public const string CommandSave = "save";
-        public const string CommandLoad = "load";
-        public const string CommandQuit = "quit";
+        public const string kIdSave = "save";
+        public const string kIdLoad = "load";
+        public const string kIdQuit = "quit";
 
         private readonly MenuActionType _actionType;
 
@@ -21,20 +21,20 @@
             _actionType = action;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
             if (arguments.Length == 1)
             {
                 MenuActionType? actionType = null;
-                if (commandName.Equals(CommandSave, StringComparison.InvariantCultureIgnoreCase))
+                if (commandId.Equals(kIdSave, StringComparison.InvariantCultureIgnoreCase))
                 {
                     actionType = MenuActionType.Save;
                 }
-                else if (commandName.Equals(CommandLoad, StringComparison.InvariantCultureIgnoreCase))
+                else if (commandId.Equals(kIdLoad, StringComparison.InvariantCultureIgnoreCase))
                 {
                     actionType = MenuActionType.Load;
                 }
-                else if (commandName.Equals(CommandQuit, StringComparison.InvariantCultureIgnoreCase))
+                else if (commandId.Equals(kIdQuit, StringComparison.InvariantCultureIgnoreCase))
                 {
                     actionType = MenuActionType.Quit;
                 }

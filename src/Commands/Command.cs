@@ -9,25 +9,25 @@
             All = new Dictionary<string, Type>
             {
                 // XXX: manually input IDs of new commands here!
-                { PrintCommand.CommandPrintSingle, typeof(PrintCommand) },
-                { PrintCommand.CommandPrintConcatenate, typeof(PrintCommand) },
-                { PrintCommand.CommandPrintRandom, typeof(PrintCommand) },
-                { JumpCommand.CommandJump, typeof(JumpCommand) },
-                { JumpCommand.CommandSwitchJump, typeof(JumpCommand) },
-                { JumpCommand.CommandInventoryJump, typeof(JumpCommand) },
-                { JumpCommand.CommandReturn, typeof(JumpCommand) },
-                { SwitchSetCommand.CommandSwitchSet, typeof(SwitchSetCommand) },
-                { ConditionalCommand.CommandConditional, typeof(ConditionalCommand) },
-                { InventoryCommand.CommandInventory, typeof(InventoryCommand) },
-                { SceneCommand.CommandScene, typeof(SceneCommand) },
-                { CallCommand.CommandCall, typeof(CallCommand) },
-                { CallCommand.CommandGoto, typeof(CallCommand) },
-                { CallCommand.CommandCallGlobal, typeof(CallCommand) },
-                { CallCommand.CommandSuper, typeof(CallCommand) },
-                { MenuCommand.CommandQuit, typeof(MenuCommand) },
-                { MenuCommand.CommandSave, typeof(MenuCommand) },
-                { MenuCommand.CommandLoad, typeof(MenuCommand) },
-                { PointsCommand.CommandPoints, typeof(PointsCommand) },
+                { PrintCommand.kIdPrintSingle, typeof(PrintCommand) },
+                { PrintCommand.kIdPrintConcatenate, typeof(PrintCommand) },
+                { PrintCommand.kIdPrintRandom, typeof(PrintCommand) },
+                { JumpCommand.kIdJump, typeof(JumpCommand) },
+                { JumpCommand.kIdSwitchJump, typeof(JumpCommand) },
+                { JumpCommand.kIdInventoryJump, typeof(JumpCommand) },
+                { JumpCommand.kIdReturn, typeof(JumpCommand) },
+                { SwitchSetCommand.kIdSwitchSet, typeof(SwitchSetCommand) },
+                { ConditionalCommand.kIdConditional, typeof(ConditionalCommand) },
+                { InventoryCommand.kIdInventory, typeof(InventoryCommand) },
+                { SceneCommand.kIdScene, typeof(SceneCommand) },
+                { CallCommand.kIdCall, typeof(CallCommand) },
+                { CallCommand.kIdGoto, typeof(CallCommand) },
+                { CallCommand.kIdCallGlobal, typeof(CallCommand) },
+                { CallCommand.kIdSuper, typeof(CallCommand) },
+                { MenuCommand.kIdQuit, typeof(MenuCommand) },
+                { MenuCommand.kIdSave, typeof(MenuCommand) },
+                { MenuCommand.kIdLoad, typeof(MenuCommand) },
+                { PointsCommand.kIdPoints, typeof(PointsCommand) },
             };
         }
 
@@ -44,11 +44,11 @@
             return null;
         }
 
-        public static Command FromText(string commandName, string[] arguments)
+        public static Command FromText(string commandId, string[] arguments)
         {
-            if (string.IsNullOrEmpty(commandName))
+            if (string.IsNullOrEmpty(commandId))
             {
-                throw new ArgumentException($"'{nameof(commandName)}' cannot be null or empty.", nameof(commandName));
+                throw new ArgumentException($"'{nameof(commandId)}' cannot be null or empty.", nameof(commandId));
             }
 
             if (arguments is null)

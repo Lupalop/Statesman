@@ -10,10 +10,10 @@
             Global
         }
 
-        public const string CommandGoto = "goto";
-        public const string CommandCall = "call";
-        public const string CommandCallGlobal = "callglob";
-        public const string CommandSuper = "super";
+        public const string kIdGoto = "goto";
+        public const string kIdCall = "call";
+        public const string kIdCallGlobal = "callglob";
+        public const string kIdSuper = "super";
 
         public CallType CallerType { get; private set; }
         private readonly string _functionName;
@@ -30,24 +30,24 @@
             CallerType = callType;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
             CallType callType = CallType.None;
             string functionName = "";
 
             if (arguments.Length == 1 &&
-                commandName.Equals(CommandSuper, StringComparison.InvariantCultureIgnoreCase))
+                commandId.Equals(kIdSuper, StringComparison.InvariantCultureIgnoreCase))
             {
                 callType = CallType.Super;
             }
             else if (arguments.Length == 2)
             {
-                if (commandName.Equals(CommandGoto, StringComparison.InvariantCultureIgnoreCase) ||
-                    commandName.Equals(CommandCall, StringComparison.InvariantCultureIgnoreCase))
+                if (commandId.Equals(kIdGoto, StringComparison.InvariantCultureIgnoreCase) ||
+                    commandId.Equals(kIdCall, StringComparison.InvariantCultureIgnoreCase))
                 {
                     callType = CallType.Normal;
                 }
-                else if (commandName.Equals(CommandCallGlobal, StringComparison.InvariantCultureIgnoreCase))
+                else if (commandId.Equals(kIdCallGlobal, StringComparison.InvariantCultureIgnoreCase))
                 {
                     callType = CallType.Global;
                 }

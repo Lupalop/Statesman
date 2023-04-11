@@ -2,9 +2,10 @@ namespace Statesman.Commands
 {
     public class ConditionalCommand : Command
     {
-        public const string CommandConditional = "cond";
-        private const string OrDelimiter = "||";
-        private const string AndDelimiter = "&&";
+        public const string kIdConditional = "cond";
+
+        private const string kOrDelimiter = "||";
+        private const string kAndDelimiter = "&&";
 
         public List<string> TargetNames { get; }
         public List<bool> TargetValues { get; private set; }
@@ -29,9 +30,9 @@ namespace Statesman.Commands
             _orMode = orMode;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
-            if (commandName != CommandConditional)
+            if (commandId != kIdConditional)
             {
                 return null;
             }
@@ -49,8 +50,8 @@ namespace Statesman.Commands
                 {
                     string operatorOrTargetName = arguments[i].Trim();
 
-                    bool foundOrOperator = operatorOrTargetName.Equals(OrDelimiter);
-                    bool foundAndOperator = operatorOrTargetName.Equals(AndDelimiter);
+                    bool foundOrOperator = operatorOrTargetName.Equals(kOrDelimiter);
+                    bool foundAndOperator = operatorOrTargetName.Equals(kAndDelimiter);
 
                     if (operatorOrTargetName.Length == 2 && isConditionNext)
                     {

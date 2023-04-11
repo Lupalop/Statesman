@@ -2,7 +2,7 @@
 {
     public class SceneCommand : Command
     {
-        public const string CommandScene = "scene";
+        public const string kIdScene = "scene";
 
         private readonly string _targetScene;
         private bool _hasKey;
@@ -17,9 +17,9 @@
             _hasKey = false;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
-            if (commandName != CommandScene)
+            if (commandId != kIdScene)
             {
                 return null;
             }

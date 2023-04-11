@@ -10,7 +10,7 @@
             List
         }
 
-        public const string CommandInventory = "inv";
+        public const string kIdInventory = "inv";
 
         public const string kInventoryAdd = "add";
         public const string kInventoryRemove = "rm";
@@ -43,9 +43,9 @@
             ActionType = action;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
-            if (commandName != CommandInventory || arguments.Length < 2)
+            if (commandId != kIdInventory || arguments.Length < 2)
             {
                 return null;
             }

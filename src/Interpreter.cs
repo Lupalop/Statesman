@@ -104,12 +104,12 @@ namespace Statesman
                         if (keyword.StartsWith("*tp"))
                         {
                             currentAction = SceneCommand.FromText(
-                                SceneCommand.CommandScene, keywordParts);
+                                SceneCommand.kIdScene, keywordParts);
                         }
                         if (keyword.StartsWith("*set"))
                         {
                             currentAction = SwitchSetCommand.FromText(
-                                SwitchSetCommand.CommandSwitchSet, keywordParts);
+                                SwitchSetCommand.kIdSwitchSet, keywordParts);
                         }
                         if (keyword.Equals("*reload", StringComparison.InvariantCultureIgnoreCase))
                         {

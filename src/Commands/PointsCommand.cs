@@ -11,7 +11,7 @@
             List
         }
 
-        public const string CommandPoints = "points";
+        public const string kIdPoints = "points";
 
         public const string kPointsAdd = "add";
         public const string kPointsSubtract = "sub";
@@ -37,9 +37,9 @@
         {
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
-            if (commandName != CommandPoints || arguments.Length < 2)
+            if (commandId != kIdPoints || arguments.Length < 2)
             {
                 return null;
             }

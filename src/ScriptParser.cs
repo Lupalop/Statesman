@@ -291,7 +291,7 @@ namespace Statesman
                     }
                     ConditionalCommand command =
                             ConditionalCommand.FromText(
-                                ConditionalCommand.CommandConditional, parts) as ConditionalCommand;
+                                ConditionalCommand.kIdConditional, parts) as ConditionalCommand;
                     // Set the name of the anonymous functions contained within
                     // conditional functions to be the same with the function
                     // that contains them.

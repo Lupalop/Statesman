@@ -2,10 +2,10 @@
 {
     public class JumpCommand : Command
     {
-        public const string CommandJump = "jmp";
-        public const string CommandInventoryJump = "ijmp";
-        public const string CommandSwitchJump = "sjmp";
-        public const string CommandReturn = "ret";
+        public const string kIdJump = "jmp";
+        public const string kIdInventoryJump = "ijmp";
+        public const string kIdSwitchJump = "sjmp";
+        public const string kIdReturn = "ret";
 
         private readonly string _targetName;
         private readonly bool _isUnconditional;
@@ -24,13 +24,13 @@
             _lineIfFalse = lineIfFalse;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
-            if (arguments.Length == 1 && commandName == CommandReturn)
+            if (arguments.Length == 1 && commandId == kIdReturn)
             {
                 return new JumpCommand(null, int.MaxValue, -1);
             }
-            else if (arguments.Length == 2 && commandName == CommandJump)
+            else if (arguments.Length == 2 && commandId == kIdJump)
             {
                 if (!GetLineNumberFromString(arguments[1], out int line))
                 {
@@ -38,7 +38,7 @@
                 }
                 return new JumpCommand(null, line, -1);
             }
-            else if (arguments.Length == 4 && (commandName == CommandInventoryJump || commandName == CommandSwitchJump))
+            else if (arguments.Length == 4 && (commandId == kIdInventoryJump || commandId == kIdSwitchJump))
             {
                 string targetName = arguments[1];
                 if (!GetLineNumberFromString(arguments[2], out int lineIfTrue))

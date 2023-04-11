@@ -2,7 +2,7 @@
 {
     public class SwitchSetCommand : Command
     {
-        public const string CommandSwitchSet = "set";
+        public const string kIdSwitchSet = "set";
 
         private readonly string _switchId;
         private readonly bool _value;
@@ -13,9 +13,9 @@
             _value = value;
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
-            if (commandName == CommandSwitchSet && arguments.Length == 3)
+            if (commandId == kIdSwitchSet && arguments.Length == 3)
             {
                 string switchId = arguments[1];
                 bool value = bool.Parse(arguments[2]);

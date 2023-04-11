@@ -9,9 +9,9 @@
             Random
         }
 
-        public const string CommandPrintSingle = "print";
-        public const string CommandPrintConcatenate = "printc";
-        public const string CommandPrintRandom = "printr";
+        public const string kIdPrintSingle = "print";
+        public const string kIdPrintConcatenate = "printc";
+        public const string kIdPrintRandom = "printr";
 
         protected bool _initialized;
         protected string[] _messages;
@@ -31,7 +31,7 @@
             }
         }
 
-        public new static Command FromText(string commandName, string[] arguments)
+        public new static Command FromText(string commandId, string[] arguments)
         {
             if (arguments.Length < 2)
             {
@@ -42,15 +42,15 @@
             Array.Copy(arguments, 1, messages, 0, arguments.Length - 1);
 
             PrintType printType;
-            switch (commandName)
+            switch (commandId)
             {
-                case CommandPrintSingle:
+                case kIdPrintSingle:
                     printType = PrintType.Single;
                     break;
-                case CommandPrintConcatenate:
+                case kIdPrintConcatenate:
                     printType = PrintType.Concatenate;
                     break;
-                case CommandPrintRandom:
+                case kIdPrintRandom:
                     printType = PrintType.Random;
                     break;
                 default:
