@@ -19,8 +19,7 @@ namespace Statesman
         // Data fields
         private readonly Script _script;
         private readonly string _scriptName;
-        private readonly StreamReader _reader;
-        private string _line;
+        private readonly Stream _stream;
         private int _lineNumber;
 
         // Parser fields
@@ -29,16 +28,21 @@ namespace Statesman
         private Function _function;
         private bool _blockComment;
 
+        private string _token;
+        private int _tokenLength;
+        private string _prevToken;
+        private int _prevTokenLength;
+        private bool _tokenConsumed;
+
         private readonly ConditionalCommand[] _conditionals;
         private readonly bool[] _conditionalsElse;
         private int _depth;
 
-        public ScriptParser(StreamReader reader, string scriptName, Script script)
+        public ScriptParser(Stream stream, string scriptName, Script script)
         {
             _script = script;
             _scriptName = scriptName;
-            _reader = reader;
-            _line = "";
+            _stream = stream;
             _lineNumber = 0;
 
             _section = Section.Root;
@@ -46,6 +50,12 @@ namespace Statesman
             _scene = null;
             _function = null;
             _blockComment = false;
+            _tokenConsumed = true;
+
+            _token = "";
+            _tokenLength = 0;
+            _prevToken = "";
+            _prevTokenLength = 0;
 
             _conditionals = new ConditionalCommand[MaxDepth];
             _conditionalsElse = new bool[MaxDepth];
@@ -53,29 +63,31 @@ namespace Statesman
 
         public void Read()
         {
-            _lineNumber = 0;
-            while (!_reader.EndOfStream)
+            _lineNumber = 1;
+            _stream.Position = 0;
+            while (_stream.Position < _stream.Length)
             {
-                _lineNumber++;
-                _line = _reader.ReadLine().Trim();
-
-                if (ParseComment())
+                if (!ParseComment())
                 {
                     continue;
                 }
-                if (ParseTerminator())
+                if (!ParseTerminator())
                 {
                     continue;
                 }
-                if (ParsePreference())
+                if (!ParsePreference())
                 {
                     continue;
                 }
-                if (ParseSection())
+                if (!ParseRootOrSceneSection())
                 {
                     continue;
                 }
-                if (ParseInnerSection())
+                if (!ParseConditionalInFunctionSection())
+                {
+                    continue;
+                }
+                if (!ParseInnerSection())
                 {
                     continue;
                 }
@@ -84,33 +96,186 @@ namespace Statesman
             }
         }
 
-        private bool ParseComment()
+        private int IsNewline(int currentChar)
         {
-            // Block comment start tag
-            if (_line.StartsWith("/*"))
+            if (currentChar == '\r' || currentChar == '\n')
             {
-                _blockComment = true;
+                int possibleLF = _stream.ReadByte();
+                if (possibleLF == '\n')
+                {
+                    return 2;
+                }
+                return 1;
+            }
+            return 0;
+        }
+
+        private void MarkNextLine()
+        {
+            _lineNumber++;
+
+            _token = "";
+            _tokenLength = 0;
+            _prevToken = null;
+            _prevTokenLength = 0;
+        }
+
+        private string NextLine()
+        {
+            string result = "";
+            while (true)
+            {
+                int currentChar = _stream.ReadByte();
+                if (IsNewline(currentChar) != 0)
+                {
+                    MarkNextLine();
+                    break;
+                }
+                else if (currentChar == -1)
+                {
+                    break;
+                }
+                result += (char)currentChar;
+            }
+
+            return result;
+        }
+
+        private bool NextToken(bool pushback = true)
+        {
+            if (_stream.Position == (_stream.Length - 1))
+            {
+                return false;
+            }
+
+            if (!_tokenConsumed)
+            {
+                _tokenConsumed = true;
                 return true;
             }
-            // Block comment end tag
-            if (_line.EndsWith("*/"))
+            long startIndex = _stream.Position;
+            string result = "";
+            int whitespaceLength = 0;
+            int tokenLength = 0;
+            while (true)
+            {
+                int currentChar = _stream.ReadByte();
+                if (currentChar == ' ')
+                {
+                    if (tokenLength == 0)
+                    {
+                        startIndex++;
+                        whitespaceLength++;
+                        continue;
+                    }
+                    _stream.Position--;
+                    break;
+                }
+                else if (currentChar == -1)
+                {
+                    break;
+                }
+                else
+                {
+                    int newlineCharCount = IsNewline(currentChar);
+                    if (newlineCharCount != 0)
+                    {
+                        if (tokenLength > 0)
+                        {
+                            _stream.Position -= newlineCharCount;
+                            break;
+                        }
+
+                        if (pushback)
+                        {
+                            _stream.Position -= newlineCharCount;
+                        }
+                        else
+                        {
+                            MarkNextLine();
+                        }
+                        return false;
+                    }
+                }
+                result += (char)currentChar;
+                tokenLength++;
+            }
+
+            _prevToken = _token;
+            _prevTokenLength = _tokenLength;
+
+            _token = result;
+            _tokenLength = tokenLength + whitespaceLength;
+            _tokenConsumed = true;
+
+            return true;
+        }
+
+        private void UngetToken(bool consumed = true)
+        {
+            if (string.IsNullOrWhiteSpace(_token) ||
+                _tokenLength == 0)
+            {
+                return;
+            }
+
+            _stream.Position -= _tokenLength;
+
+            _token = _prevToken;
+            _tokenLength = _prevTokenLength;
+            _tokenConsumed = consumed;
+
+            _prevToken = null;
+            _prevTokenLength = 0;
+        }
+
+        private bool ParseComment()
+        {
+            if (!NextToken(false))
+            {
+                return false;
+            }
+
+            // Block comment start tag.
+            if (_token.StartsWith("/*"))
+            {
+                _blockComment = true;
+                return false;
+            }
+            // Block comment end tag.
+            else if (_token.EndsWith("*/"))
             {
                 _blockComment = false;
                 return true;
             }
-            // Ignore blank lines and comments
-            if (_blockComment || string.IsNullOrWhiteSpace(_line) || _line.StartsWith("//"))
+            // Skip until we find the block comment end tag.
+            else if (_blockComment)
             {
-                return true;
+                return false;
             }
-            return false;
+            // Ignore single-line comments.
+            else if (_token.StartsWith("//"))
+            {
+                UngetToken();
+                NextLine();
+                return false;
+            }
+
+            UngetToken();
+            return true;
         }
 
         private bool ParseTerminator()
         {
-            if (!_line.StartsWith("end"))
+            if (!NextToken(false))
             {
                 return false;
+            }
+
+            if (!_token.StartsWith("end"))
+            {
+                UngetToken();
+                return true;
             }
 
             switch (_section)
@@ -137,6 +302,7 @@ namespace Statesman
                 default:
                     break;
             }
+
             if (_scene != null)
             {
                 _section = Section.Scene;
@@ -146,21 +312,31 @@ namespace Statesman
                 _section = Section.Root;
             }
 
-            return true;
+            return false;
         }
 
         private bool ParsePreference()
         {
-            string[] parts = _line.Split(" ");
-            if (_section != Section.Root || parts.Length != 2)
+            if (_section != Section.Root)
+            {
+                return true;
+            }
+            if (!NextToken(false))
             {
                 return false;
             }
+            string preferenceName = _token;
+            if (!NextToken())
+            {
+                UngetToken();
+                return true;
+            }
+            string preferenceValue = _token;
 
-            switch (parts[0])
+            switch (preferenceName)
             {
                 case "maxpoints":
-                    int maxPoints = int.Parse(parts[1]);
+                    int maxPoints = int.Parse(preferenceValue);
                     if (maxPoints < 0)
                     {
                         ThrowParserException(
@@ -172,31 +348,30 @@ namespace Statesman
                     // XXX: This is a legacy property and is ignored.
                     break;
                 default:
-                    return false;
+                    // Likely not a preference.
+                    UngetToken(false);
+                    return true;
             }
 
             return true;
         }
 
-        private bool ParseSection()
+        private bool ParseRootOrSceneSection()
         {
-            string[] parts = _line.Split(" ");
-            if (_section == Section.Root || _section == Section.Scene)
+            if (_section != Section.Root && _section != Section.Scene)
             {
-                return ParseRootOrSceneSection(parts);
+                return true;
             }
-            else if (_section == Section.Function)
-            {
-                return ParseFunctionSection(parts);
-            }
-            return false;
-        }
 
-        private bool ParseRootOrSceneSection(string[] parts)
-        {
-            if (!Enum.TryParse(typeof(Section), parts[0], true, out object parsedSection))
+            if (!NextToken(false))
             {
                 return false;
+            }
+
+            if (!Enum.TryParse(typeof(Section), _token, true, out object parsedSection))
+            {
+                UngetToken();
+                return true;
             }
             Section nextSection = (Section)parsedSection;
             switch (nextSection)
@@ -211,31 +386,29 @@ namespace Statesman
                     }
                     break;
                 case Section.Function:
-                    if (parts.Length == 2)
+                    if (!NextToken())
                     {
-                        _function = new Function(parts[1]);
-                        if (_section == Section.Root)
+                        ThrowParserException("Invalid function section tag");
+                    }
+
+                    _function = new Function(_token);
+                    if (_section == Section.Root)
+                    {
+                        // Reserved function name (command ran on entry)
+                        if (_function.Name.Equals(Scene.FunctionEntry, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            // Reserved function name (command ran on entry)
-                            if (_function.Name.Equals(Scene.FunctionEntry, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                ThrowParserException("Use of reserved function name");
-                            }
-                            _script.Functions[_function.Name] = _function;
+                            ThrowParserException("Use of reserved function name");
                         }
-                        else
-                        {
-                            // Function name already in use locally
-                            if (_scene.Functions.ContainsKey(_function.Name))
-                            {
-                                ThrowParserException("Function name is already in use in the current scene");
-                            }
-                            _scene.Functions[_function.Name] = _function;
-                        }
+                        _script.Functions[_function.Name] = _function;
                     }
                     else
                     {
-                        ThrowParserException("Invalid function section tag");
+                        // Function name already in use locally
+                        if (_scene.Functions.ContainsKey(_function.Name))
+                        {
+                            ThrowParserException("Function name is already in use in the current scene");
+                        }
+                        _scene.Functions[_function.Name] = _function;
                     }
                     break;
                 case Section.Scene:
@@ -244,91 +417,119 @@ namespace Statesman
                     {
                         ThrowParserException("Nested scenes are not allowed");
                     }
-                    if (parts.Length == 2)
-                    {
-                        _scene = new Scene(parts[1]);
-                        // Scene name already in use
-                        if (_script.Scenes.ContainsKey(_scene.Name))
-                        {
-                            ThrowParserException("Scene name is already in use");
-                        }
-                        _script.Scenes.Add(_scene.Name, _scene);
-                    }
-                    else
+                    else if (!NextToken())
                     {
                         ThrowParserException("Invalid scene section tag");
                     }
+
+                    _scene = new Scene(_token);
+                    // Scene name already in use
+                    if (_script.Scenes.ContainsKey(_scene.Name))
+                    {
+                        ThrowParserException("Scene name is already in use");
+                    }
+                    _script.Scenes.Add(_scene.Name, _scene);
                     break;
                 default:
-                    return false;
+                    // Unknown section.
+                    ThrowParserException("This should not be reached.");
+                    return true;
             }
             _section = nextSection;
 
-            return true;
+            return false;
         }
 
-        private bool ParseFunctionSection(string[] parts)
+        private bool ParseConditionalInFunctionSection()
         {
-            if (parts.Length == 1 && parts[0].Equals("else", StringComparison.InvariantCultureIgnoreCase))
+            if (_section != Section.Function)
+            {
+                return true;
+            }
+
+            if (!NextToken(false))
+            {
+                return false;
+            }
+
+            bool isElse =
+                _token.Equals("else", StringComparison.InvariantCultureIgnoreCase);
+            bool isIf =
+                _token.Equals("if", StringComparison.InvariantCultureIgnoreCase) ||
+                _token.Equals("elsif", StringComparison.InvariantCultureIgnoreCase) ||
+                _token.Equals("if_inv", StringComparison.InvariantCultureIgnoreCase) ||
+                _token.Equals("elsif_inv", StringComparison.InvariantCultureIgnoreCase);
+
+            if (isElse)
             {
                 if (_conditionals[_depth] == null || _conditionalsElse[_depth])
                 {
                     ThrowParserException("Stray else tag");
                 }
                 _conditionalsElse[_depth] = true;
-                return true;
+                return false;
             }
-            else if (parts.Length >= 2)
+            else if (isIf)
             {
-                if (parts[0].Equals("if", StringComparison.InvariantCultureIgnoreCase) ||
-                    parts[0].Equals("elsif", StringComparison.InvariantCultureIgnoreCase) ||
-                    parts[0].Equals("if_inv", StringComparison.InvariantCultureIgnoreCase) ||
-                    parts[0].Equals("elsif_inv", StringComparison.InvariantCultureIgnoreCase))
+                bool isElseIf = _token.StartsWith("els");
+                if (isElseIf)
                 {
-                    bool isElseIf = parts[0].StartsWith("els");
-                    if (isElseIf)
-                    {
-                        _conditionalsElse[_depth] = true;
-                    }
-                    ConditionalCommand command =
-                            ConditionalCommand.FromText(
-                                ConditionalCommand.kIdConditional, parts) as ConditionalCommand;
-                    // Set the name of the anonymous functions contained within
-                    // conditional functions to be the same with the function
-                    // that contains them.
-                    command.Group.Name = _function.Name;
-                    command.ElseGroup.Name = _function.Name;
-                    if (_depth == 0 && _section == Section.Function)
-                    {
-                        _function.Commands.Add(command);
-                    }
-                    else if (_conditionalsElse[_depth])
-                    {
-                        _conditionals[_depth].ElseGroup.Commands.Add(command);
-                    }
-                    else
-                    {
-                        _conditionals[_depth].Group.Commands.Add(command);
-                    }
-                    if (isElseIf)
-                    {
-                        _conditionalsElse[_depth] = false;
-                    }
-                    else
-                    {
-                        _depth++;
-                    }
-                    _conditionals[_depth] = command;
-                    return true;
+                    _conditionalsElse[_depth] = true;
                 }
+
+                List<string> conditions = new() {
+                    ConditionalCommand.kIdConditional
+                };
+                while (true)
+                {
+                    if (!ParseComment() || !NextToken(false))
+                    {
+                        break;
+                    }
+                    conditions.Add(_token);
+                }
+
+                ConditionalCommand command =
+                        ConditionalCommand.FromText(
+                            ConditionalCommand.kIdConditional,
+                            conditions.ToArray()) as ConditionalCommand;
+                // Set the name of the anonymous functions contained within
+                // conditional functions to be the same with the function
+                // that contains them.
+                command.Group.Name = _function.Name;
+                command.ElseGroup.Name = _function.Name;
+                if (_depth == 0 && _section == Section.Function)
+                {
+                    _function.Commands.Add(command);
+                }
+                else if (_conditionalsElse[_depth])
+                {
+                    _conditionals[_depth].ElseGroup.Commands.Add(command);
+                }
+                else
+                {
+                    _conditionals[_depth].Group.Commands.Add(command);
+                }
+                if (isElseIf)
+                {
+                    _conditionalsElse[_depth] = false;
+                }
+                else
+                {
+                    _depth++;
+                }
+                _conditionals[_depth] = command;
+                return false;
             }
 
-            return false;
+            UngetToken();
+            return true;
         }
 
         private bool ParseInnerSection()
         {
-            string[] parts = _line.Split("|");
+            string line = NextLine().Trim();
+            string[] parts = line.Split("|");
             switch (_section)
             {
                 case Section.Action:
@@ -438,9 +639,9 @@ namespace Statesman
                     }
                     break;
                 default:
-                    return false;
+                    return true;
             }
-            return true;
+            return false;
         }
 
         private void ThrowParserException(string innerMessage)
