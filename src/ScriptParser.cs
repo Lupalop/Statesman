@@ -1,4 +1,5 @@
 ﻿using Statesman.Commands;
+using System.Text;
 
 namespace Statesman
 {
@@ -122,7 +123,7 @@ namespace Statesman
 
         private string NextLine()
         {
-            string result = "";
+            List<byte> buffer = new();
             while (true)
             {
                 int currentChar = _stream.ReadByte();
@@ -135,10 +136,10 @@ namespace Statesman
                 {
                     break;
                 }
-                result += (char)currentChar;
+                buffer.Add((byte)currentChar);
             }
 
-            return result;
+            return Encoding.UTF8.GetString(buffer.ToArray());
         }
 
         private bool NextToken(bool pushback = true)
@@ -154,7 +155,7 @@ namespace Statesman
                 return true;
             }
             long startIndex = _stream.Position;
-            string result = "";
+            List<byte> buffer = new();
             int whitespaceLength = 0;
             int tokenLength = 0;
             while (true)
@@ -197,14 +198,14 @@ namespace Statesman
                         return false;
                     }
                 }
-                result += (char)currentChar;
+                buffer.Add((byte)currentChar);
                 tokenLength++;
             }
 
             _prevToken = _token;
             _prevTokenLength = _tokenLength;
 
-            _token = result;
+            _token = Encoding.UTF8.GetString(buffer.ToArray());
             _tokenLength = tokenLength + whitespaceLength;
             _tokenConsumed = true;
 
