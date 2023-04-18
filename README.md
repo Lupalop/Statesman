@@ -14,7 +14,7 @@ Rignall, J. (2015, December 25). *Dave Lebling on the Genesis of the Adventure G
 Montfort, N. (2013, May 17). *Riddle Machines: The History and Nature of Interactive Fiction*. Wiley Online Library. https://onlinelibrary.wiley.com/doi/10.1002/9781405177504.ch14
 
 ## Game Scripts
-Statesman features its own custom scripting language and is similar in syntax to Ruby. The documentation (still subject to change) for this scripting language can be found in the `/docs` directory, while sample scripts are available in the `/src/scripts` directory. Script files have the `.gs` extension.
+Statesman features its own custom scripting language and is similar in syntax to Ruby. The documentation (still subject to change) for this scripting language can be found in the [`/docs`](/docs) directory, while sample scripts are available in the [`/src/scripts`](/src/scripts) directory. Script files have the `.gs` extension.
 
 ## Samples
 - [Pacific Liberty](https://github.com/Lupalop/PacificLiberty): Showcases many of the project's features. The game follows a young man who finds himself transported back in time to the period of the Bataan Death March, and must use his wits to survive the harsh conditions of war.
@@ -24,8 +24,10 @@ Testing out the project is relatively straightforward.
 - Clone the repository and open it in an integrated development environment (IDE) such as Eclipse.
 - The program can then be compiled, and the custom scripting language can be explored by modifying the sample scripts.
 
+There is a C# port available in the [`port-csharp`](https://github.com/Lupalop/Statesman/tree/port-csharp) branch.
+
 ## License
-This project is licensed under the Mozilla Public License 2.0 (MPL 2.0). Please see the LICENSE file for more details.
+This project is licensed under the Mozilla Public License 2.0 (MPL 2.0). Please see the [`LICENSE`](/LICENSE) file for more details.
 
 ## Authors
-The list of authors and contributors to this project can be found in the `AUTHORS` file in the root directory of this repository.
+The list of authors and contributors to this project can be found in the [`AUTHORS`](/AUTHORS) file in the root directory of this repository.
