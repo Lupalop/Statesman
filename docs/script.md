@@ -1,7 +1,7 @@
 # Statesman Script Language
 
 ## Scenes
-Scenes are the primary means of facilitating user interaction in Statesman. A scene usually contains one or more of the following section blocks: messages, actions, and command groups.
+Scenes are the primary means of facilitating user interaction in Statesman. A scene usually contains one or more of the following section blocks: messages, actions, and functions.
 
 A scene always starts with the keyword `scene` followed by the name of the scene, and is terminated with the `end` keyword. The scene name is **case sensitive** and does not allow spaces. Longer scene names can be achieved by using delimiters except space (i.e. `very_very_very_long_scene_name`). A scene with the name `home` can be written as:
 
@@ -33,7 +33,7 @@ end
 ```
 
 ## Actions
-Actions are commands associated with an input or a set of inputs. Inputs are the text that you type in the game's console. Only one command can be associated with an action, but you can use the `goto` command to reference a command group which can execute multiple commands. Action section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Action section blocks that are outside of scenes (global) apply to all scenes, while section blocks that are placed inside a scene only affects that individual scene. Local action section blocks can override or replace the behavior of actions defined in global action section blocks. An action section block always starts with the `action` keyword.
+Actions are commands associated with an input or a set of inputs. Inputs are the text that you type in the game's console. Only one command can be associated with an action, but you can use the `call` command to invoke a function which can execute multiple commands. Action section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Action section blocks that are outside of scenes (global) apply to all scenes, while section blocks that are placed inside a scene only affects that individual scene. Local action section blocks can override or replace the behavior of actions defined in global action section blocks. An action section block always starts with the `action` keyword.
 
 ### Action section block (global)
 ```
@@ -53,12 +53,12 @@ scene home
 end
 ```
 
-## Command Groups
-Command groups, as the name implies, contain a set of commands that are executed sequentially or as the way they are ordered in the data file. They are usually called and executed using the `goto` command that is associated with an action. Conditional sections can be placed inside command groups to apply conditional behavior, but the conditional jump [`cjmp`] can also be used if you prefer that format. Command group section blocks can be placed either inside or outside of scenes, and their placement affects which scenes can access them. Command group section blocks that are outside of scenes (global) can be referenced by all scenes, while section blocks that are placed inside a scene can only be accessed by that individual scene. Local command group section blocks can override or replace global command groups in an individual scene's scope. A command group section block always starts with the `group` keyword.
+## Functions
+Functions contain a set of commands or instructions that are executed sequentially or as the way they are ordered in the game script. They are usually called and executed using the `call` command that is associated with an action. Conditional blocks of code can be also placed inside functions to apply conditional behavior, but the conditional jump [`cjmp`] can also be used if you prefer that format. Functions can be placed either outside or inside of scenes, and their placement affects which scenes can access them. Functions that are outside of scenes (global) can be referenced by all scenes, while functions that are placed inside a scene can only be accessed by that individual scene. Local functions can override or replace global functions in an individual scene's scope. A function block always starts with the `function` keyword.
 
-### Command group section block (global)
+### Function section block (global)
 ```
-group i_am_global
+function i_am_global
     print,test
     print,bored
     print,test
@@ -68,10 +68,10 @@ group i_am_global
 end
 ```
 
-### Command group section block (local/inside a scene)
+### Function section block (local/inside a scene)
 ```
 scene home
-    group walk
+    function walk
         print,walk
         print,walking
         print,walked
@@ -79,9 +79,9 @@ scene home
 end
 ```
 
-### Command group section block (global overriden inside a scene)
+### Function section block (global overriden inside a scene)
 ```
-group i_am_global
+function i_am_global
     print,test
     print,bored
     print,test
@@ -91,64 +91,64 @@ group i_am_global
 end
 
 scene home
-    group i_am_global
+    function i_am_global
         print,bored
         print,test
     end
 end
 ```
 
-### Command group section block (if-style conditional)
+### Function section block (if-style conditional)
 ```
-group wave
-    # Checks if switch no. 100 is TRUE
+function wave
+    // Checks if switch no. 100 is TRUE
     if 100
-        # Checks if switch no. 101 is FALSE
+        // Checks if switch no. 101 is FALSE
         if !101
-            # Print message with a key of `9`
+            // Print message with a key of `9`
             print,9
-            # Sets switch no. 101 to TRUE
+            // Sets switch no. 101 to TRUE
             set,101,true
-        # If switch no. 101 is TRUE, execute commands below
+        // If switch no. 101 is TRUE, execute commands below
         else
-            # Print message with a key of `10`
+            // Print message with a key of `10`
             print,10
         end
-    # If switch 100 is FALSE, execute commands below
+    // If switch 100 is FALSE, execute commands below
     else
-        # Print message with a key of `11`
+        // Print message with a key of `11`
         print,11
     end
 end
 ```
 
-### Command group section block (if-style conditional - inventory)
+### Function section block (if-style conditional - inventory)
 ```
-group check_rock
-    # Checks if the item "rock" exists in the global inventory
-    if_inv rock
-        # Print message with a key of `9`
+function check_rock
+    // Checks if the item "rock" exists in the global inventory
+    if i:rock
+        // Print message with a key of `9`
         print,9
-    # If the item "rock" is NOT in the global inventory
+    // If the item "rock" is NOT in the global inventory
     else
-        # Print message with a key of `11`
+        // Print message with a key of `11`
         print,11
     end
 end
 ```
 
-### Command group section block (conditional jump)
+### Function section block (conditional jump)
 ```
-group view
-    # Conditional jump, check value of switch #2, if TRUE jump to line 1, if FALSE jump to line 3
+function view
+    // Conditional jump, check value of switch #2, if TRUE jump to line 1, if FALSE jump to line 3
     cjmp,2,1,3
-    # Print message with a key of `nothing2`
+    // Print message with a key of `nothing2`
     print,nothing2
-    # RETURN (meaning stop execution of current block)
+    // RETURN (meaning stop execution of current block)
     ret
-    # Set switch #2 to TRUE
+    // Set switch #2 to TRUE
     set,2,true
-    # Print message with a key of `nothing`
+    // Print message with a key of `nothing`
     print,nothing
 end
 ```
@@ -162,8 +162,8 @@ This preference sets the highest number of points that a player can achieve in-g
 maxpoints 200
 ```
 
-### `switches`
-This preference sets the number of switches that is allocated by the game's interpreter. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to two thousand (2000).
+### `switches` (deprecated)
+This preference sets the number of switches that is allocated by the game's interpreter. This must appear **outside** section blocks (`scene` and others). If this section tag is not set, this defaults to two thousand (2000). This has no effect anymore since the size restriction has been removed in the latest update.
 ```
 switches 5000
 ```
@@ -173,46 +173,46 @@ Statesman allows both single-line and block comments, with the following syntax:
 
 ### Single-line comments
 ```
-# This is a comment
-# This is a comment (another)
-# This is a comment (and another one)
+// This is a comment
+// This is a comment (another)
+// This is a comment (and another one)
 ```
 
 ### Block comments
 ```
-#<
-  This is a block comment.
-  This line is ignored by the parser.
-  This one too!
-#>
+/*
+ * This is a block comment.
+ * This line is ignored by the parser.
+ * This one too!
+ */
 ```
 
 ### Notes
-The start tag for block comments [`#<`] must appear as the first sequence (white space is excluded). The end tag for block comments [`#>`] must appear either as the first or the last sequence and MUST NOT be placed in between.
+The start tag for block comments [`/*`] must appear as the first sequence (white space is excluded). The end tag for block comments [`*/`] must appear either as the first or the last sequence and MUST NOT be placed in between.
 
 The following locations for comments are not allowed:
 ```
-#< This is not allowed #>
- blabla #< This is not allowed #>
- bla #<
+/* This is not allowed */
+ blabla /* This is not allowed */
+ bla /*
  This is not allowed
- #> bla
+ */ bla
  
-group test # This comment is not allowed
+group test // This comment is not allowed
     messages
-        test|# This comment is treated as a message and is read by the parser.
+        test|// This comment is treated as a message and is read by the parser.
     end
 end
 ```
 
 ## Commands
 
-### Commands that can be used anywhere (action or inside command group):
+### Commands that can be used anywhere (action or inside function):
 
-#### `goto`
-- Executes commands inside a command group.
-- Accepts only one argument: command group name [`string`].
-- Example: `goto,view`
+#### `call`
+- Invokes a function; executes commands contained by a function.
+- Accepts only one argument: function name [`string`].
+- Example: `call,view`
 #### `print`
 - Prints the message to console.
 - Accepts only one argument: message key or inline message [`string`].
@@ -256,7 +256,7 @@ end
 - Does NOT accept any arguments.
 - Example: `quit`
 
-### Commands that can only be used in command groups:
+### Commands that can only be used inside functions:
 
 #### `jmp`
 - Moves execution to the provided line.
@@ -273,6 +273,3 @@ end
 #### `ret`
 - Stops execution of the current block and returns to the parent block.
 - Does NOT accept any arguments.
-#### `cond`, `swcond`, `invcond`
-- These are **reserved** commands used in allowing if-style conditional blocks.
-- **DO NOT** use these commands under any circumstances.
